@@ -1,124 +1,68 @@
-import type { UseChatHelpers } from "@ai-sdk/react";
-import equal from "fast-deep-equal";
-import { ArrowDownIcon } from "lucide-react";
-import { memo } from "react";
-import { useMessages } from "@/hooks/use-messages";
-import type { Vote } from "@/lib/db/schema";
-import type { ChatMessage } from "@/lib/types";
-import { useDataStream } from "./data-stream-provider";
-import { Greeting } from "./greeting";
-import { PreviewMessage, ThinkingMessage } from "./message";
+"use client";
+
+import { format } from "date-fns";
+import { useEffect, useRef } from "react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import type { XMTPMessage } from "@/lib/xmtp/client";
 
 type MessagesProps = {
-  chatId: string;
-  status: UseChatHelpers<ChatMessage>["status"];
-  votes: Vote[] | undefined;
-  messages: ChatMessage[];
-  setMessages: UseChatHelpers<ChatMessage>["setMessages"];
-  regenerate: UseChatHelpers<ChatMessage>["regenerate"];
-  isReadonly: boolean;
-  isArtifactVisible: boolean;
-  selectedModelId: string;
+  messages: XMTPMessage[];
+  userAddress: string;
 };
 
-function PureMessages({
-  chatId,
-  status,
-  votes,
-  messages,
-  setMessages,
-  regenerate,
-  isReadonly,
-  selectedModelId: _selectedModelId,
-}: MessagesProps) {
-  const {
-    containerRef: messagesContainerRef,
-    endRef: messagesEndRef,
-    isAtBottom,
-    scrollToBottom,
-    hasSentMessage,
-  } = useMessages({
-    status,
-  });
+export function Messages({ messages, userAddress }: MessagesProps) {
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  useDataStream();
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages]);
 
-  return (
-    <div className="relative flex-1">
-      <div
-        className="absolute inset-0 touch-pan-y overflow-y-auto"
-        ref={messagesContainerRef}
-      >
-        <div className="mx-auto flex min-w-0 max-w-4xl flex-col gap-4 px-2 py-4 md:gap-6 md:px-4">
-          {messages.length === 0 && <Greeting />}
-
-          {messages.map((message, index) => (
-            <PreviewMessage
-              chatId={chatId}
-              isLoading={
-                status === "streaming" && messages.length - 1 === index
-              }
-              isReadonly={isReadonly}
-              key={message.id}
-              message={message}
-              regenerate={regenerate}
-              requiresScrollPadding={
-                hasSentMessage && index === messages.length - 1
-              }
-              setMessages={setMessages}
-              vote={
-                votes
-                  ? votes.find((vote) => vote.messageId === message.id)
-                  : undefined
-              }
-            />
-          ))}
-
-          {status === "submitted" && <ThinkingMessage />}
-
-          <div
-            className="min-h-[24px] min-w-[24px] shrink-0"
-            ref={messagesEndRef}
-          />
+  if (messages.length === 0) {
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        <div className="text-center space-y-2">
+          <h2 className="text-2xl font-bold">Start a conversation</h2>
+          <p className="text-muted-foreground">
+            Send a message to begin chatting with the AI agent
+          </p>
         </div>
       </div>
+    );
+  }
 
-      <button
-        aria-label="Scroll to bottom"
-        className={`-translate-x-1/2 absolute bottom-4 left-1/2 z-10 rounded-full border bg-background p-2 shadow-lg transition-all hover:bg-muted ${
-          isAtBottom
-            ? "pointer-events-none scale-0 opacity-0"
-            : "pointer-events-auto scale-100 opacity-100"
-        }`}
-        onClick={() => scrollToBottom("smooth")}
-        type="button"
-      >
-        <ArrowDownIcon className="size-4" />
-      </button>
-    </div>
+  return (
+    <ScrollArea className="flex-1">
+      <div ref={scrollRef} className="p-6 space-y-4">
+        {messages.map((message) => {
+          const isUser = message.senderAddress === userAddress;
+          return (
+            <div
+              key={message.id}
+              className={`flex ${isUser ? "justify-end" : "justify-start"}`}
+            >
+              <div
+                className={`max-w-[70%] rounded-lg p-4 ${
+                  isUser
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-card border border-border"
+                }`}
+              >
+                <div className="text-xs mb-2 opacity-70 font-medium uppercase tracking-wide">
+                  {isUser ? "You" : "Agent"}
+                </div>
+                <div className="whitespace-pre-wrap break-words text-sm leading-relaxed">
+                  {message.content}
+                </div>
+                <div className="text-xs mt-3 opacity-50">
+                  {format(message.sentAt, "HH:mm")}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </ScrollArea>
   );
 }
-
-export const Messages = memo(PureMessages, (prevProps, nextProps) => {
-  if (prevProps.isArtifactVisible && nextProps.isArtifactVisible) {
-    return true;
-  }
-
-  if (prevProps.status !== nextProps.status) {
-    return false;
-  }
-  if (prevProps.selectedModelId !== nextProps.selectedModelId) {
-    return false;
-  }
-  if (prevProps.messages.length !== nextProps.messages.length) {
-    return false;
-  }
-  if (!equal(prevProps.messages, nextProps.messages)) {
-    return false;
-  }
-  if (!equal(prevProps.votes, nextProps.votes)) {
-    return false;
-  }
-
-  return false;
-});
