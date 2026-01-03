@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.1.4] - 2025-01-03
+
+### Added
+- Added Vercel configuration for Vite deployment
+
 ## [0.1.3] - 2025-01-03
 
 ### Fixed
