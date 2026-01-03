@@ -180,7 +180,6 @@ export const AI_AGENTS: AgentConfig[] = [
     ],
   },
 ];
-
 export function getAgentByAddress(address: string): AgentConfig | undefined {
   return AI_AGENTS.find((agent) => agent.address === address);
 }

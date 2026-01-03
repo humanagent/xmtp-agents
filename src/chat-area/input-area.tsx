@@ -1,4 +1,4 @@
-import { AgentSelector } from "@chat-area/agent-selector";
+import { AgentSelectorDialog as AgentSelector } from "@chat-area/agent-selector";
 import {
   PromptInput,
   PromptInputSubmit,
@@ -85,6 +85,11 @@ export function InputArea({
             value={input}
             onChange={(e) => {
               setInput(e.target.value);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "@") {
+                setOpen(true);
+              }
             }}
           />
         </div>

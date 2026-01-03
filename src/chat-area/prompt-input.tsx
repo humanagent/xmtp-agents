@@ -37,6 +37,7 @@ export type PromptInputTextareaProps = ComponentProps<typeof Textarea> & {
 
 export const PromptInputTextarea = ({
   onChange,
+  onKeyDown,
   className,
   placeholder = "What would you like to know?",
   minHeight = 48,
@@ -46,6 +47,9 @@ export const PromptInputTextarea = ({
   ...props
 }: PromptInputTextareaProps) => {
   const handleKeyDown: KeyboardEventHandler<HTMLTextAreaElement> = (e) => {
+    // Call the passed onKeyDown handler first
+    onKeyDown?.(e);
+
     if (e.key === "Enter") {
       // Don't submit if IME composition is in progress
       if (e.nativeEvent.isComposing) {

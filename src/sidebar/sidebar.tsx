@@ -95,7 +95,10 @@ export function Sidebar() {
                   <Button
                     className="h-8 p-1 md:h-fit md:p-2"
                     type="button"
-                    variant="ghost">
+                    variant="ghost"
+                    onClick={() => {
+                      setSelectedConversation(null);
+                    }}>
                     <PlusIcon />
                   </Button>
                 </TooltipTrigger>
@@ -110,7 +113,7 @@ export function Sidebar() {
       <SidebarContent>
         <SidebarMenu>
           {!conversations || conversations.length === 0 ? (
-            <div className="flex w-full flex-row items-center justify-center gap-2 px-2 py-8 text-sm text-muted-foreground">
+            <div className="flex w-full flex-row items-center justify-center gap-2 px-2 py-2 text-sm text-muted-foreground">
               Your conversations will appear here once you start chatting!
             </div>
           ) : (

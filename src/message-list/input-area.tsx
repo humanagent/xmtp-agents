@@ -1,13 +1,4 @@
-import {
-  AgentSelector,
-  AgentSelectorContent,
-  AgentSelectorGroup,
-  AgentSelectorInput,
-  AgentSelectorItem,
-  AgentSelectorList,
-  AgentSelectorName,
-  AgentSelectorTrigger,
-} from "@chat-area/agent-selector";
+import { AgentSelector } from "@chat-area/agent-selector";
 import { SuggestedActions } from "@chat-area/suggested-actions";
 import {
   PromptInput,

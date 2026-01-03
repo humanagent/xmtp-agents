@@ -86,3 +86,92 @@ export const SidebarLeftIcon = ({ size = 16 }: { size?: number }) => (
     />
   </svg>
 );
+
+export const Loader2Icon = ({
+  size = 16,
+  className = "",
+  ...props
+}: { size?: number; className?: string } & React.SVGProps<SVGSVGElement>) => (
+  <svg
+    height={size}
+    strokeLinejoin="round"
+    style={{ color: "currentcolor", ...props.style }}
+    viewBox="0 0 16 16"
+    width={size}
+    className={className}
+    {...props}>
+    <path
+      d="M8 1.5A6.5 6.5 0 1 0 14.5 8"
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeWidth="1.5"
+    />
+  </svg>
+);
+
+export const SendIcon = ({
+  size = 16,
+  className = "",
+  ...props
+}: { size?: number; className?: string } & React.SVGProps<SVGSVGElement>) => (
+  <svg
+    height={size}
+    strokeLinejoin="round"
+    style={{ color: "currentcolor", ...props.style }}
+    viewBox="0 0 16 16"
+    width={size}
+    className={className}
+    {...props}>
+    <path
+      clipRule="evenodd"
+      d="M1.591 2.205a.75.75 0 0 1 .84-.405l12.5 2.5a.75.75 0 0 1 .564.864.75.75 0 0 1-.564.636L9.5 7.5v5.25a.75.75 0 0 1-1.28.53L5.5 9.5l-3.75 2.25a.75.75 0 0 1-1.03-.97l1.5-6.5a.75.75 0 0 1 .371-.525Z"
+      fill="currentColor"
+      fillRule="evenodd"
+    />
+  </svg>
+);
+
+export const SquareIcon = ({
+  size = 16,
+  className = "",
+  ...props
+}: { size?: number; className?: string } & React.SVGProps<SVGSVGElement>) => (
+  <svg
+    height={size}
+    strokeLinejoin="round"
+    style={{ color: "currentcolor", ...props.style }}
+    viewBox="0 0 16 16"
+    width={size}
+    className={className}
+    {...props}>
+    <path
+      clipRule="evenodd"
+      d="M2.5 2.5h11v11h-11v-11Z"
+      fill="currentColor"
+      fillRule="evenodd"
+    />
+  </svg>
+);
+
+export const XIcon = ({
+  size = 16,
+  className = "",
+  ...props
+}: { size?: number; className?: string } & React.SVGProps<SVGSVGElement>) => (
+  <svg
+    height={size}
+    strokeLinejoin="round"
+    style={{ color: "currentcolor", ...props.style }}
+    viewBox="0 0 16 16"
+    width={size}
+    className={className}
+    {...props}>
+    <path
+      clipRule="evenodd"
+      d="M12.207 4.207a1 1 0 0 0-1.414-1.414L8 6.586 5.207 3.793a1 1 0 0 0-1.414 1.414L6.586 8l-2.793 2.793a1 1 0 1 0 1.414 1.414L8 9.414l2.793 2.793a1 1 0 0 0 1.414-1.414L9.414 8l2.793-2.793Z"
+      fill="currentColor"
+      fillRule="evenodd"
+    />
+  </svg>
+);

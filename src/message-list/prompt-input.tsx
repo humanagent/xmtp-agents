@@ -1,5 +1,4 @@
 import { Button } from "@ui/button";
-import { Loader2Icon, SendIcon, SquareIcon, XIcon } from "@ui/icons";
 import {
   Select,
   SelectContent,
@@ -8,6 +7,7 @@ import {
   SelectValue,
 } from "@ui/select";
 import { Textarea } from "@ui/textarea";
+import { Loader2Icon, SendIcon, SquareIcon, XIcon } from "lucide-react";
 import {
   Children,
   type ComponentProps,

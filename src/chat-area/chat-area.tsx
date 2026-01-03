@@ -173,7 +173,7 @@ export function ChatArea() {
         <InputArea
           selectedAgents={selectedAgents}
           setSelectedAgents={setSelectedAgents}
-          sendMessage={() => void handleSendMessage()}
+          sendMessage={handleSendMessage}
         />
       </div>
       {isCreatingConversation && (
