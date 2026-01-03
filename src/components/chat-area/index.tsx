@@ -53,8 +53,11 @@ export function ChatArea() {
   const [selectedAgents, setSelectedAgents] = useState<AgentConfig[]>([]);
   const [isCreatingConversation, setIsCreatingConversation] = useState(false);
   const { client } = useXMTPClient();
-  const { selectedConversation, setSelectedConversation } =
-    useXMTPConversations(client);
+  const {
+    selectedConversation,
+    setSelectedConversation,
+    refreshConversations,
+  } = useXMTPConversations(client);
 
   useEffect(() => {
     if (!client || !selectedConversation) {
@@ -160,6 +163,8 @@ export function ChatArea() {
             conversationType: conversation.constructor.name,
           });
           setSelectedConversation(conversation);
+          await refreshConversations();
+          console.log("[ChatArea] Conversations list refreshed");
         } catch (error) {
           console.error("[ChatArea] Error creating conversation:", error);
           setIsCreatingConversation(false);
@@ -198,7 +203,7 @@ export function ChatArea() {
         setMessages((prev) => prev.filter((m) => m.id !== tempMessage.id));
       }
     },
-    [client, selectedConversation, selectedAgents, setSelectedConversation],
+    [client, selectedConversation, selectedAgents, setSelectedConversation, refreshConversations],
   );
 
   return (

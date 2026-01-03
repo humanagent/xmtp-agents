@@ -1,5 +1,5 @@
 import type { Client, Conversation } from "@xmtp/browser-sdk";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export function useXMTPConversations(client: Client | null) {
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -7,6 +7,26 @@ export function useXMTPConversations(client: Client | null) {
     useState<Conversation | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+
+  const refreshConversations = useCallback(async () => {
+    if (!client) {
+      return;
+    }
+
+    try {
+      console.log("[useXMTPConversations] Refreshing conversations list");
+      await client.conversations.sync();
+      const allConversations = await client.conversations.list();
+      console.log(
+        "[useXMTPConversations] Refreshed conversations list",
+        allConversations.length,
+      );
+      setConversations(allConversations);
+    } catch (err) {
+      console.error("[useXMTPConversations] Failed to refresh:", err);
+      setError(err instanceof Error ? err : new Error(String(err)));
+    }
+  }, [client]);
 
   useEffect(() => {
     if (!client) {
@@ -74,5 +94,6 @@ export function useXMTPConversations(client: Client | null) {
     setSelectedConversation,
     isLoading,
     error,
+    refreshConversations,
   };
 }
