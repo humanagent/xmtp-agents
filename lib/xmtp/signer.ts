@@ -1,6 +1,6 @@
 import type { Signer } from "@xmtp/browser-sdk";
 import { toBytes, type Hex } from "viem";
-import { privateKeyToAccount } from "viem/accounts";
+import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 
 export type PrivateKey = Hex;
 
@@ -61,3 +61,16 @@ export const createSCWSigner = (
     getChainId: () => BigInt(chainId),
   };
 };
+
+export function getOrCreateEphemeralAccountKey(): PrivateKey {
+  if (typeof window === "undefined") {
+    throw new Error(
+      "Ephemeral account key can only be created in browser environment",
+    );
+  }
+
+  // always generate a new ephemeral identity
+  const accountKey = generatePrivateKey();
+
+  return accountKey;
+}

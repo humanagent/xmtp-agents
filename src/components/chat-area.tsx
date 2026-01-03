@@ -2,8 +2,8 @@ import { useState, useEffect, useCallback } from "react";
 import { Greeting } from "./greeting";
 import { ChatHeader } from "./chat-header";
 import { InputArea } from "./input-area";
-import { useXMTPClient } from "@/hooks/use-xmtp-client";
-import { useXMTPConversations } from "@/hooks/use-xmtp-conversations";
+import { useXMTPClient } from "../hooks/use-xmtp-client";
+import { useXMTPConversations } from "../hooks/use-xmtp-conversations";
 
 type Message = {
   id: string;

@@ -2,7 +2,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import {
@@ -10,6 +9,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "./ui/sidebar";
+import { useXMTPClient } from "../hooks/use-xmtp-client";
+import { shortAddress } from "@/lib/utils";
 
 const ChevronUpIcon = ({
   size = 16,
@@ -33,6 +34,11 @@ const ChevronUpIcon = ({
 );
 
 export function SidebarUserNav() {
+  const { client } = useXMTPClient();
+  const address = client?.accountIdentifier?.identifier;
+  const displayAddress = address ? shortAddress(address.toLowerCase()) : "Guest";
+  const initial = address ? address.substring(2, 3).toUpperCase() : "G";
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -43,10 +49,10 @@ export function SidebarUserNav() {
               data-testid="user-nav-button"
             >
               <div className="flex aspect-square size-6 items-center justify-center rounded-full bg-sidebar-primary text-sidebar-primary-foreground">
-                <span className="text-xs font-semibold">G</span>
+                <span className="text-xs font-semibold">{initial}</span>
               </div>
               <span className="flex-1 truncate text-left" data-testid="user-email">
-                Guest
+                {displayAddress}
               </span>
               <ChevronUpIcon className="ml-auto shrink-0" size={16} />
             </SidebarMenuButton>

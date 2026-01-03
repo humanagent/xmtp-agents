@@ -13,7 +13,7 @@ export const Greeting = () => {
         initial={{ opacity: 0, y: 10 }}
         transition={{ delay: 0.5, duration: 0.15 }}
       >
-        Hello there!
+        Hello there
       </motion.div>
       <motion.div
         animate={{ opacity: 1, y: 0 }}
@@ -22,7 +22,7 @@ export const Greeting = () => {
         initial={{ opacity: 0, y: 10 }}
         transition={{ delay: 0.6, duration: 0.15 }}
       >
-        How can I help you today?
+        This chat is secured by XMTP. Each conversation its a new identity, untraceable to the previous one
       </motion.div>
     </div>
   );

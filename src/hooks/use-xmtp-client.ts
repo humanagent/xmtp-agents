@@ -1,7 +1,7 @@
 import type { Client } from "@xmtp/browser-sdk";
 import { useEffect, useState } from "react";
 import { createXMTPClient } from "@/lib/xmtp/client";
-import { getOrCreateEphemeralAccountKey } from "@/lib/xmtp/identity";
+import { getOrCreateEphemeralAccountKey } from "@/lib/xmtp/signer";
 
 export function useXMTPClient() {
   const [client, setClient] = useState<Client | null>(null);
