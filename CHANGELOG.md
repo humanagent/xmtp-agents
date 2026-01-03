@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.1.4] - 2025-01-03
+
+### Added
+- Added Vercel configuration for Vite deployment
+
+## [0.1.3] - 2025-01-03
+
+### Fixed
+- Added missing dependencies (lucide-react, framer-motion, tailwind-merge, cmdk)
+- Suppressed build warnings (chunk size, __PURE__ comments)
+
+### Changed
+- Made app independent from parent workspace with local .yarnrc.yml configuration
+- Updated all @xmtp packages to use specific npm versions instead of "latest"
+- Updated viem to ^2.36.0 for compatibility with yarn age gate
+- Removed local yarn.lock (now uses root workspace lockfile)
+
 ## [0.1.2] - 2025-01-03
 
 ### Fixed
