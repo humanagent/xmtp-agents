@@ -262,7 +262,7 @@ export function InputArea({
                   return (
                     <CommandItem
                       key={agent.address}
-                      value={agent.address}
+                      value={agent.name}
                       disabled={isSelected}
                       onSelect={() => {
                         if (!isSelected) {
