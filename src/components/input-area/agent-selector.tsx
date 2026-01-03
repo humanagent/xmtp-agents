@@ -58,7 +58,16 @@ export function AgentSelector({
                     onSelect={() => {
                       onSelectAgent(agent);
                     }}
-                    className={cn(isSelected && "opacity-50")}>
+                    className={cn("flex items-center gap-2", isSelected && "opacity-50")}>
+                    {agent.image ? (
+                      <img
+                        alt={agent.name}
+                        className="h-6 w-6 shrink-0 rounded-full object-cover"
+                        src={agent.image}
+                      />
+                    ) : (
+                      <div className="h-6 w-6 shrink-0 rounded-full bg-muted" />
+                    )}
                     <span className="flex-1 truncate text-left">
                       {agent.name}
                     </span>

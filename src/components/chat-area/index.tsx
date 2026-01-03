@@ -1,13 +1,17 @@
 import { InputArea } from "@components/input-area";
+import { MessageList } from "@components/message-list";
 import { useXMTPClient } from "@hooks/use-xmtp-client";
 import { useXMTPConversations } from "@hooks/use-xmtp-conversations";
 import { Loader2Icon } from "@ui/icons";
 import { motion } from "framer-motion";
 import { useCallback, useEffect, useState } from "react";
-import { type AgentConfig } from "@/lib/agents";
+import { useNavigate } from "react-router-dom";
+import { type AgentConfig, AI_AGENTS } from "@/lib/agents";
 import { createGroupWithAgentAddresses } from "@/lib/xmtp/conversations";
 import { SidebarToggle } from "@/src/components/sidebar/sidebar-toggle";
+import { ShareButton } from "@/src/components/sidebar/share-button";
 import { useToast } from "@ui/toast";
+import type { Conversation } from "@xmtp/browser-sdk";
 
 type Message = {
   id: string;
@@ -19,6 +23,7 @@ export const ChatHeader = () => {
   return (
     <header className="sticky top-0 flex items-center gap-2 bg-background px-2 py-1.5 md:px-2">
       <SidebarToggle />
+      <ShareButton />
     </header>
   );
 };
@@ -54,9 +59,9 @@ export function ChatArea() {
   const [selectedAgents, setSelectedAgents] = useState<AgentConfig[]>([]);
   const [isCreatingConversation, setIsCreatingConversation] = useState(false);
   const { client } = useXMTPClient();
-  const { selectedConversation, setSelectedConversation } =
-    useXMTPConversations(client);
+  const { selectedConversation } = useXMTPConversations(client);
   const { showToast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!client || !selectedConversation) {
@@ -161,8 +166,8 @@ export function ChatArea() {
             conversationId: conversation.id,
             conversationType: conversation.constructor.name,
           });
-          setSelectedConversation(conversation);
-          console.log("[ChatArea] Set selected conversation", {
+          navigate(`/chat/${conversation.id}`);
+          console.log("[ChatArea] Navigated to conversation", {
             conversationId: conversation.id,
           });
 
@@ -228,7 +233,7 @@ export function ChatArea() {
         setMessages((prev) => prev.filter((m) => m.id !== tempMessage.id));
       }
     },
-    [client, selectedConversation, selectedAgents, setSelectedConversation],
+    [client, selectedConversation, selectedAgents, navigate],
   );
 
   return (
@@ -282,6 +287,221 @@ export function ChatArea() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+export function ConversationView({
+  conversation,
+}: {
+  conversation?: Conversation;
+}) {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [selectedAgents, setSelectedAgents] = useState<AgentConfig[]>([]);
+  const { client } = useXMTPClient();
+  const { selectedConversation: hookSelectedConversation } =
+    useXMTPConversations((client ?? null) as any);
+  const { showToast } = useToast();
+
+  // Use prop conversation if provided, otherwise fall back to hook
+  const selectedConversation =
+    conversation || hookSelectedConversation;
+
+  // Load agents from conversation members
+  useEffect(() => {
+    if (!selectedConversation || !client) {
+      setSelectedAgents([]);
+      return;
+    }
+
+    const loadAgentsFromMembers = async () => {
+      try {
+        const members = await selectedConversation.members();
+        const userInboxId = client.inboxId.toLowerCase();
+
+        // Get member addresses, excluding the current user
+        const memberAddresses = new Set(
+          members
+            .filter((member) => member.inboxId.toLowerCase() !== userInboxId)
+            .flatMap((member) =>
+              member.accountIdentifiers
+                .filter(
+                  (id) =>
+                    id.identifierKind === 0 || id.identifierKind === "Ethereum",
+                )
+                .map((id) => id.identifier.toLowerCase()),
+            ),
+        );
+
+        const agents = AI_AGENTS.filter((agent) =>
+          memberAddresses.has(agent.address.toLowerCase()),
+        );
+
+        console.log("[ConversationView] Loaded agents from members:", {
+          memberCount: members.length,
+          agentCount: agents.length,
+          agents: agents.map((a) => a.name),
+        });
+
+        setSelectedAgents(agents);
+      } catch (error) {
+        console.error(
+          "[ConversationView] Error loading agents from members:",
+          error,
+        );
+        setSelectedAgents([]);
+      }
+    };
+
+    void loadAgentsFromMembers();
+  }, [selectedConversation, client]);
+
+  useEffect(() => {
+    console.log("[ConversationView] Effect triggered", {
+      hasClient: !!client,
+      hasSelectedConversation: !!selectedConversation,
+      conversationId: selectedConversation?.id,
+      clientInboxId: client?.inboxId,
+    });
+
+    if (!client) {
+      console.log("[ConversationView] Early return - no client");
+      return;
+    }
+
+    if (!selectedConversation) {
+      console.log("[ConversationView] Early return - no selectedConversation");
+      return;
+    }
+
+    let mounted = true;
+
+    const setupMessages = async () => {
+      try {
+        console.log(
+          "[ConversationView] Setting up messages for conversation:",
+          selectedConversation.id,
+        );
+        await selectedConversation.sync();
+        console.log("[ConversationView] Conversation synced");
+        const existingMessages = await selectedConversation.messages();
+        console.log(
+          "[ConversationView] Fetched messages:",
+          existingMessages.length,
+        );
+
+        const chatMessages: Message[] = existingMessages
+          .filter((msg: any) => typeof msg.content === "string")
+          .map((msg: any) => ({
+            id: msg.id,
+            role: msg.senderInboxId === client.inboxId ? "user" : "assistant",
+            content: msg.content as string,
+          }));
+
+        console.log(
+          "[ConversationView] Processed chat messages:",
+          chatMessages.length,
+        );
+
+        if (mounted) {
+          setMessages(chatMessages);
+          console.log("[ConversationView] Messages set in state");
+        }
+
+        const stream = await selectedConversation.stream({
+          onValue: (message: any) => {
+            if (!mounted || typeof message.content !== "string") {
+              return;
+            }
+
+            const newMessage: Message = {
+              id: message.id,
+              role:
+                message.senderInboxId === client.inboxId ? "user" : "assistant",
+              content: message.content as string,
+            };
+
+            setMessages((prev) => {
+              if (prev.some((m) => m.id === message.id)) {
+                return prev;
+              }
+              return [...prev, newMessage];
+            });
+          },
+        });
+
+        return () => {
+          stream.end().catch(console.error);
+        };
+      } catch (error) {
+        console.error("[ConversationView] Error setting up messages:", error);
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : "Failed to load messages";
+        showToast(errorMessage, "error");
+      }
+    };
+
+    void setupMessages();
+
+    return () => {
+      mounted = false;
+    };
+  }, [client, selectedConversation, showToast]);
+
+  const handleSendMessage = useCallback(
+    async (content: string) => {
+      if (!client || !selectedConversation) {
+        return;
+      }
+
+      const tempMessage: Message = {
+        id: `temp-${Date.now()}`,
+        role: "user",
+        content,
+      };
+
+      setMessages((prev) => [...prev, tempMessage]);
+
+      try {
+        await selectedConversation.send(content);
+        setMessages((prev) => prev.filter((m) => m.id !== tempMessage.id));
+      } catch (error) {
+        console.error("[ConversationView] Error sending message:", error);
+        const errorMessage =
+          error instanceof Error ? error.message : "Failed to send message";
+        showToast(errorMessage, "error");
+        setMessages((prev) => prev.filter((m) => m.id !== tempMessage.id));
+      }
+    },
+    [client, selectedConversation, showToast],
+  );
+
+  return (
+    <div className="overscroll-behavior-contain flex h-dvh min-w-0 touch-pan-y flex-col bg-background">
+      <ChatHeader />
+
+      <div className="relative flex-1">
+        <div className="absolute inset-0 touch-pan-y overflow-y-auto">
+          <div className="mx-auto flex min-w-0 max-w-4xl flex-col gap-4 px-2 py-4 md:gap-6 md:px-4">
+            {messages.length === 0 && <Greeting />}
+            {messages.length > 0 && <MessageList messages={messages} />}
+          </div>
+        </div>
+      </div>
+
+      <div className="sticky bottom-0 z-1 mx-auto flex w-full max-w-4xl gap-2 border-t-0 bg-background px-2 pb-3 md:px-4 md:pb-4">
+        <InputArea
+          selectedAgents={selectedAgents}
+          setSelectedAgents={setSelectedAgents}
+          messages={messages}
+          sendMessage={(content) => {
+            void handleSendMessage(content);
+          }}
+          conversation={selectedConversation}
+        />
+      </div>
     </div>
   );
 }

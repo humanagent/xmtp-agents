@@ -1,12 +1,20 @@
 import type { Client, Conversation } from "@xmtp/browser-sdk";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
-export function useXMTPConversations(client: Client | null) {
+export function useXMTPConversations(client: Client<any> | null | undefined) {
   const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [selectedConversation, setSelectedConversation] =
+  const [selectedConversation, setSelectedConversationState] =
     useState<Conversation | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+
+  const setSelectedConversation = useCallback((conversation: Conversation | null) => {
+    console.log("[useXMTPConversations] setSelectedConversation called", {
+      conversationId: conversation?.id,
+      hasConversation: !!conversation,
+    });
+    setSelectedConversationState(conversation);
+  }, []);
 
   useEffect(() => {
     if (!client) {
@@ -66,6 +74,13 @@ export function useXMTPConversations(client: Client | null) {
       }
     };
   }, [client]);
+
+  useEffect(() => {
+    console.log("[useXMTPConversations] selectedConversation changed", {
+      conversationId: selectedConversation?.id,
+      hasConversation: !!selectedConversation,
+    });
+  }, [selectedConversation]);
 
   return {
     conversations,

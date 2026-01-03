@@ -1,6 +1,7 @@
 import { useXMTPClient } from "@hooks/use-xmtp-client";
 import { useXMTPConversations } from "@hooks/use-xmtp-conversations";
 import { Button } from "@ui/button";
+import { useNavigate } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -87,8 +88,8 @@ const SidebarUserNav = () => {
 
 export function Sidebar() {
   const { client } = useXMTPClient();
-  const { conversations, selectedConversation, setSelectedConversation } =
-    useXMTPConversations(client);
+  const { conversations, selectedConversation } = useXMTPConversations(client);
+  const navigate = useNavigate();
   const [conversationLabels, setConversationLabels] = useState<
     Map<string, string>
   >(new Map());
@@ -133,7 +134,7 @@ export function Sidebar() {
   }, [client, conversations]);
 
   const handleConversationClick = (conversation: Conversation) => {
-    setSelectedConversation(conversation);
+    navigate(`/chat/${conversation.id}`);
   };
 
   return (
@@ -165,7 +166,7 @@ export function Sidebar() {
                     type="button"
                     variant="ghost"
                     onClick={() => {
-                      setSelectedConversation(null);
+                      navigate("/");
                     }}>
                     <PlusIcon />
                   </Button>

@@ -20,29 +20,26 @@ export async function createXMTPClient(
     dbEncryptionKey?: Uint8Array;
   },
 ) {
-  try {
-    const signer = createEphemeralSigner(accountKey);
+  const signer = createEphemeralSigner(accountKey);
+  const env = options?.env || "production";
 
-    const codecs = [
-      new ReactionCodec(),
-      new ReplyCodec(),
-      new RemoteAttachmentCodec(),
-      new TransactionReferenceCodec(),
-      new WalletSendCallsCodec(),
-      new ReadReceiptCodec(),
-      new MarkdownCodec(),
-    ];
+  const codecs = [
+    new ReactionCodec(),
+    new ReplyCodec(),
+    new RemoteAttachmentCodec(),
+    new TransactionReferenceCodec(),
+    new WalletSendCallsCodec(),
+    new ReadReceiptCodec(),
+    new MarkdownCodec(),
+  ];
 
-    const client = await Client.create(signer, {
-      env: "production",
-      appVersion: "xmtp-agents/0.1.0",
-      dbEncryptionKey: hexToBytes(dbEncryptionKey),
-      codecs,
-    });
+  const client = await Client.create(signer, {
+    env,
+    loggingLevel: options?.loggingLevel,
+    dbEncryptionKey: hexToBytes(dbEncryptionKey),
+    appVersion: "xmtp-agents/0.1.0",
+    codecs,
+  });
 
-    return client;
-  } catch (error) {
-    console.error("[createXMTPClient] Error creating client:", error);
-    throw error;
-  }
+  return client;
 }

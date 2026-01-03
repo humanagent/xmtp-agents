@@ -429,6 +429,15 @@ export function InputArea({
                             exit={{ opacity: 0, scale: 0.8 }}
                             transition={{ duration: 0.15 }}
                             className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-2.5 py-1 text-xs text-secondary-foreground h-6">
+                            {agent.image ? (
+                              <img
+                                alt={agent.name}
+                                className="h-4 w-4 shrink-0 rounded-full object-cover"
+                                src={agent.image}
+                              />
+                            ) : (
+                              <div className="h-4 w-4 shrink-0 rounded-full bg-muted" />
+                            )}
                             <span>{agent.name}</span>
                             <button
                               type="button"
@@ -455,11 +464,20 @@ export function InputArea({
                     title="Select Agent"
                   />
                   <Button
-                    className="h-8 w-[200px] justify-between px-2"
+                    className="h-8 w-[200px] justify-between gap-2 px-2"
                     variant="ghost"
                     onClick={() => {
                       setOpenDialog(true);
                     }}>
+                    {singleAgent?.image ? (
+                      <img
+                        alt={singleAgent.name}
+                        className="h-5 w-5 shrink-0 rounded-full object-cover"
+                        src={singleAgent.image}
+                      />
+                    ) : (
+                      <div className="h-5 w-5 shrink-0 rounded-full bg-muted" />
+                    )}
                     <span className="flex-1 truncate text-left">
                       {singleAgent?.name || "Select agent"}
                     </span>
@@ -502,7 +520,16 @@ export function InputArea({
                             handleAddAgent(agent);
                           }
                         }}
-                        className={cn(isSelected && "opacity-50")}>
+                        className={cn("flex items-center gap-2", isSelected && "opacity-50")}>
+                        {agent.image ? (
+                          <img
+                            alt={agent.name}
+                            className="h-6 w-6 shrink-0 rounded-full object-cover"
+                            src={agent.image}
+                          />
+                        ) : (
+                          <div className="h-6 w-6 shrink-0 rounded-full bg-muted" />
+                        )}
                         <span className="flex-1 truncate text-left">
                           {agent.name}
                         </span>
