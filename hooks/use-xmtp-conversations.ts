@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import type { Client, Conversation, Dm } from "@xmtp/browser-sdk";
 import { findOrCreateDmWithAddress } from "@/lib/xmtp/conversations";

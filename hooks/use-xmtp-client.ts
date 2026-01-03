@@ -1,8 +1,6 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import type { Client } from "@xmtp/browser-sdk";
-import { getOrCreateEphemeralWallet } from "@/lib/xmtp/identity";
+import { getOrCreateEphemeralAccountKey } from "@/lib/xmtp/identity";
 import { createXMTPClient } from "@/lib/xmtp/client";
 
 export function useXMTPClient() {
@@ -28,12 +26,12 @@ export function useXMTPClient() {
         console.log("[useXMTPClient] Waiting 100ms before initialization");
         await new Promise((resolve) => setTimeout(resolve, 100));
 
-        console.log("[useXMTPClient] Getting or creating ephemeral wallet");
-        const wallet = getOrCreateEphemeralWallet();
-        console.log("[useXMTPClient] Wallet address:", wallet.address);
+        console.log("[useXMTPClient] Getting or creating ephemeral account key");
+        const accountKey = getOrCreateEphemeralAccountKey();
+        console.log("[useXMTPClient] Account key length:", accountKey.length);
 
         console.log("[useXMTPClient] Creating XMTP client...");
-        const xmtpClient = await createXMTPClient(wallet);
+        const xmtpClient = await createXMTPClient(accountKey);
         console.log("[useXMTPClient] XMTP client created, inboxId:", xmtpClient.inboxId);
 
         if (mounted) {

@@ -1,5 +1,3 @@
-"use client";
-
 import type { ComponentProps } from "react";
 import { Button } from "./ui/button";
 import { ScrollArea, ScrollBar } from "./ui/scroll-area";

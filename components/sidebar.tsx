@@ -1,5 +1,3 @@
-"use client";
-
 import { PlusIcon, TrashIcon } from "./icons";
 import { Button } from "./ui/button";
 import {

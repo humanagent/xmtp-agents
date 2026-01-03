@@ -1,38 +1,50 @@
-import type { Client } from "@xmtp/browser-sdk";
-import type { HDNodeWallet } from "ethers";
-import { createEOASigner } from "./signer";
+import { Client, type ExtractCodecContentTypes } from "@xmtp/browser-sdk";
+import { MarkdownCodec } from "@xmtp/content-type-markdown";
+import { ReactionCodec } from "@xmtp/content-type-reaction";
+import { ReadReceiptCodec } from "@xmtp/content-type-read-receipt";
+import { RemoteAttachmentCodec } from "@xmtp/content-type-remote-attachment";
+import { ReplyCodec } from "@xmtp/content-type-reply";
+import { TransactionReferenceCodec } from "@xmtp/content-type-transaction-reference";
+import { WalletSendCallsCodec } from "@xmtp/content-type-wallet-send-calls";
+import { createEphemeralSigner, type PrivateKey } from "./signer";
 
-export async function createXMTPClient(wallet: HDNodeWallet): Promise<Client> {
+export type ContentTypes = ExtractCodecContentTypes<
+  [
+    ReactionCodec,
+    ReplyCodec,
+    RemoteAttachmentCodec,
+    TransactionReferenceCodec,
+    WalletSendCallsCodec,
+    ReadReceiptCodec,
+    MarkdownCodec,
+  ]
+>;
+
+export async function createXMTPClient(
+  privateKey: PrivateKey,
+): Promise<Client<ContentTypes>> {
   if (typeof window === "undefined") {
     throw new Error("XMTP client can only be created in browser environment");
   }
 
-  console.log("[XMTP] Starting client creation...");
-  console.log("[XMTP] Wallet address:", wallet.address);
+  const signer = createEphemeralSigner(privateKey);
 
-  const signer = createEOASigner(wallet);
-  console.log("[XMTP] Signer created");
+  const codecs = [
+    new ReactionCodec(),
+    new ReplyCodec(),
+    new RemoteAttachmentCodec(),
+    new TransactionReferenceCodec(),
+    new WalletSendCallsCodec(),
+    new ReadReceiptCodec(),
+    new MarkdownCodec(),
+  ];
 
-  try {
-    console.log("[XMTP] Dynamically importing Client...");
-    const { Client } = await import("@xmtp/browser-sdk");
-    
-    console.log("[XMTP] Calling Client.create...");
-    const client = await Client.create(signer as any, {
-      env: "production",
-      loggingLevel: "info",
-    });
-    
-    console.log("[XMTP] Client created successfully!");
-    console.log("[XMTP] Inbox ID:", client.inboxId);
-    return client;
-  } catch (error) {
-    console.error("[XMTP] Client creation failed:", error);
-    console.error("[XMTP] Error details:", {
-      message: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined,
-    });
-    throw error;
-  }
+  const client = await Client.create(signer, {
+    env: "production",
+    loggingLevel: "warn",
+    appVersion: "xmtp-agents/0",
+    codecs,
+  });
+
+  return client;
 }
-

@@ -1,5 +1,3 @@
-"use client";
-
 import { motion } from "framer-motion";
 import { Suggestion } from "./suggestion";
 
@@ -11,10 +9,10 @@ export function SuggestedActions({
   sendMessage: (content: string) => void;
 }) {
   const suggestedActions = [
-    "What are the advantages of using Next.js?",
     "Write code to demonstrate Dijkstra's algorithm",
     "Help me write an essay about Silicon Valley",
     "What is the weather in San Francisco?",
+    "Explain how React hooks work",
   ];
 
   return (

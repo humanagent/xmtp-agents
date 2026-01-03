@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import {
   ModelSelector,
@@ -22,6 +20,7 @@ import {
 } from "./prompt-input";
 import { ArrowUpIcon, PaperclipIcon } from "./icons";
 import { SuggestedActions } from "./suggested-actions";
+import { AI_AGENTS, type AgentConfig } from "@/lib/agents";
 
 type Message = {
   id: string;
@@ -39,6 +38,8 @@ export function InputArea({
   const [input, setInput] = useState("");
   const [open, setOpen] = useState(false);
   const [attachments] = useState([]);
+  const liveAgents = AI_AGENTS.filter(agent => agent.live);
+  const [selectedAgent, setSelectedAgent] = useState<AgentConfig>(liveAgents[0]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -89,21 +90,24 @@ export function InputArea({
             >
               <PaperclipIcon size={16} />
             </Button>
-            <ModelSelector onOpenChange={setOpen} open={open}>
+            <ModelSelector onOpenChange={setOpen} open={open} value={selectedAgent.address} onValueChange={(value) => {
+              const agent = liveAgents.find(a => a.address === value);
+              if (agent) setSelectedAgent(agent);
+            }}>
               <ModelSelectorTrigger asChild>
                 <Button className="h-8 w-[200px] justify-between px-2" variant="ghost">
-                  <ModelSelectorLogo provider="anthropic" />
-                  <ModelSelectorName>Claude Opus 4.5</ModelSelectorName>
+                  <ModelSelectorName>{selectedAgent.name}</ModelSelectorName>
                 </Button>
               </ModelSelectorTrigger>
               <ModelSelectorContent>
-                <ModelSelectorInput placeholder="Search models..." />
+                <ModelSelectorInput placeholder="Search agents..." />
                 <ModelSelectorList>
-                  <ModelSelectorGroup heading="Anthropic">
-                    <ModelSelectorItem value="anthropic/claude-opus-4.5">
-                      <ModelSelectorLogo provider="anthropic" />
-                      <ModelSelectorName>Claude Opus 4.5</ModelSelectorName>
-                    </ModelSelectorItem>
+                  <ModelSelectorGroup heading="AI Agents">
+                    {liveAgents.map((agent) => (
+                      <ModelSelectorItem key={agent.address} value={agent.address}>
+                        <ModelSelectorName>{agent.name}</ModelSelectorName>
+                      </ModelSelectorItem>
+                    ))}
                   </ModelSelectorGroup>
                 </ModelSelectorList>
               </ModelSelectorContent>

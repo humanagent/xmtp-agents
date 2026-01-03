@@ -1,17 +1,63 @@
-import { getBytes } from "ethers";
-import type { HDNodeWallet } from "ethers";
+import type { Signer } from "@xmtp/browser-sdk";
+import { toBytes, type Hex } from "viem";
+import { privateKeyToAccount } from "viem/accounts";
 
-export function createEOASigner(wallet: HDNodeWallet) {
-  return {
-    getAddress: async () => wallet.address,
-    getIdentifier: async () => ({
-      identifier: wallet.address.toLowerCase(),
-      identifierKind: "Ethereum" as const,
-    }),
+export type PrivateKey = Hex;
+
+export const createEphemeralSigner = (privateKey: Hex): Signer => {
+  const account = privateKeyToAccount(privateKey);
+  const signer = {
+    type: "EOA" as const,
+    getIdentifier: () => {
+      return {
+        identifier: account.address.toLowerCase(),
+        identifierKind: "Ethereum" as const,
+      };
+    },
     signMessage: async (message: string) => {
-      const signature = await wallet.signMessage(message);
-      return getBytes(signature);
+      const signature = await account.signMessage({
+        message,
+      });
+      const signatureBytes = toBytes(signature);
+      return signatureBytes;
     },
   };
-}
+  return signer;
+};
 
+export const createEOASigner = (
+  address: `0x${string}`,
+  signMessage: (message: string) => Promise<string> | string,
+): Signer => {
+  return {
+    type: "EOA",
+    getIdentifier: () => ({
+      identifier: address.toLowerCase(),
+      identifierKind: "Ethereum",
+    }),
+    signMessage: async (message: string) => {
+      const signature = await signMessage(message);
+      return toBytes(signature);
+    },
+  };
+};
+
+export const createSCWSigner = (
+  address: `0x${string}`,
+  signMessage: (message: string) => Promise<string> | string,
+  chainId: number = 1,
+): Signer => {
+  return {
+    type: "SCW",
+    getIdentifier: () => ({
+      identifier: address.toLowerCase(),
+      identifierKind: "Ethereum",
+    }),
+    signMessage: async (message: string) => {
+      const signature = await signMessage(message);
+      const signatureBytes = toBytes(signature);
+      return signatureBytes;
+    },
+    getChainId: () => BigInt(chainId),
+  };
+};

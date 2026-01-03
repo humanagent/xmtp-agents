@@ -7,24 +7,23 @@ A self-contained wireframe UI for the chat application.
 1. Install dependencies:
 
 ```bash
-npm install
+yarn install
 ```
 
 2. Run the development server:
 
 ```bash
-npm run dev
+yarn dev
 ```
 
-3. Open [http://localhost:3000](http://localhost:3000) in your browser.
+3. Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ## Structure
 
 - `components/` - All React components
-- `app/` - Next.js app directory with layout and styles
+- `src/` - Source files with App component and styles
 - `lib/` - Utility functions
 - `hooks/` - React hooks
-- `page.tsx` - Main wireframe page component
 
 ## Features
 

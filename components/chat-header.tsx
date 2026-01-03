@@ -1,5 +1,3 @@
-"use client";
-
 import { memo } from "react";
 import { SidebarToggle } from "./sidebar-toggle";
 import { useSidebar } from "./ui/sidebar";

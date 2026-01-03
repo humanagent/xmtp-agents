@@ -1,5 +1,3 @@
-"use client";
-
 import { Loader2Icon, SendIcon, SquareIcon, XIcon } from "lucide-react";
 import type {
   ComponentProps,

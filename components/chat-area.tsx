@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect, useRef } from "react";
 import { Greeting } from "./greeting";
 import { ChatHeader } from "./chat-header";
@@ -62,14 +60,16 @@ export function ChatArea() {
             const existingMessages = await conversation.messages();
             console.log("[ChatArea] Loaded", existingMessages.length, "existing messages");
 
-            const chatMessages: Message[] = existingMessages.map((msg: any) => {
-              const isFromMe = msg.senderInboxId === client?.inboxId;
-              return {
-                id: msg.id,
-                role: isFromMe ? "user" : "assistant",
-                content: msg.content as string,
-              };
-            });
+            const chatMessages: Message[] = existingMessages
+              .filter((msg: any) => typeof msg.content === "string")
+              .map((msg: any) => {
+                const isFromMe = msg.senderInboxId === client?.inboxId;
+                return {
+                  id: msg.id,
+                  role: isFromMe ? "user" : "assistant",
+                  content: msg.content as string,
+                };
+              });
 
             setMessages(chatMessages);
             console.log("[ChatArea] Messages set in state:", chatMessages.length);
@@ -88,8 +88,15 @@ export function ChatArea() {
                 console.log("[ChatArea] New message received:", {
                   id: message.id,
                   content: message.content,
+                  contentType: typeof message.content,
                   senderInboxId: message.senderInboxId,
                 });
+
+                // only handle text messages
+                if (typeof message.content !== "string") {
+                  console.log("[ChatArea] Skipping non-text message");
+                  return;
+                }
 
                 const isFromMe = message.senderInboxId === client?.inboxId;
                 const newMessage: Message = {
