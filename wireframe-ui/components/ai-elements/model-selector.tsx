@@ -17,7 +17,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
-import { cn } from "../../../lib/utils";
+import { cn } from "@/lib/utils";
 
 export type ModelSelectorProps = ComponentProps<typeof Dialog>;
 
