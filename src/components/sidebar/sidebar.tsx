@@ -1,5 +1,5 @@
 import { useXMTPClient } from "@hooks/use-xmtp-client";
-import { useXMTPConversations } from "@hooks/use-xmtp-conversations";
+import { useConversationsContext } from "@/src/contexts/xmtp-conversations-context";
 import { Button } from "@ui/button";
 import {
   DropdownMenu,
@@ -88,7 +88,7 @@ const SidebarUserNav = () => {
 export function Sidebar() {
   const { client } = useXMTPClient();
   const { conversations, selectedConversation, setSelectedConversation } =
-    useXMTPConversations(client);
+    useConversationsContext();
   const [conversationLabels, setConversationLabels] = useState<
     Map<string, string>
   >(new Map());

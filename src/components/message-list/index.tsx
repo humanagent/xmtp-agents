@@ -1,8 +1,8 @@
 import { ChatHeader, Greeting } from "@components/chat-area/index";
 import { InputArea } from "@components/input-area";
 import { useXMTPClient } from "@hooks/use-xmtp-client";
-import { useXMTPConversations } from "@hooks/use-xmtp-conversations";
 import { useCallback, useEffect, useState } from "react";
+import { useConversationsContext } from "@/src/contexts/xmtp-conversations-context";
 
 type Message = {
   id: string;
@@ -41,7 +41,7 @@ export function MessageList({ messages }: { messages: Message[] }) {
 export function ConversationView() {
   const [messages, setMessages] = useState<Message[]>([]);
   const { client } = useXMTPClient();
-  const { selectedConversation } = useXMTPConversations(client);
+  const { selectedConversation } = useConversationsContext();
 
   useEffect(() => {
     if (!client || !selectedConversation) {

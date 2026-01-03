@@ -1,6 +1,5 @@
 import { InputArea } from "@components/input-area";
 import { useXMTPClient } from "@hooks/use-xmtp-client";
-import { useXMTPConversations } from "@hooks/use-xmtp-conversations";
 import { Loader2Icon } from "@ui/icons";
 import { motion } from "framer-motion";
 import { useCallback, useEffect, useState } from "react";
@@ -8,6 +7,7 @@ import { type AgentConfig } from "@/lib/agents";
 import { createGroupWithAgentAddresses } from "@/lib/xmtp/conversations";
 import { SidebarToggle } from "@/src/components/sidebar/sidebar-toggle";
 import { ShareButton } from "@/src/components/sidebar/share-button";
+import { useConversationsContext } from "@/src/contexts/xmtp-conversations-context";
 
 type Message = {
   id: string;
@@ -59,7 +59,7 @@ export function ChatArea() {
     selectedConversation,
     setSelectedConversation,
     refreshConversations,
-  } = useXMTPConversations(client);
+  } = useConversationsContext();
 
   useEffect(() => {
     if (!client || !selectedConversation) {
