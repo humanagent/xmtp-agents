@@ -15,7 +15,7 @@
     "db:pull": "drizzle-kit pull",
     "db:check": "drizzle-kit check",
     "db:up": "drizzle-kit up",
-    "test": "export PLAYWRIGHT=True && pnpm exec playwright test"
+    "test": "export PLAYWRIGHT=True && yarn exec playwright test"
   },
   "dependencies": {
     "@ai-sdk/gateway": "^2.0.18",
@@ -117,6 +117,5 @@
     "tsx": "^4.19.1",
     "typescript": "^5.6.3",
     "ultracite": "5.3.9"
-  },
-  "packageManager": "pnpm@9.12.3"
+  }
 }
