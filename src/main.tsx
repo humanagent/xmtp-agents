@@ -1,19 +1,13 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
+import { MiniKitProvider } from "@worldcoin/minikit-js/minikit-provider";
 import App from "./App";
 import "./index.css";
-import { ToastProvider } from "./ui/toast";
-import { XMTPClientProvider } from "./contexts/xmtp-client-context";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <BrowserRouter>
-      <ToastProvider>
-        <XMTPClientProvider>
-          <App />
-        </XMTPClientProvider>
-      </ToastProvider>
-    </BrowserRouter>
+    <MiniKitProvider>
+      <App />
+    </MiniKitProvider>
   </StrictMode>,
 );

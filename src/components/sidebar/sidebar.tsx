@@ -1,7 +1,6 @@
 import { useXMTPClient } from "@hooks/use-xmtp-client";
-import { useXMTPConversations } from "@hooks/use-xmtp-conversations";
+import { useConversationsContext } from "@/src/contexts/xmtp-conversations-context";
 import { Button } from "@ui/button";
-import { useNavigate } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -88,8 +87,8 @@ const SidebarUserNav = () => {
 
 export function Sidebar() {
   const { client } = useXMTPClient();
-  const { conversations, selectedConversation } = useXMTPConversations(client);
-  const navigate = useNavigate();
+  const { conversations, selectedConversation, setSelectedConversation } =
+    useConversationsContext();
   const [conversationLabels, setConversationLabels] = useState<
     Map<string, string>
   >(new Map());
@@ -105,7 +104,6 @@ export function Sidebar() {
       for (const conversation of conversations) {
         try {
           const members = await conversation.members();
-
           const otherMember = members.find(
             (m) =>
               m.inboxId.toLowerCase() !== (client?.inboxId || "").toLowerCase(),
@@ -113,17 +111,19 @@ export function Sidebar() {
 
           if (otherMember) {
             const address = otherMember.inboxId;
-            const label = address.slice(0, 6) + "..." + address.slice(-4);
-            labels.set(conversation.id, label);
+            labels.set(
+              conversation.id,
+              address.slice(0, 6) + "..." + address.slice(-4),
+            );
           } else {
-            labels.set(conversation.id, conversation.id.slice(0, 6) + "..." + conversation.id.slice(-4));
+            labels.set(conversation.id, "Unknown");
           }
         } catch (error) {
           console.error(
             `[Sidebar] Error loading label for conversation ${conversation.id}:`,
             error,
           );
-          labels.set(conversation.id, conversation.id.slice(0, 6) + "..." + conversation.id.slice(-4));
+          labels.set(conversation.id, "Unknown");
         }
       }
 
@@ -134,7 +134,7 @@ export function Sidebar() {
   }, [client, conversations]);
 
   const handleConversationClick = (conversation: Conversation) => {
-    navigate(`/chat/${conversation.id}`);
+    setSelectedConversation(conversation);
   };
 
   return (
@@ -166,7 +166,7 @@ export function Sidebar() {
                     type="button"
                     variant="ghost"
                     onClick={() => {
-                      navigate("/");
+                      setSelectedConversation(null);
                     }}>
                     <PlusIcon />
                   </Button>

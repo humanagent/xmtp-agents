@@ -2,32 +2,12 @@ import type { Signer } from "@xmtp/browser-sdk";
 import { toBytes, type Hex } from "viem";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 
-const STORAGE_KEY = "xmtp_private_key";
+export type PrivateKey = Hex;
 
-export function getOrCreateEphemeralAccountKey(): Hex {
-  if (typeof window === "undefined") {
-    throw new Error(
-      "getOrCreateEphemeralAccountKey can only be called in browser",
-    );
-  }
-
-  // Try to get existing key from localStorage
-  const storedKey = localStorage.getItem(STORAGE_KEY);
-  if (storedKey) {
-    return storedKey as Hex;
-  }
-
-  // Generate new key and store it
-  const newKey = generatePrivateKey();
-  localStorage.setItem(STORAGE_KEY, newKey);
-  return newKey;
-}
-
-export function createEphemeralSigner(privateKey: Hex): Signer {
+export const createEphemeralSigner = (privateKey: Hex): Signer => {
   const account = privateKeyToAccount(privateKey);
-
-  const signer: Signer = {
-    type: "EOA",
+  const signer = {
+    type: "EOA" as const,
     getIdentifier: () => {
       return {
         identifier: account.address.toLowerCase(),
@@ -38,9 +18,63 @@ export function createEphemeralSigner(privateKey: Hex): Signer {
       const signature = await account.signMessage({
         message,
       });
+      const signatureBytes = toBytes(signature);
+      return signatureBytes;
+    },
+  };
+  return signer;
+};
+
+export const createEOASigner = (
+  address: `0x${string}`,
+  signMessage: (message: string) => Promise<string> | string,
+): Signer => {
+  return {
+    type: "EOA",
+    getIdentifier: () => ({
+      identifier: address.toLowerCase(),
+      identifierKind: "Ethereum",
+    }),
+    signMessage: async (message: string) => {
+      const signature = await signMessage(message);
       return toBytes(signature);
     },
   };
+};
 
-  return signer;
+export const createSCWSigner = (
+  address: `0x${string}`,
+  signMessage: (message: string) => Promise<string> | string,
+  chainId: number = 1,
+): Signer => {
+  return {
+    type: "SCW",
+    getIdentifier: () => ({
+      identifier: address.toLowerCase(),
+      identifierKind: "Ethereum",
+    }),
+    signMessage: async (message: string) => {
+      const signature = await signMessage(message);
+      const signatureBytes = toBytes(signature);
+      return signatureBytes;
+    },
+    getChainId: () => BigInt(chainId),
+  };
+};
+
+export function getOrCreateEphemeralAccountKey(): PrivateKey {
+  console.log("[getOrCreateEphemeralAccountKey] Starting...");
+  
+  if (typeof window === "undefined") {
+    throw new Error(
+      "Ephemeral account key can only be created in browser environment",
+    );
+  }
+
+  // always generate a new ephemeral identity
+  console.log("[getOrCreateEphemeralAccountKey] Generating new private key...");
+  const accountKey = generatePrivateKey();
+  console.log("[getOrCreateEphemeralAccountKey] Private key generated:", accountKey.slice(0, 10) + "...");
+
+  return accountKey;
 }
