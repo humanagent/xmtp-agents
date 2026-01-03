@@ -7,6 +7,7 @@ import { useCallback, useEffect, useState } from "react";
 import { type AgentConfig } from "@/lib/agents";
 import { createGroupWithAgentAddresses } from "@/lib/xmtp/conversations";
 import { SidebarToggle } from "@/src/components/sidebar/sidebar-toggle";
+import { ShareButton } from "@/src/components/sidebar/share-button";
 
 type Message = {
   id: string;
@@ -18,6 +19,7 @@ export const ChatHeader = () => {
   return (
     <header className="sticky top-0 flex items-center gap-2 bg-background px-2 py-1.5 md:px-2">
       <SidebarToggle />
+      <ShareButton />
     </header>
   );
 };
@@ -163,8 +165,8 @@ export function ChatArea() {
             conversationType: conversation.constructor.name,
           });
           setSelectedConversation(conversation);
-          await refreshConversations();
-          console.log("[ChatArea] Conversations list refreshed");
+          refreshConversations().catch(console.error);
+          console.log("[ChatArea] Refreshing conversations list in background");
         } catch (error) {
           console.error("[ChatArea] Error creating conversation:", error);
           setIsCreatingConversation(false);
