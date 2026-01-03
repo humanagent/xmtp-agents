@@ -1,27 +1,51 @@
-import { Client, type Dm } from "@xmtp/browser-sdk";
+import type { Client, Group } from "@xmtp/browser-sdk";
 
-export async function findOrCreateDmWithAddress(
+export async function createGroupWithAgentAddresses(
   client: Client,
-  agentAddress: string,
-): Promise<Dm> {
-  const inboxId = await client.findInboxIdByIdentifier({
-    identifier: agentAddress.toLowerCase(),
-    identifierKind: "Ethereum",
+  addresses: string[],
+): Promise<Group> {
+  console.log("[createGroupWithAgentAddresses] Called", {
+    addressesCount: addresses.length,
+    addresses,
+    clientInboxId: client.inboxId,
   });
 
-  if (!inboxId) {
-    throw new Error(`Address ${agentAddress} is not registered on XMTP`);
+  if (!addresses || addresses.length === 0) {
+    throw new Error("No addresses provided for group creation");
   }
 
-  const existingDm = await client.conversations.getDmByInboxId(inboxId);
-  if (existingDm) {
-    return existingDm;
+  const identifiers = addresses.map((address) => ({
+    identifier: address.toLowerCase(),
+    identifierKind: "Ethereum" as const,
+  }));
+
+  console.log(
+    "[createGroupWithAgentAddresses] Creating group with identifiers",
+    {
+      identifiersCount: identifiers.length,
+      identifiers,
+    },
+  );
+
+  try {
+    const group = await client.conversations.newGroupWithIdentifiers(
+      identifiers,
+      {
+        name: "Agent Group",
+      },
+    );
+
+    console.log("[createGroupWithAgentAddresses] Group created successfully", {
+      groupId: group.id,
+      groupName: group.name,
+    });
+
+    return group;
+  } catch (error) {
+    console.error(
+      "[createGroupWithAgentAddresses] Error creating group",
+      error,
+    );
+    throw error;
   }
-
-  const newDm = await client.conversations.newDmWithIdentifier({
-    identifier: agentAddress.toLowerCase(),
-    identifierKind: "Ethereum",
-  });
-
-  return newDm;
 }
