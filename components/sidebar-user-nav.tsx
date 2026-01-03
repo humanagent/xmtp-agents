@@ -43,10 +43,10 @@ export function SidebarUserNav() {
               <div className="flex aspect-square size-6 items-center justify-center rounded-full bg-sidebar-primary text-sidebar-primary-foreground">
                 <span className="text-xs font-semibold">G</span>
               </div>
-              <span className="truncate" data-testid="user-email">
+              <span className="flex-1 truncate text-left" data-testid="user-email">
                 Guest
               </span>
-              <ChevronUpIcon className="ml-auto" size={16} />
+              <ChevronUpIcon className="ml-auto shrink-0" size={16} />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
