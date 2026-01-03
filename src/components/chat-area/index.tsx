@@ -1,12 +1,13 @@
 import { InputArea } from "@components/input-area";
 import { useXMTPClient } from "@hooks/use-xmtp-client";
-import { useXMTPConversations } from "@hooks/use-xmtp-conversations";
 import { Loader2Icon } from "@ui/icons";
 import { motion } from "framer-motion";
 import { useCallback, useEffect, useState } from "react";
 import { type AgentConfig } from "@/lib/agents";
 import { createGroupWithAgentAddresses } from "@/lib/xmtp/conversations";
 import { SidebarToggle } from "@/src/components/sidebar/sidebar-toggle";
+import { ShareButton } from "@/src/components/sidebar/share-button";
+import { useConversationsContext } from "@/src/contexts/xmtp-conversations-context";
 
 type Message = {
   id: string;
@@ -18,6 +19,7 @@ export const ChatHeader = () => {
   return (
     <header className="sticky top-0 flex items-center gap-2 bg-background px-2 py-1.5 md:px-2">
       <SidebarToggle />
+      <ShareButton />
     </header>
   );
 };
@@ -53,8 +55,11 @@ export function ChatArea() {
   const [selectedAgents, setSelectedAgents] = useState<AgentConfig[]>([]);
   const [isCreatingConversation, setIsCreatingConversation] = useState(false);
   const { client } = useXMTPClient();
-  const { selectedConversation, setSelectedConversation } =
-    useXMTPConversations(client);
+  const {
+    selectedConversation,
+    setSelectedConversation,
+    refreshConversations,
+  } = useConversationsContext();
 
   useEffect(() => {
     if (!client || !selectedConversation) {
@@ -160,6 +165,8 @@ export function ChatArea() {
             conversationType: conversation.constructor.name,
           });
           setSelectedConversation(conversation);
+          refreshConversations().catch(console.error);
+          console.log("[ChatArea] Refreshing conversations list in background");
         } catch (error) {
           console.error("[ChatArea] Error creating conversation:", error);
           setIsCreatingConversation(false);
@@ -198,7 +205,7 @@ export function ChatArea() {
         setMessages((prev) => prev.filter((m) => m.id !== tempMessage.id));
       }
     },
-    [client, selectedConversation, selectedAgents, setSelectedConversation],
+    [client, selectedConversation, selectedAgents, setSelectedConversation, refreshConversations],
   );
 
   return (
