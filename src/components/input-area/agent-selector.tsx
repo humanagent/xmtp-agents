@@ -1,0 +1,76 @@
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@ui/command";
+import { Dialog, DialogContent, DialogTitle } from "@ui/dialog";
+import { cn } from "@/lib/utils";
+import { type AgentConfig } from "@/lib/agents";
+
+type AgentSelectorProps = {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  agents: AgentConfig[];
+  selectedAgents: AgentConfig[];
+  onSelectAgent: (agent: AgentConfig) => void;
+  title?: string;
+  placeholder?: string;
+};
+
+export function AgentSelector({
+  open,
+  onOpenChange,
+  agents,
+  selectedAgents,
+  onSelectAgent,
+  title = "Select Agent",
+  placeholder = "Search agents...",
+}: AgentSelectorProps) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="p-0">
+        <DialogTitle className="sr-only">{title}</DialogTitle>
+        <Command className="**:data-[slot=command-input-wrapper]:h-auto">
+          <CommandInput
+            className="h-auto py-3.5"
+            placeholder={placeholder}
+          />
+          <CommandList>
+            <CommandGroup heading="AI Agents">
+              {agents.map((agent) => {
+                const isSelected = selectedAgents.some(
+                  (a) => a.address === agent.address,
+                );
+                return (
+                  <CommandItem
+                    key={agent.address}
+                    value={agent.name}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        onSelectAgent(agent);
+                      }
+                    }}
+                    onSelect={() => {
+                      onSelectAgent(agent);
+                    }}
+                    className={cn(isSelected && "opacity-50")}>
+                    <span className="flex-1 truncate text-left">
+                      {agent.name}
+                    </span>
+                  </CommandItem>
+                );
+              })}
+            </CommandGroup>
+            {agents.length === 0 && (
+              <CommandEmpty>No agents found.</CommandEmpty>
+            )}
+          </CommandList>
+        </Command>
+      </DialogContent>
+    </Dialog>
+  );
+}

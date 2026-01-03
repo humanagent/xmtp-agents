@@ -6,13 +6,13 @@ import {
   CommandItem,
   CommandList,
 } from "@ui/command";
-import { Dialog, DialogContent, DialogTitle } from "@ui/dialog";
 import { ArrowUpIcon, PaperclipIcon, PlusIcon, XIcon } from "@ui/icons";
 import {
   Popover,
   PopoverAnchor,
   PopoverContent,
 } from "@ui/popover";
+import { AgentSelector } from "./agent-selector";
 import { Textarea } from "@ui/textarea";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -170,6 +170,7 @@ export function InputArea({
   const [conversationAgents, setConversationAgents] = useState<AgentConfig[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const isSubmittingRef = useRef(false);
+  const lastEnterPressRef = useRef<number>(0);
 
   // Multi-agent mode: use props
   // Single-agent mode: use internal state
@@ -215,8 +216,14 @@ export function InputArea({
         const members = await conversation.members();
         const memberAddresses = new Set(
           members
-            .flatMap((member) => member.accountAddresses)
-            .map((addr) => addr.toLowerCase()),
+            .flatMap((member) =>
+              member.accountIdentifiers
+                .filter(
+                  (id) =>
+                    id.identifierKind === 0 || id.identifierKind === "Ethereum",
+                )
+                .map((id) => id.identifier.toLowerCase()),
+            ),
         );
 
         const agents = AI_AGENTS.filter((agent) =>
@@ -260,10 +267,23 @@ export function InputArea({
       setAgents([...agents, agent]);
     } else {
       setSingleAgent(agent);
+      setOpenDialog(false);
+      textareaRef.current?.focus();
     }
-    setOpenDialog(false);
     setOpenPopover(false);
-    textareaRef.current?.focus();
+  };
+
+  const handleAgentSelect = (agent: AgentConfig) => {
+    const now = Date.now();
+    const timeSinceLastEnter = now - lastEnterPressRef.current;
+    lastEnterPressRef.current = now;
+
+    handleAddAgent(agent);
+
+    if (timeSinceLastEnter < 500) {
+      setOpenDialog(false);
+      textareaRef.current?.focus();
+    }
   };
 
   const handleRemoveAgent = (address: string) => {
@@ -347,41 +367,14 @@ export function InputArea({
               className={`flex flex-row ${isMultiAgentMode ? "items-center" : "items-start"} gap-1 sm:gap-2`}>
               {isMultiAgentMode ? (
                 <>
-                  <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-                    <DialogContent className="p-0">
-                      <DialogTitle className="sr-only">Add Agent</DialogTitle>
-                      <Command className="**:data-[slot=command-input-wrapper]:h-auto">
-                        <CommandList>
-                          <CommandGroup heading="AI Agents">
-                            {liveAgents.map((agent) => {
-                              const isSelected = currentSelectedAgents.some(
-                                (a) => a.address === agent.address,
-                              );
-                              return (
-                                <CommandItem
-                                  key={agent.address}
-                                  value={agent.name}
-                                  disabled={isSelected}
-                                  onSelect={() => {
-                                    if (!isSelected) {
-                                      handleAddAgent(agent);
-                                    }
-                                  }}
-                                  className={cn(isSelected && "opacity-50")}>
-                                  <span className="flex-1 truncate text-left">
-                                    {agent.name}
-                                  </span>
-                                </CommandItem>
-                              );
-                            })}
-                          </CommandGroup>
-                          {liveAgents.length === 0 && (
-                            <CommandEmpty>No agents found.</CommandEmpty>
-                          )}
-                        </CommandList>
-                      </Command>
-                    </DialogContent>
-                  </Dialog>
+                  <AgentSelector
+                    open={openDialog}
+                    onOpenChange={setOpenDialog}
+                    agents={liveAgents}
+                    selectedAgents={currentSelectedAgents}
+                    onSelectAgent={handleAgentSelect}
+                    title="Add Agent"
+                  />
                   <Button
                     className="h-7 w-7 p-0 shrink-0"
                     type="button"
@@ -453,41 +446,14 @@ export function InputArea({
                 </>
               ) : (
                 <>
-                  <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-                    <DialogContent className="p-0">
-                      <DialogTitle className="sr-only">Select Agent</DialogTitle>
-                      <Command className="**:data-[slot=command-input-wrapper]:h-auto">
-                        <CommandList>
-                          <CommandGroup heading="AI Agents">
-                            {liveAgents.map((agent) => {
-                              const isSelected = currentSelectedAgents.some(
-                                (a) => a.address === agent.address,
-                              );
-                              return (
-                                <CommandItem
-                                  key={agent.address}
-                                  value={agent.name}
-                                  disabled={isSelected}
-                                  onSelect={() => {
-                                    if (!isSelected) {
-                                      handleAddAgent(agent);
-                                    }
-                                  }}
-                                  className={cn(isSelected && "opacity-50")}>
-                                  <span className="flex-1 truncate text-left">
-                                    {agent.name}
-                                  </span>
-                                </CommandItem>
-                              );
-                            })}
-                          </CommandGroup>
-                          {liveAgents.length === 0 && (
-                            <CommandEmpty>No agents found.</CommandEmpty>
-                          )}
-                        </CommandList>
-                      </Command>
-                    </DialogContent>
-                  </Dialog>
+                  <AgentSelector
+                    open={openDialog}
+                    onOpenChange={setOpenDialog}
+                    agents={liveAgents}
+                    selectedAgents={currentSelectedAgents}
+                    onSelectAgent={handleAgentSelect}
+                    title="Select Agent"
+                  />
                   <Button
                     className="h-8 w-[200px] justify-between px-2"
                     variant="ghost"
