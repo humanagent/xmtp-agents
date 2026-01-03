@@ -1,8 +1,5 @@
-import type { Client, Conversation, Dm } from "@xmtp/browser-sdk";
+import type { Client, Conversation } from "@xmtp/browser-sdk";
 import { useEffect, useState } from "react";
-import { findOrCreateDmWithAddress } from "@/lib/xmtp/conversations";
-
-const FIXED_AGENT_ADDRESS = "0x194c31cae1418d5256e8c58e0d08aee1046c6ed0";
 
 export function useXMTPConversations(client: Client | null) {
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -26,16 +23,10 @@ export function useXMTPConversations(client: Client | null) {
 
         await client.conversations.sync();
 
-        const fixedDm = await findOrCreateDmWithAddress(
-          client,
-          FIXED_AGENT_ADDRESS,
-        );
-
         const allConversations = await client.conversations.list();
 
         if (mounted) {
           setConversations(allConversations);
-          setSelectedConversation(fixedDm);
           setIsLoading(false);
         }
 

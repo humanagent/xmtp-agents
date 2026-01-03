@@ -1,6 +1,6 @@
-import { SidebarProvider, SidebarInset } from "./components/ui/sidebar";
-import { Sidebar } from "./components/sidebar";
-import { ChatArea } from "./components/chat-area";
+import { ChatArea } from "@chat-area/index";
+import { Sidebar } from "@sidebar/sidebar";
+import { SidebarInset, SidebarProvider } from "@ui/sidebar";
 
 export default function App() {
   return (
@@ -12,4 +12,3 @@ export default function App() {
     </SidebarProvider>
   );
 }
-

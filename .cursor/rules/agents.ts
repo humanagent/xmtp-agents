@@ -112,4 +112,3 @@ export function getAgentByAddress(address: string): AIAgent | undefined {
 export function getAgentById(id: string): AIAgent | undefined {
   return AI_AGENTS.find((agent) => agent.id === id);
 }
-
