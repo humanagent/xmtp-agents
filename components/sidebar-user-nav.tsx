@@ -56,13 +56,6 @@ export function SidebarUserNav() {
             data-testid="user-nav-menu"
             side="top"
           >
-            <DropdownMenuItem
-              className="cursor-pointer"
-              data-testid="user-nav-item-theme"
-            >
-              Toggle dark mode
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
             <DropdownMenuItem asChild data-testid="user-nav-item-auth">
               <button
                 className="w-full cursor-pointer"

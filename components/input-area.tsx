@@ -38,28 +38,29 @@ export function InputArea({
   const [input, setInput] = useState("");
   const [open, setOpen] = useState(false);
   const [attachments] = useState([]);
-  const liveAgents = AI_AGENTS.filter(agent => agent.live);
+  
+  const shuffleArray = <T,>(array: T[]): T[] => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  };
+  
+  const [liveAgents] = useState(() => shuffleArray(AI_AGENTS.filter(agent => agent.live)));
   const [selectedAgent, setSelectedAgent] = useState<AgentConfig>(liveAgents[0]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const messageContent = input.trim();
     
-    if (!messageContent) {
-      console.log("[InputArea] Submit attempted but message is empty");
+    if (!messageContent || !sendMessage) {
       return;
     }
 
-    console.log("[InputArea] Form submitted with message:", messageContent);
-    console.log("[InputArea] Calling sendMessage callback");
-    
-    if (sendMessage) {
-      sendMessage(messageContent);
-      setInput("");
-      console.log("[InputArea] Message sent, input cleared");
-    } else {
-      console.error("[InputArea] sendMessage callback is not provided!");
-    }
+    sendMessage(messageContent);
+    setInput("");
   };
 
   return (
