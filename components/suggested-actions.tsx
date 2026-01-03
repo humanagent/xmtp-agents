@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Suggestion } from "./elements/suggestion";
+import { Suggestion } from "./suggestion";
 
 export function SuggestedActions({
   chatId,

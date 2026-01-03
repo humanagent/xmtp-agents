@@ -8,15 +8,15 @@ import type {
   KeyboardEventHandler,
 } from "react";
 import { Children } from "react";
-import { Button } from "../ui/button";
+import { Button } from "./ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
-import { Textarea } from "../ui/textarea";
+} from "./ui/select";
+import { Textarea } from "./ui/textarea";
 import { cn } from "@/lib/utils";
 
 export type PromptInputProps = HTMLAttributes<HTMLFormElement>;
@@ -238,3 +238,4 @@ export const PromptInputModelSelectValue = ({
 }: PromptInputModelSelectValueProps) => (
   <SelectValue className={cn(className)} {...props} />
 );
+

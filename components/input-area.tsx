@@ -11,7 +11,7 @@ import {
   ModelSelectorLogo,
   ModelSelectorName,
   ModelSelectorTrigger,
-} from "./ai-elements/model-selector";
+} from "./model-selector";
 import { Button } from "./ui/button";
 import {
   PromptInput,
@@ -19,7 +19,7 @@ import {
   PromptInputTextarea,
   PromptInputToolbar,
   PromptInputTools,
-} from "./elements/prompt-input";
+} from "./prompt-input";
 import { ArrowUpIcon, PaperclipIcon } from "./icons";
 import { SuggestedActions } from "./suggested-actions";
 
