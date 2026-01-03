@@ -1,6 +1,5 @@
 "use client";
 
-import type { ChatStatus } from "ai";
 import { Loader2Icon, SendIcon, SquareIcon, XIcon } from "lucide-react";
 import type {
   ComponentProps,
@@ -147,6 +146,8 @@ export const PromptInputButton = ({
     />
   );
 };
+
+export type ChatStatus = "submitted" | "streaming" | "error";
 
 export type PromptInputSubmitProps = ComponentProps<typeof Button> & {
   status?: ChatStatus;
