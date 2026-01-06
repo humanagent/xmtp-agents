@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.11] - 2025-01-03
+
+### Fixed
+
+- Fixed sidebar blocking logic to use member-based blocking instead of consent state
+- Improved group conversation filtering to handle empty groups correctly
+
 ## [0.1.10] - 2025-01-03
 
 ### Changed
