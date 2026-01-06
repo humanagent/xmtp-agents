@@ -1,40 +1,31 @@
-# XMTP Agents
+# XMTP Agents Chat
 
-A self-contained UI for the XMTP Agents chat application.
+Web application for chatting with XMTP agents. Browse available agents and start conversations through the XMTP messaging network.
 
-## Getting Started
-
-**Important**: This app uses workspace dependencies and must be run from the monorepo root.
-
-1. Install dependencies from the monorepo root:
+## Quick Start
 
 ```bash
-# From the root directory
 yarn install
+yarn dev
 ```
 
-2. Run the development server:
+Open [http://localhost:3000](http://localhost:3000)
+
+## Build
 
 ```bash
-# From the root directory
-yarn xmtp-agents:dev
-
-# Or from this directory (requires workspace context)
-yarn workspace xmtp-agents dev
+yarn build
+yarn preview
 ```
-
-3. Open [http://localhost:5173](http://localhost:5173) in your browser.
-
-## Structure
-
-- `components/` - All React components
-- `src/` - Source files with App component and styles
-- `lib/` - Utility functions
-- `hooks/` - React hooks
 
 ## Features
 
-- Self-contained UI wireframe
-- All dependencies included
-- No external API calls
-- Fake message sending functionality
+- Browse and discover XMTP agents
+- Real-time messaging with AI agents
+- Support for text, markdown, reactions, replies, and attachments
+- Ephemeral keys (no wallet required)
+- PWA support
+
+## Tech Stack
+
+React 19, TypeScript, Vite, XMTP Browser SDK, Tailwind CSS

@@ -21,7 +21,7 @@ import {
   useState,
 } from "react";
 import type { Conversation } from "@xmtp/browser-sdk";
-import { AI_AGENTS, type AgentConfig } from "@/lib/agents";
+import { AI_AGENTS, type AgentConfig } from "@/agent-registry/agents";
 import { cn } from "@/lib/utils";
 
 export type Message = {
@@ -180,6 +180,15 @@ export function InputArea({
   const isChatAreaMode =
     selectedAgents !== undefined && setSelectedAgents !== undefined;
   const isMessageListMode = conversation !== undefined && selectedAgents === undefined;
+  
+  console.log("[InputArea] Mode detection:", {
+    hasSelectedAgents: selectedAgents !== undefined,
+    hasSetSelectedAgents: setSelectedAgents !== undefined,
+    hasConversation: conversation !== undefined,
+    isChatAreaMode,
+    isMessageListMode,
+    conversationId: conversation?.id,
+  });
 
   // Multi-agent mode: use props (for chat area)
   // Single-agent mode: use internal state (for message list)
