@@ -4,6 +4,9 @@ import { useXMTPClient } from "@hooks/use-xmtp-client";
 import { useCallback, useEffect, useState } from "react";
 import type { DecodedMessage } from "@xmtp/browser-sdk";
 import { useConversationsContext } from "@/src/contexts/xmtp-conversations-context";
+import { ThinkingIndicator } from "@ui/thinking-indicator";
+import { createGroupWithAgentAddresses } from "@/lib/xmtp/conversations";
+import type { AgentConfig } from "@/lib/agents";
 
 export function MessageList({ messages }: { messages: Message[] }) {
   return (
@@ -38,8 +41,15 @@ export function MessageList({ messages }: { messages: Message[] }) {
 
 export function ConversationView() {
   const [messages, setMessages] = useState<Message[]>([]);
+  const [isCreatingConversation, setIsCreatingConversation] = useState(false);
+  const [isSyncingConversation, setIsSyncingConversation] = useState(false);
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const { client } = useXMTPClient();
-  const { selectedConversation } = useConversationsContext();
+  const {
+    selectedConversation,
+    setSelectedConversation,
+    refreshConversations,
+  } = useConversationsContext();
 
   useEffect(() => {
     if (!client || !selectedConversation) {
@@ -50,7 +60,11 @@ export function ConversationView() {
 
     const setupMessages = async () => {
       try {
+        setIsSyncingConversation(true);
         await selectedConversation.sync();
+        setIsSyncingConversation(false);
+
+        setIsLoadingMessages(true);
         const existingMessages = await selectedConversation.messages();
 
         const chatMessages: Message[] = existingMessages
@@ -69,6 +83,7 @@ export function ConversationView() {
 
         if (mounted) {
           setMessages(chatMessages);
+          setIsLoadingMessages(false);
         }
 
         const stream = await selectedConversation.stream({
@@ -97,7 +112,10 @@ export function ConversationView() {
           void stream.end();
         };
       } catch {
-        // Error handling - messages will remain empty if setup fails
+        if (mounted) {
+          setIsSyncingConversation(false);
+          setIsLoadingMessages(false);
+        }
       }
     };
 
@@ -109,8 +127,36 @@ export function ConversationView() {
   }, [client, selectedConversation]);
 
   const handleSendMessage = useCallback(
-    async (content: string) => {
-      if (!client || !selectedConversation) {
+    async (content: string, agents?: AgentConfig[]) => {
+      if (!client) {
+        return;
+      }
+
+      let conversation = selectedConversation;
+
+      if (!conversation) {
+        if (!agents || agents.length === 0) {
+          return;
+        }
+
+        try {
+          setIsCreatingConversation(true);
+          const agentAddresses = agents.map((agent) => agent.address);
+          conversation = await createGroupWithAgentAddresses(
+            client,
+            agentAddresses,
+          );
+          setSelectedConversation(conversation);
+          void refreshConversations();
+        } catch {
+          setIsCreatingConversation(false);
+          return;
+        } finally {
+          setIsCreatingConversation(false);
+        }
+      }
+
+      if (!conversation) {
         return;
       }
 
@@ -123,13 +169,13 @@ export function ConversationView() {
       setMessages((prev) => [...prev, tempMessage]);
 
       try {
-        await selectedConversation.send(content);
+        await conversation.send(content);
         setMessages((prev) => prev.filter((m) => m.id !== tempMessage.id));
       } catch {
         setMessages((prev) => prev.filter((m) => m.id !== tempMessage.id));
       }
     },
-    [client, selectedConversation],
+    [client, selectedConversation, setSelectedConversation, refreshConversations],
   );
 
   return (
@@ -139,7 +185,16 @@ export function ConversationView() {
       <div className="relative flex-1">
         <div className="absolute inset-0 touch-pan-y overflow-y-auto">
           <div className="mx-auto flex min-w-0 max-w-4xl flex-col gap-4 px-2 py-4 md:gap-6 md:px-4">
-            {messages.length === 0 && <Greeting />}
+            {isCreatingConversation && (
+              <ThinkingIndicator message="Creating conversation..." />
+            )}
+            {isSyncingConversation && !isCreatingConversation && (
+              <ThinkingIndicator message="Syncing conversation..." />
+            )}
+            {isLoadingMessages && !isSyncingConversation && !isCreatingConversation && (
+              <ThinkingIndicator message="Loading messages..." />
+            )}
+            {messages.length === 0 && !isCreatingConversation && !isSyncingConversation && !isLoadingMessages && <Greeting />}
             {messages.length > 0 && <MessageList messages={messages} />}
           </div>
         </div>
@@ -148,8 +203,8 @@ export function ConversationView() {
       <div className="sticky bottom-0 z-1 mx-auto flex w-full max-w-4xl gap-2 border-t-0 bg-background px-2 pb-3 md:px-4 md:pb-4">
         <InputArea
           messages={messages}
-          sendMessage={(content) => {
-            void handleSendMessage(content);
+          sendMessage={(content, agents) => {
+            void handleSendMessage(content, agents);
           }}
           conversation={selectedConversation ?? undefined}
         />

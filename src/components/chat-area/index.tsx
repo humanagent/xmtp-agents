@@ -1,6 +1,5 @@
 import { InputArea, type Message } from "@components/input-area";
 import { useXMTPClient } from "@hooks/use-xmtp-client";
-import { Loader2Icon } from "@ui/icons";
 import { motion } from "framer-motion";
 import { useCallback, useEffect, useState } from "react";
 import type { DecodedMessage } from "@xmtp/browser-sdk";
@@ -51,7 +50,6 @@ export const Greeting = () => {
 export function ChatArea() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [selectedAgents, setSelectedAgents] = useState<AgentConfig[]>([]);
-  const [isCreatingConversation, setIsCreatingConversation] = useState(false);
   const { client } = useXMTPClient();
   const {
     selectedConversation,
@@ -127,21 +125,21 @@ export function ChatArea() {
   }, [client, selectedConversation]);
 
   const handleSendMessage = useCallback(
-    async (content: string) => {
+    async (content: string, agents?: AgentConfig[]) => {
       if (!client) {
-        return;
-      }
-
-      if (selectedAgents.length === 0) {
         return;
       }
 
       let conversation = selectedConversation;
 
       if (!conversation) {
+        const agentsToUse = agents || selectedAgents;
+        if (agentsToUse.length === 0) {
+          return;
+        }
+
         try {
-          setIsCreatingConversation(true);
-          const agentAddresses = selectedAgents.map((agent) => agent.address);
+          const agentAddresses = agentsToUse.map((agent) => agent.address);
           conversation = await createGroupWithAgentAddresses(
             client,
             agentAddresses,
@@ -149,10 +147,7 @@ export function ChatArea() {
           setSelectedConversation(conversation);
           void refreshConversations();
         } catch {
-          setIsCreatingConversation(false);
           return;
-        } finally {
-          setIsCreatingConversation(false);
         }
       }
 
@@ -228,16 +223,6 @@ export function ChatArea() {
           conversation={selectedConversation ?? null}
         />
       </div>
-      {isCreatingConversation && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
-          <div className="flex flex-col items-center gap-3 rounded-lg bg-card p-6 shadow-lg">
-            <Loader2Icon size={24} className="animate-spin text-primary" />
-            <p className="text-sm text-muted-foreground">
-              Creating conversation...
-            </p>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

@@ -7,6 +7,8 @@ import {
   ConversationsProvider,
   useConversationsContext,
 } from "@/src/contexts/xmtp-conversations-context";
+import { BrowserRouter, Routes, Route } from "react-router";
+import { ExplorePage } from "@components/explore/index";
 
 function AppContent() {
   const { selectedConversation } = useConversationsContext();
@@ -15,7 +17,18 @@ function AppContent() {
     <SidebarProvider>
       <Sidebar />
       <SidebarInset>
-        {selectedConversation ? <ConversationView /> : <ChatArea />}
+        <Routes>
+          <Route
+            path="/explore"
+            element={<ExplorePage />}
+          />
+          <Route
+            path="/"
+            element={
+              selectedConversation ? <ConversationView /> : <ChatArea />
+            }
+          />
+        </Routes>
       </SidebarInset>
     </SidebarProvider>
   );
@@ -27,8 +40,10 @@ export default function App() {
   console.log("[XMTP] App - client:", client ? "exists" : "null", "isLoading:", isLoading, "error:", error?.message);
 
   return (
-    <ConversationsProvider client={client}>
-      <AppContent />
-    </ConversationsProvider>
+    <BrowserRouter>
+      <ConversationsProvider client={client}>
+        <AppContent />
+      </ConversationsProvider>
+    </BrowserRouter>
   );
 }

@@ -160,7 +160,7 @@ export function InputArea({
 }: {
   selectedAgents?: AgentConfig[];
   setSelectedAgents?: (agents: AgentConfig[]) => void;
-  sendMessage?: (content: string) => void;
+  sendMessage?: (content: string, agents?: AgentConfig[]) => void;
   messages?: Message[];
   conversation?: Conversation | null;
 }) {
@@ -318,7 +318,7 @@ export function InputArea({
     isSubmittingRef.current = true;
 
     try {
-      sendMessage(messageContent);
+      sendMessage?.(messageContent, isMultiAgentMode ? currentSelectedAgents : undefined);
       setInput("");
     } catch {
       // Error handling - sendMessage callback handles errors
@@ -331,7 +331,7 @@ export function InputArea({
 
   const handleSuggestionClick = (suggestion: string) => {
     if (sendMessage) {
-      sendMessage(suggestion);
+      sendMessage(suggestion, isMultiAgentMode ? currentSelectedAgents : undefined);
     }
   };
 
