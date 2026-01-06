@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.1.12] - 2026-01-06
+
+### Fixed
+
+- Fixed sidebar blocking issue that prevented proper interaction
+- Improved sidebar component structure and organization
+
+### Changed
+
+- Refactored sidebar component with better separation of concerns
+- Extracted conversation item, user navigation, and utility functions into separate components
+- Enhanced sheet component with improved mobile interactions
+- Improved message list rendering and performance
+
+### Added
+
+- Added conversation-item component for better conversation rendering
+- Added user-nav component for user profile navigation
+- Added swipe gesture support for mobile sidebar interactions
+- Added utility functions for conversation sorting and management
+
 ## [0.1.11] - 2025-01-03
 
 ### Fixed
