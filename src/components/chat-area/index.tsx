@@ -12,7 +12,7 @@ export const ChatHeader = ({
   );
 };
 
-export const Greeting = () => {
+export const Greeting = ({ onOpenAgents }: { onOpenAgents?: () => void }) => {
   return (
     <div
       className="mx-auto mt-4 flex size-full max-w-3xl flex-col justify-center px-4 md:mt-16 md:px-8"
@@ -34,8 +34,17 @@ export const Greeting = () => {
         initial={{ opacity: 0, y: 10 }}
         transition={{ delay: 0.6, duration: 0.15 }}
       >
-        This chat is secured by XMTP. Each conversation its a new identity,
-        untraceable to the previous one
+        This chat is secured by XMTP.{" "}
+        {onOpenAgents && (
+          <button
+            type="button"
+            onClick={onOpenAgents}
+            className="text-primary underline hover:text-primary/80 transition-colors"
+          >
+            Select an agent
+          </button>
+        )}{" "}
+        to get started.
       </motion.div>
     </div>
   );

@@ -351,15 +351,21 @@ export function InputArea({
   sendMessage,
   messages: _messages,
   conversation,
+  openAgentsDialog,
+  onOpenAgentsDialogChange,
 }: {
   selectedAgents?: AgentConfig[];
   setSelectedAgents?: (agents: AgentConfig[]) => void;
   sendMessage?: (content: string, agents?: AgentConfig[]) => void;
   messages?: Message[];
   conversation?: Conversation | null;
+  openAgentsDialog?: boolean;
+  onOpenAgentsDialogChange?: (open: boolean) => void;
 }) {
   const [input, setInput] = useState("");
-  const [openDialog, setOpenDialog] = useState(false);
+  const [internalOpenDialog, setInternalOpenDialog] = useState(false);
+  const openDialog = openAgentsDialog ?? internalOpenDialog;
+  const setOpenDialog = onOpenAgentsDialogChange ?? setInternalOpenDialog;
   const [openPopover, setOpenPopover] = useState(false);
   const [addPeopleOpen, setAddPeopleOpen] = useState(false);
   const [metadataOpen, setMetadataOpen] = useState(false);

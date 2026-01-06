@@ -108,7 +108,7 @@ export function ExplorePage() {
       <div className="flex-1 overflow-y-auto">
         <div className="mx-auto max-w-6xl px-4 py-8 md:px-8">
           <div className="mb-8">
-            <h1 className="mb-2 font-semibold text-3xl">Agents</h1>
+            <h1 className="mb-2 font-semibold text-3xl">XMTP Agents</h1>
             <p className="text-muted-foreground">
               Chat with your favorite XMTP agents
             </p>

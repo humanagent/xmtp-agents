@@ -1,6 +1,6 @@
 import type { Client } from "@xmtp/browser-sdk";
 import { createContext, useContext, useState, type ReactNode } from "react";
-import { useXMTPConversations } from "@hooks/use-xmtp-conversations";
+import { useXMTPConversations } from "@/src/components/sidebar/use-xmtp-conversations";
 import type { ContentTypes } from "@/lib/xmtp/client";
 import type { AgentConfig } from "@/agent-registry/agents";
 

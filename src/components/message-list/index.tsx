@@ -99,6 +99,7 @@ export function MessageList({ messages }: { messages: Message[] }) {
 export function ConversationView() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [selectedAgents, setSelectedAgents] = useState<AgentConfig[]>([]);
+  const [openAgentsDialog, setOpenAgentsDialog] = useState(false);
   const [isCreatingConversation, setIsCreatingConversation] = useState(false);
   const [isSyncingConversation, setIsSyncingConversation] = useState(false);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
@@ -108,6 +109,7 @@ export function ConversationView() {
   const [isWaitingForAgent, setIsWaitingForAgent] = useState(false);
   const waitingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const streamCleanupRef = useRef<(() => Promise<void>) | null>(null);
+  const tempMessageTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { client } = useXMTPClient();
   const {
     selectedConversation,
@@ -183,7 +185,68 @@ export function ConversationView() {
     return () => {
       mounted = false;
     };
-  }, [pendingConversation, client, setPendingConversation, setSelectedConversation, refreshConversations]);
+  }, [
+    pendingConversation,
+    client,
+    setPendingConversation,
+    setSelectedConversation,
+    refreshConversations,
+  ]);
+
+  // Reset view when agent is selected in input area
+  const prevSelectedAgentsRef = useRef<AgentConfig[]>([]);
+  useEffect(() => {
+    const agentsChanged =
+      selectedAgents.length !== prevSelectedAgentsRef.current.length ||
+      selectedAgents.some(
+        (agent, index) =>
+          agent.address !== prevSelectedAgentsRef.current[index]?.address,
+      );
+
+    if (agentsChanged && selectedAgents.length > 0) {
+      console.log(
+        "[ConversationView] Agent selected in input, resetting view",
+        selectedAgents.map((a) => a.name),
+      );
+
+      // Clear conversation to show fresh chat area
+      if (selectedConversation) {
+        setSelectedConversation(null);
+        navigate("/", { replace: true });
+      }
+
+      // Clear all messages and state
+      setMessages([]);
+      setSyncError(null);
+      setLoadError(null);
+      setIsSyncingConversation(false);
+      setIsLoadingMessages(false);
+      setIsWaitingForAgent(false);
+
+      // Cleanup previous stream
+      if (streamCleanupRef.current) {
+        console.log("[ConversationView] Cleaning up previous stream");
+        void streamCleanupRef.current();
+        streamCleanupRef.current = null;
+      }
+
+      if (waitingTimeoutRef.current) {
+        clearTimeout(waitingTimeoutRef.current);
+        waitingTimeoutRef.current = null;
+      }
+      if (tempMessageTimeoutRef.current) {
+        clearTimeout(tempMessageTimeoutRef.current);
+        tempMessageTimeoutRef.current = null;
+      }
+    }
+
+    prevSelectedAgentsRef.current = selectedAgents;
+  }, [
+    selectedAgents,
+    selectedConversation,
+    setSelectedConversation,
+    navigate,
+  ]);
 
   // Sync selected conversation with URL params
   useEffect(() => {
@@ -234,6 +297,10 @@ export function ConversationView() {
     if (waitingTimeoutRef.current) {
       clearTimeout(waitingTimeoutRef.current);
       waitingTimeoutRef.current = null;
+    }
+    if (tempMessageTimeoutRef.current) {
+      clearTimeout(tempMessageTimeoutRef.current);
+      tempMessageTimeoutRef.current = null;
     }
 
     if (!client || !selectedConversation) {
@@ -373,6 +440,21 @@ export function ConversationView() {
                 if (prev.some((m) => m.id === message.id)) {
                   return prev;
                 }
+                if (newMessage.role === "user") {
+                  const tempIndex = prev.findIndex(
+                    (m) =>
+                      m.id.startsWith("temp-") && m.content === message.content,
+                  );
+                  if (tempIndex !== -1) {
+                    if (tempMessageTimeoutRef.current) {
+                      clearTimeout(tempMessageTimeoutRef.current);
+                      tempMessageTimeoutRef.current = null;
+                    }
+                    const updated = [...prev];
+                    updated[tempIndex] = newMessage;
+                    return updated;
+                  }
+                }
                 return [...prev, newMessage];
               });
 
@@ -432,6 +514,9 @@ export function ConversationView() {
       if (waitingTimeoutRef.current) {
         clearTimeout(waitingTimeoutRef.current);
       }
+      if (tempMessageTimeoutRef.current) {
+        clearTimeout(tempMessageTimeoutRef.current);
+      }
     };
   }, []);
 
@@ -485,9 +570,16 @@ export function ConversationView() {
 
       setMessages((prev) => [...prev, tempMessage]);
 
+      if (tempMessageTimeoutRef.current) {
+        clearTimeout(tempMessageTimeoutRef.current);
+      }
+      tempMessageTimeoutRef.current = setTimeout(() => {
+        setMessages((prev) => prev.filter((m) => m.id !== tempMessage.id));
+        tempMessageTimeoutRef.current = null;
+      }, 5000);
+
       try {
         await conversation.send(content);
-        setMessages((prev) => prev.filter((m) => m.id !== tempMessage.id));
 
         setIsWaitingForAgent(true);
         if (waitingTimeoutRef.current) {
@@ -544,6 +636,10 @@ export function ConversationView() {
           clearTimeout(waitingTimeoutRef.current);
           waitingTimeoutRef.current = null;
         }
+        if (tempMessageTimeoutRef.current) {
+          clearTimeout(tempMessageTimeoutRef.current);
+          tempMessageTimeoutRef.current = null;
+        }
       }
     },
     [
@@ -568,9 +664,10 @@ export function ConversationView() {
                 message={`Error creating conversation: ${createError}`}
               />
             )}
-            {(isCreatingConversation || pendingConversation) && !createError && (
-              <ThinkingIndicator message="Creating conversation..." />
-            )}
+            {(isCreatingConversation || pendingConversation) &&
+              !createError && (
+                <ThinkingIndicator message="Creating conversation..." />
+              )}
             {syncError && (
               <ThinkingIndicator
                 error
@@ -599,7 +696,13 @@ export function ConversationView() {
             {!selectedConversation &&
               !isCreatingConversation &&
               !createError &&
-              selectedAgents.length === 0 && <Greeting />}
+              selectedAgents.length === 0 && (
+                <Greeting
+                  onOpenAgents={() => {
+                    setOpenAgentsDialog(true);
+                  }}
+                />
+              )}
             {messages.length > 0 && <MessageList messages={messages} />}
             {isWaitingForAgent &&
               !isCreatingConversation &&
@@ -618,6 +721,8 @@ export function ConversationView() {
             : {
                 selectedAgents,
                 setSelectedAgents,
+                openAgentsDialog,
+                onOpenAgentsDialogChange: setOpenAgentsDialog,
               })}
           messages={messages}
           sendMessage={(content, agents) => {
