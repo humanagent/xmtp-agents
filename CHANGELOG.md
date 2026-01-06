@@ -6,6 +6,10 @@
 
 - Added Vercel configuration for Vite deployment
 
+### Fixed
+
+- Enabled dev server output by changing log level from error to info
+
 ## [0.1.3] - 2025-01-03
 
 ### Fixed
