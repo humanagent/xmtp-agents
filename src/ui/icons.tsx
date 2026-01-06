@@ -226,3 +226,192 @@ export const ExploreIcon = ({
     />
   </svg>
 );
+
+export const CopyIcon = ({
+  size = 16,
+  ...props
+}: { size?: number } & React.SVGProps<SVGSVGElement>) => (
+  <svg
+    height={size}
+    strokeLinejoin="round"
+    style={{ color: "currentcolor", ...props.style }}
+    viewBox="0 0 16 16"
+    width={size}
+    {...props}
+  >
+    <path
+      clipRule="evenodd"
+      d="M5.5 2C4.67157 2 4 2.67157 4 3.5V10.5C4 11.3284 4.67157 12 5.5 12H6V13.5C6 14.3284 6.67157 15 7.5 15H12.5C13.3284 15 14 14.3284 14 13.5V6.5C14 5.67157 13.3284 5 12.5 5H11V3.5C11 2.67157 10.3284 2 9.5 2H5.5ZM9.5 3.5H5.5V10.5H7.5V6.5C7.5 5.67157 8.17157 5 9 5H11V3.5H9.5ZM9 6.5H12.5V13.5H7.5V6.5H9Z"
+      fill="currentColor"
+      fillRule="evenodd"
+    />
+  </svg>
+);
+
+export const CheckIcon = ({
+  size = 16,
+  ...props
+}: { size?: number } & React.SVGProps<SVGSVGElement>) => (
+  <svg
+    height={size}
+    strokeLinejoin="round"
+    style={{ color: "currentcolor", ...props.style }}
+    viewBox="0 0 16 16"
+    width={size}
+    {...props}
+  >
+    <path
+      clipRule="evenodd"
+      d="M13.8536 3.64645C14.0488 3.84171 14.0488 4.15829 13.8536 4.35355L6.35355 11.8536C6.15829 12.0488 5.84171 12.0488 5.64645 11.8536L2.14645 8.35355C1.95118 8.15829 1.95118 7.84171 2.14645 7.64645C2.34171 7.45118 2.65829 7.45118 2.85355 7.64645L6 10.7929L13.1464 3.64645C13.3417 3.45118 13.6583 3.45118 13.8536 3.64645Z"
+      fill="currentColor"
+      fillRule="evenodd"
+    />
+  </svg>
+);
+
+export const ThumbsUpIcon = ({
+  size = 16,
+  ...props
+}: { size?: number } & React.SVGProps<SVGSVGElement>) => (
+  <svg
+    height={size}
+    strokeLinejoin="round"
+    style={{ color: "currentcolor", ...props.style }}
+    viewBox="0 0 16 16"
+    width={size}
+    {...props}
+  >
+    <path
+      clipRule="evenodd"
+      d="M5.5 6.5C5.5 5.94772 5.94772 5.5 6.5 5.5H8.5V2.5C8.5 1.94772 8.94772 1.5 9.5 1.5C10.0523 1.5 10.5 1.94772 10.5 2.5V5.5H12.5C13.0523 5.5 13.5 5.94772 13.5 6.5V13.5C13.5 14.0523 13.0523 14.5 12.5 14.5H6.5C5.94772 14.5 5.5 14.0523 5.5 13.5V6.5ZM7 6.5V13H12.5V6.5H10.5V2.5C10.5 2.22386 10.2761 2 10 2C9.72386 2 9.5 2.22386 9.5 2.5V6.5H7ZM3.5 4.5C3.5 4.22386 3.72386 4 4 4H4.5V3.5C4.5 3.22386 4.72386 3 5 3C5.27614 3 5.5 3.22386 5.5 3.5V4H6C6.27614 4 6.5 4.22386 6.5 4.5C6.5 4.77614 6.27614 5 6 5H5.5V6.5C5.5 6.77614 5.27614 7 5 7C4.72386 7 4.5 6.77614 4.5 6.5V5H4C3.72386 5 3.5 4.77614 3.5 4.5Z"
+      fill="currentColor"
+      fillRule="evenodd"
+    />
+  </svg>
+);
+
+export const ThumbsDownIcon = ({
+  size = 16,
+  ...props
+}: { size?: number } & React.SVGProps<SVGSVGElement>) => (
+  <svg
+    height={size}
+    strokeLinejoin="round"
+    style={{ color: "currentcolor", ...props.style }}
+    viewBox="0 0 16 16"
+    width={size}
+    {...props}
+  >
+    <path
+      clipRule="evenodd"
+      d="M10.5 9.5C10.5 10.0523 10.0523 10.5 9.5 10.5H7.5V13.5C7.5 14.0523 7.05228 14.5 6.5 14.5C5.94772 14.5 5.5 14.0523 5.5 13.5V10.5H3.5C2.94772 10.5 2.5 10.0523 2.5 9.5V2.5C2.5 1.94772 2.94772 1.5 3.5 1.5H9.5C10.0523 1.5 10.5 1.94772 10.5 2.5V9.5ZM9 9.5V3H3.5V9.5H5.5V13.5C5.5 13.7761 5.72386 14 6 14C6.27614 14 6.5 13.7761 6.5 13.5V9.5H9ZM12.5 11.5C12.5 11.7761 12.2761 12 12 12H11.5V12.5C11.5 12.7761 11.2761 13 11 13C10.7239 13 10.5 12.7761 10.5 12.5V12H10C9.72386 12 9.5 11.7761 9.5 11.5C9.5 11.2239 9.72386 11 10 11H10.5V9.5C10.5 9.22386 10.7239 9 11 9C11.2761 9 11.5 9.22386 11.5 9.5V11H12C12.2761 11 12.5 11.2239 12.5 11.5Z"
+      fill="currentColor"
+      fillRule="evenodd"
+    />
+  </svg>
+);
+
+export const RefreshIcon = ({
+  size = 16,
+  ...props
+}: { size?: number } & React.SVGProps<SVGSVGElement>) => (
+  <svg
+    height={size}
+    strokeLinejoin="round"
+    style={{ color: "currentcolor", ...props.style }}
+    viewBox="0 0 16 16"
+    width={size}
+    {...props}
+  >
+    <path
+      clipRule="evenodd"
+      d="M8 1.5C4.41015 1.5 1.5 4.41015 1.5 8C1.5 8.41421 1.16421 8.75 0.75 8.75C0.335786 8.75 0 8.41421 0 8C0 3.58172 3.58172 0 8 0C12.4183 0 16 3.58172 16 8C16 12.4183 12.4183 16 8 16C7.58579 16 7.25 15.6642 7.25 15.25C7.25 14.8358 7.58579 14.5 8 14.5C11.5899 14.5 14.5 11.5899 14.5 8C14.5 4.41015 11.5899 1.5 8 1.5ZM8 4.5C8.41421 4.5 8.75 4.83579 8.75 5.25V7.25H10.75C11.1642 7.25 11.5 7.58579 11.5 8C11.5 8.41421 11.1642 8.75 10.75 8.75H8C7.58579 8.75 7.25 8.41421 7.25 8V5.25C7.25 4.83579 7.58579 4.5 8 4.5Z"
+      fill="currentColor"
+      fillRule="evenodd"
+    />
+  </svg>
+);
+
+export const MoreActionsIcon = ({
+  size = 16,
+  ...props
+}: { size?: number } & React.SVGProps<SVGSVGElement>) => (
+  <svg
+    height={size}
+    strokeLinejoin="round"
+    style={{ color: "currentcolor", ...props.style }}
+    viewBox="0 0 16 16"
+    width={size}
+    {...props}
+  >
+    <path
+      clipRule="evenodd"
+      d="M3 8C3 8.55228 3.44772 9 4 9C4.55228 9 5 8.55228 5 8C5 7.44772 4.55228 7 4 7C3.44772 7 3 7.44772 3 8ZM8 8C8 8.55228 8.44772 9 9 9C9.55228 9 10 8.55228 10 8C10 7.44772 9.55228 7 9 7C8.44772 7 8 7.44772 8 8ZM12 9C12.5523 9 13 8.55228 13 8C13 7.44772 12.5523 7 12 7C11.4477 7 11 7.44772 11 8C11 8.55228 11.4477 9 12 9Z"
+      fill="currentColor"
+      fillRule="evenodd"
+    />
+  </svg>
+);
+
+export const AddPeopleIcon = ({
+  size = 16,
+  ...props
+}: { size?: number } & React.SVGProps<SVGSVGElement>) => (
+  <svg
+    height={size}
+    strokeLinejoin="round"
+    style={{ color: "currentcolor", ...props.style }}
+    viewBox="0 0 16 16"
+    width={size}
+    {...props}
+  >
+    <path
+      clipRule="evenodd"
+      d="M8 1.5C6.067 1.5 4.5 3.067 4.5 5C4.5 6.933 6.067 8.5 8 8.5C9.933 8.5 11.5 6.933 11.5 5C11.5 3.067 9.933 1.5 8 1.5ZM6 5C6 3.89543 6.89543 3 8 3C9.10457 3 10 3.89543 10 5C10 6.10457 9.10457 7 8 7C6.89543 7 6 6.10457 6 5ZM3.5 12.5C3.5 10.0147 5.51472 8 8 8C10.4853 8 12.5 10.0147 12.5 12.5V14.5H3.5V12.5ZM8 9.5C6.34315 9.5 5 10.8431 5 12.5V13H11V12.5C11 10.8431 9.65685 9.5 8 9.5ZM12.5 6.5C12.5 6.22386 12.7239 6 13 6H14.5V4.5C14.5 4.22386 14.7239 4 15 4C15.2761 4 15.5 4.22386 15.5 4.5V6H17C17.2761 6 17.5 6.22386 17.5 6.5C17.5 6.77614 17.2761 7 17 7H15.5V8.5C15.5 8.77614 15.2761 9 15 9C14.7239 9 14.5 8.77614 14.5 8.5V7H13C12.7239 7 12.5 6.77614 12.5 6.5Z"
+      fill="currentColor"
+      fillRule="evenodd"
+    />
+  </svg>
+);
+
+export const MenuIcon = ({
+  size = 16,
+  ...props
+}: { size?: number } & React.SVGProps<SVGSVGElement>) => (
+  <svg
+    height={size}
+    strokeLinejoin="round"
+    style={{ color: "currentcolor", ...props.style }}
+    viewBox="0 0 16 16"
+    width={size}
+    {...props}
+  >
+    <path
+      clipRule="evenodd"
+      d="M2 4C2 3.44772 2.44772 3 3 3H13C13.5523 3 14 3.44772 14 4C14 4.55228 13.5523 5 13 5H3C2.44772 5 2 4.55228 2 4ZM2 8C2 7.44772 2.44772 7 3 7H13C13.5523 7 14 7.44772 14 8C14 8.55228 13.5523 9 13 9H3C2.44772 9 2 8.55228 2 8ZM3 11C2.44772 11 2 11.4477 2 12C2 12.5523 2.44772 13 3 13H13C13.5523 13 14 12.5523 14 12C14 11.4477 13.5523 11 13 11H3Z"
+      fill="currentColor"
+      fillRule="evenodd"
+    />
+  </svg>
+);
+
+export const ChevronDownIcon = ({
+  size = 16,
+  ...props
+}: { size?: number } & React.SVGProps<SVGSVGElement>) => (
+  <svg
+    height={size}
+    strokeLinejoin="round"
+    style={{ color: "currentcolor", ...props.style }}
+    viewBox="0 0 16 16"
+    width={size}
+    {...props}
+  >
+    <path
+      clipRule="evenodd"
+      d="M4.29289 5.29289C4.68342 4.90237 5.31658 4.90237 5.70711 5.29289L8 2.99999L10.2929 5.29289C10.6834 5.68342 11.3166 5.68342 11.7071 5.29289C12.0976 4.90237 12.0976 4.2692 11.7071 3.87868L8.70711 0.87868C8.31658 0.488155 7.68342 0.488155 7.29289 0.87868L4.29289 3.87868C3.90237 4.2692 3.90237 4.90237 4.29289 5.29289Z"
+      fill="currentColor"
+      fillRule="evenodd"
+    />
+  </svg>
+);

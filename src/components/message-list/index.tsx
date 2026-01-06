@@ -6,37 +6,88 @@ import type { DecodedMessage } from "@xmtp/browser-sdk";
 import { useConversationsContext } from "@/src/contexts/xmtp-conversations-context";
 import { ThinkingIndicator } from "@ui/thinking-indicator";
 import { createGroupWithAgentAddresses } from "@/lib/xmtp/conversations";
-import type { AgentConfig } from "@/lib/agents";
+import type { AgentConfig } from "@/agent-registry/agents";
 import { motion } from "framer-motion";
+import { CopyIcon, CheckIcon } from "@ui/icons";
+import { Button } from "@ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@ui/tooltip";
 
 export function MessageList({ messages }: { messages: Message[] }) {
+  const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
+
+  const handleCopy = useCallback(async (content: string, messageId: string) => {
+    try {
+      await navigator.clipboard.writeText(content);
+      setCopiedMessageId(messageId);
+      setTimeout(() => {
+        setCopiedMessageId(null);
+      }, 2000);
+    } catch (error) {
+      console.error("Failed to copy:", error);
+    }
+  }, []);
+
   return (
-    <>
-      {messages.map((message) => (
-        <div
-          key={message.id}
-          className="fade-in w-full animate-in duration-150"
-        >
+    <TooltipProvider>
+      {messages.map((message) => {
+        const isCopied = copiedMessageId === message.id;
+        return (
           <div
-            className={`flex w-full items-start gap-2 md:gap-3 ${message.role === "user" ? "justify-end" : "justify-start"}`}
+            key={message.id}
+            className="fade-in w-full animate-in duration-150"
           >
-            <div className="flex flex-col gap-2 md:gap-4 max-w-[calc(100%-2.5rem)] sm:max-w-[min(fit-content,80%)]">
-              <div
-                className={`flex flex-col gap-2 overflow-hidden text-sm w-fit break-words rounded-md px-3 py-2 ${
-                  message.role === "user"
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-secondary text-foreground"
-                }`}
-              >
-                <div className="space-y-4 whitespace-normal size-full [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&_code]:whitespace-pre-wrap [&_code]:break-words [&_pre]:max-w-full [&_pre]:overflow-x-auto">
-                  <p>{message.content}</p>
+            <div
+              className={`group flex w-full items-start ${message.role === "user" ? "justify-end" : "justify-start"} mb-6`}
+            >
+              <div className={`flex flex-col ${message.role === "user" ? "items-end" : "items-start"} max-w-[85%] sm:max-w-[80%] md:max-w-[70%]`}>
+                <div
+                  className={`flex flex-col overflow-hidden text-sm w-fit break-words rounded-lg px-4 py-3 ${
+                    message.role === "user"
+                      ? "bg-primary text-primary-foreground"
+                      : "text-foreground"
+                  }`}
+                >
+                  <div className="space-y-2 whitespace-normal size-full [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&_code]:whitespace-pre-wrap [&_code]:break-words [&_pre]:max-w-full [&_pre]:overflow-x-auto">
+                    <p className="leading-relaxed">{message.content}</p>
+                  </div>
                 </div>
+                {message.role === "assistant" && (
+                  <div className="flex items-center gap-0.5 mt-1">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon-sm"
+                          className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                          onClick={() => {
+                            void handleCopy(message.content, message.id);
+                          }}
+                        >
+                          {isCopied ? (
+                            <CheckIcon size={14} />
+                          ) : (
+                            <CopyIcon size={14} />
+                          )}
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{isCopied ? "Copied" : "Copy"}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                )}
               </div>
             </div>
           </div>
-        </div>
-      ))}
-    </>
+        );
+      })}
+    </TooltipProvider>
   );
 }
 
@@ -264,7 +315,7 @@ export function ConversationView() {
 
       <div className="relative flex-1">
         <div className="absolute inset-0 touch-pan-y overflow-y-auto">
-          <div className="mx-auto flex min-w-0 max-w-4xl flex-col gap-4 px-2 py-4 md:gap-6 md:px-4">
+          <div className="mx-auto flex min-w-0 max-w-4xl flex-col px-3 py-4 md:px-6 md:py-6">
             {createError && (
               <ThinkingIndicator
                 error
@@ -305,8 +356,12 @@ export function ConversationView() {
 
       <div className="sticky bottom-0 z-1 mx-auto flex w-full max-w-4xl gap-2 border-t-0 bg-background px-2 pb-3 md:px-4 md:pb-4">
         <InputArea
-          selectedAgents={selectedAgents}
-          setSelectedAgents={setSelectedAgents}
+          {...(selectedConversation
+            ? {}
+            : {
+                selectedAgents,
+                setSelectedAgents,
+              })}
           messages={messages}
           sendMessage={(content, agents) => {
             void handleSendMessage(content, agents);

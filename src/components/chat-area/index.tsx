@@ -1,12 +1,64 @@
 import { motion } from "framer-motion";
 import { SidebarToggle } from "@/src/components/sidebar/sidebar-toggle";
-import { ShareButton } from "@/src/components/sidebar/share-button";
+import { Button } from "@ui/button";
+import {
+  ShareIcon,
+  AddPeopleIcon,
+  MenuIcon,
+  ChevronDownIcon,
+} from "@ui/icons";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@ui/tooltip";
 
 export const ChatHeader = () => {
   return (
-    <header className="sticky top-0 flex items-center gap-2 bg-background px-2 py-1.5 md:px-2">
-      <SidebarToggle />
-      <ShareButton />
+    <header className="sticky top-0 z-10 flex items-center justify-between gap-2 border-b border-border bg-background px-3 py-2 md:px-4">
+      <div className="flex items-center gap-2">
+        <SidebarToggle />
+        <div className="flex items-center gap-1 cursor-pointer rounded-md px-2 py-1 hover:bg-secondary transition-colors">
+          <span className="font-semibold text-sm">XMTP Agents</span>
+          <ChevronDownIcon size={14} />
+        </div>
+      </div>
+      <div className="flex items-center gap-1">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              className="h-8 px-2 md:h-fit md:px-2"
+              variant="ghost"
+              type="button"
+            >
+              <ShareIcon size={16} />
+              <span className="ml-1 hidden md:inline text-sm">Share</span>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Share conversation</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              className="h-8 px-2 md:h-fit md:px-2"
+              variant="ghost"
+              type="button"
+            >
+              <AddPeopleIcon size={16} />
+              <span className="ml-1 hidden md:inline text-sm">Add people</span>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Add people to conversation</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              className="h-8 px-2 md:h-fit md:px-2"
+              variant="ghost"
+              type="button"
+            >
+              <MenuIcon size={16} />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>More options</TooltipContent>
+        </Tooltip>
+      </div>
     </header>
   );
 };
