@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.9] - 2025-01-03
+
+### Added
+
+- Added copy icon below each agent message for easy content copying
+
 ## [0.1.8] - 2025-01-03
 
 ### Fixed

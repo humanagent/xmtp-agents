@@ -1,4 +1,4 @@
-import type { AgentConfig } from "@/lib/agents";
+import type { AgentConfig } from "@/agent-registry/agents";
 import { ArrowUpIcon } from "@ui/icons";
 import { motion } from "framer-motion";
 

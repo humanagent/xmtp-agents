@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router";
-import { AI_AGENTS, type AgentConfig } from "@/lib/agents";
+import { AI_AGENTS, type AgentConfig } from "@/agent-registry/agents";
 import { AgentCard } from "./agent-card";
 import { useXMTPClient } from "@hooks/use-xmtp-client";
 import { useConversationsContext } from "@/src/contexts/xmtp-conversations-context";
