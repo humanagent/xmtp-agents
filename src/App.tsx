@@ -13,6 +13,10 @@ function AppContent() {
       <SidebarInset>
         <Routes>
           <Route path="/explore" element={<ExplorePage />} />
+          <Route
+            path="/conversation/:conversationId"
+            element={<ConversationView />}
+          />
           <Route path="/" element={<ConversationView />} />
         </Routes>
       </SidebarInset>

@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState, useRef } from "react";
 import type { DecodedMessage } from "@xmtp/browser-sdk";
 import { Group } from "@xmtp/browser-sdk";
 import { useConversationsContext } from "@/src/contexts/xmtp-conversations-context";
+import { useParams, useNavigate } from "react-router";
 import { ThinkingIndicator } from "@ui/thinking-indicator";
 import { createGroupWithAgentAddresses } from "@/lib/xmtp/conversations";
 import type { AgentConfig } from "@/agent-registry/agents";
@@ -111,8 +112,36 @@ export function ConversationView() {
   const {
     selectedConversation,
     setSelectedConversation,
+    conversations,
     refreshConversations,
   } = useConversationsContext();
+  const { conversationId } = useParams();
+  const navigate = useNavigate();
+
+  // Sync selected conversation with URL params
+  useEffect(() => {
+    if (conversationId) {
+      const conversation = conversations.find((c) => c.id === conversationId);
+      if (conversation && conversation.id !== selectedConversation?.id) {
+        console.log(
+          "[ConversationView] Setting conversation from URL:",
+          conversationId,
+        );
+        setSelectedConversation(conversation);
+      } else if (!conversation && conversations.length > 0) {
+        console.log(
+          "[ConversationView] Conversation not found in list, navigating to home",
+        );
+        navigate("/");
+      }
+    }
+  }, [
+    conversationId,
+    conversations,
+    selectedConversation,
+    setSelectedConversation,
+    navigate,
+  ]);
 
   useEffect(() => {
     console.log(
@@ -202,6 +231,60 @@ export function ConversationView() {
             );
             setMessages(chatMessages);
             setIsLoadingMessages(false);
+          }
+
+          if (
+            mounted &&
+            selectedConversation instanceof Group &&
+            selectedConversation.name === "Agent Group" &&
+            chatMessages.length > 0
+          ) {
+            console.log(
+              "[ConversationView] Conversation needs naming, generating metadata...",
+            );
+            try {
+              const firstUserMessage = chatMessages.find(
+                (msg) => msg.role === "user",
+              );
+              if (firstUserMessage) {
+                const members = await selectedConversation.members();
+                const allAddresses = members.flatMap((member) =>
+                  member.accountIdentifiers
+                    .filter((id) => id.identifierKind === "Ethereum")
+                    .map((id) => id.identifier.toLowerCase()),
+                );
+
+                const agentAddresses = allAddresses.filter((addr) => {
+                  const normalizedAddr = addr.toLowerCase();
+                  return AI_AGENTS.some(
+                    (agent) => agent.address.toLowerCase() === normalizedAddr,
+                  );
+                });
+
+                if (agentAddresses.length > 0) {
+                  const metadata = await generateConversationMetadata(
+                    firstUserMessage.content,
+                    agentAddresses,
+                  );
+                  console.log(
+                    "[ConversationView] Generated metadata:",
+                    metadata,
+                  );
+                  await selectedConversation.updateName(metadata.name);
+                  if (metadata.description) {
+                    await selectedConversation.updateDescription(
+                      metadata.description,
+                    );
+                  }
+                  void refreshConversations();
+                }
+              }
+            } catch (error) {
+              console.error(
+                "[ConversationView] Error generating conversation metadata on selection:",
+                error,
+              );
+            }
           }
 
           const stream = await selectedConversation.stream({
@@ -308,6 +391,7 @@ export function ConversationView() {
             agentAddresses,
           );
           setSelectedConversation(conversation);
+          navigate(`/conversation/${conversation.id}`);
           void refreshConversations();
         } catch (error) {
           const errorMessage =

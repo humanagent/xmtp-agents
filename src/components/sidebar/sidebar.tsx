@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@ui/dropdown-menu";
-import { ExploreIcon, PlusIcon, TrashIcon } from "@ui/icons";
+import { ExploreIcon, PlusIcon } from "@ui/icons";
 import {
   SidebarContent,
   SidebarFooter,
@@ -19,10 +19,10 @@ import {
 } from "@ui/sidebar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@ui/tooltip";
 import type { Conversation } from "@xmtp/browser-sdk";
-import { Group } from "@xmtp/browser-sdk";
-import { useEffect } from "react";
+import { Group, Dm, ConsentState, ConsentEntityType } from "@xmtp/browser-sdk";
+import { useEffect, useState, useCallback } from "react";
 import { shortAddress } from "@/lib/utils";
-import { Link, useLocation } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { motion, AnimatePresence } from "framer-motion";
 
 const ChevronUpIcon = ({
@@ -93,10 +93,134 @@ const SidebarUserNav = () => {
 };
 
 export function Sidebar() {
-  const { client: _client } = useXMTPClient();
-  const { conversations, selectedConversation, setSelectedConversation } =
-    useConversationsContext();
+  const { client } = useXMTPClient();
+  const {
+    conversations,
+    selectedConversation,
+    setSelectedConversation,
+    refreshConversations,
+  } = useConversationsContext();
   const location = useLocation();
+  const navigate = useNavigate();
+  const [_blockedInboxIds, setBlockedInboxIds] = useState<Set<string>>(
+    new Set(),
+  );
+  const [_blockedGroupIds, setBlockedGroupIds] = useState<Set<string>>(
+    new Set(),
+  );
+
+  // Check if conversations are blocked on mount and when conversations change
+  useEffect(() => {
+    if (!client) return;
+
+    const checkBlocked = async () => {
+      const blocked = new Set<string>();
+      const blockedGroups = new Set<string>();
+
+      for (const conversation of conversations) {
+        if (conversation instanceof Group) {
+          try {
+            const getState = await conversation.consentState();
+            if (getState === ConsentState.Denied) {
+              blockedGroups.add(conversation.id);
+              console.log("[Sidebar] Group is blocked:", conversation.id);
+            }
+          } catch (error) {
+            console.error(
+              "[Sidebar] Error checking group consent state:",
+              error,
+            );
+          }
+        } else if (conversation instanceof Dm) {
+          // DM - check peer inbox ID consent state
+          const peerInboxId = conversation.peerInboxId as unknown as string;
+          if (peerInboxId) {
+            try {
+              const consentState = await client.preferences.getConsentState(
+                peerInboxId,
+                ConsentEntityType.InboxId,
+              );
+              if (consentState === ConsentState.Denied) {
+                blocked.add(peerInboxId);
+                console.log("[Sidebar] DM is blocked:", peerInboxId);
+              }
+            } catch (error) {
+              console.error(
+                "[Sidebar] Error checking peer inbox ID consent:",
+                error,
+              );
+            }
+          }
+        }
+      }
+      setBlockedInboxIds(blocked);
+      setBlockedGroupIds(blockedGroups);
+    };
+
+    void checkBlocked();
+  }, [client, conversations]);
+
+  const handleDeleteConversation = useCallback(
+    async (conversation: Conversation, event: React.MouseEvent) => {
+      event.stopPropagation();
+      if (!client) return;
+
+      try {
+        console.log("[Sidebar] Deleting conversation:", conversation.id);
+
+        if (conversation instanceof Group) {
+          // Block the group using consent state
+          await client.preferences.setConsentStates([
+            {
+              entity: conversation.id,
+              entityType: ConsentEntityType.GroupId,
+              state: ConsentState.Denied,
+            },
+          ]);
+          console.log("[Sidebar] Group blocked:", conversation.id);
+        } else if (conversation instanceof Dm) {
+          // DM - block the peer using consent state
+          const peerInboxId = conversation.peerInboxId as unknown as string;
+          if (peerInboxId) {
+            await client.preferences.setConsentStates([
+              {
+                entity: peerInboxId,
+                entityType: ConsentEntityType.InboxId,
+                state: ConsentState.Denied,
+              },
+            ]);
+            console.log("[Sidebar] Peer blocked:", peerInboxId);
+          }
+        }
+
+        // If this was the selected conversation, deselect it
+        if (selectedConversation?.id === conversation.id) {
+          setSelectedConversation(null);
+        }
+
+        // Update blocked sets immediately
+        if (conversation instanceof Group) {
+          setBlockedGroupIds((prev) => new Set(prev).add(conversation.id));
+        } else if (conversation instanceof Dm) {
+          const peerInboxId = conversation.peerInboxId as unknown as string;
+          if (peerInboxId) {
+            setBlockedInboxIds((prev) => new Set(prev).add(peerInboxId));
+          }
+        }
+
+        // Refresh conversations to update the list
+        await refreshConversations();
+      } catch (error) {
+        console.error("[Sidebar] Error blocking conversation:", error);
+      }
+    },
+    [
+      client,
+      selectedConversation,
+      setSelectedConversation,
+      refreshConversations,
+    ],
+  );
 
   // Log conversations when they change
   useEffect(() => {
@@ -113,6 +237,7 @@ export function Sidebar() {
 
   const handleConversationClick = (conversation: Conversation) => {
     setSelectedConversation(conversation);
+    navigate(`/conversation/${conversation.id}`);
   };
 
   return (
@@ -130,22 +255,9 @@ export function Sidebar() {
                     className="h-8 p-1 md:h-fit md:p-2"
                     type="button"
                     variant="ghost"
-                  >
-                    <TrashIcon />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent align="end" className="hidden md:block">
-                  Delete All Chats
-                </TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    className="h-8 p-1 md:h-fit md:p-2"
-                    type="button"
-                    variant="ghost"
                     onClick={() => {
                       setSelectedConversation(null);
+                      navigate("/");
                     }}
                   >
                     <PlusIcon />
@@ -281,46 +393,90 @@ export function Sidebar() {
 
               console.log("[Sidebar] ===== END DEBUG =====");
 
-              return uniqueConversations.map((conversation, _renderIndex) => {
-                const isActive = selectedConversation?.id === conversation.id;
-                const isGroup = conversation instanceof Group;
-                const groupName = isGroup ? conversation.name : null;
-                const displayId =
-                  conversation.id.length > 20
-                    ? `${conversation.id.slice(0, 10)}...${conversation.id.slice(-6)}`
-                    : conversation.id;
-                const displayText =
-                  isGroup && groupName && groupName !== "Agent Group"
-                    ? groupName
-                    : displayId;
-                const isNamed =
-                  isGroup && groupName && groupName !== "Agent Group";
+              // Filter out blocked conversations
+              const nonBlockedConversations = uniqueConversations.filter(
+                (conversation) => {
+                  if (conversation instanceof Group) {
+                    // Check if group is in blocked groups set
+                    if (blockedGroupIds.has(conversation.id)) {
+                      console.log(
+                        "[Sidebar] Filtering out blocked group:",
+                        conversation.id,
+                      );
+                      return false;
+                    }
+                    return true;
+                  } else if (conversation instanceof Dm) {
+                    // For DMs, check if peer is blocked
+                    const peerInboxId =
+                      conversation.peerInboxId as unknown as string;
+                    if (peerInboxId && blockedInboxIds.has(peerInboxId)) {
+                      console.log(
+                        "[Sidebar] Filtering out blocked DM:",
+                        peerInboxId,
+                      );
+                      return false;
+                    }
+                  }
+                  return true;
+                },
+              );
 
-                return (
-                  <SidebarMenuItem key={conversation.id}>
-                    <SidebarMenuButton
-                      isActive={isActive}
-                      className="cursor-pointer"
-                      onClick={() => {
-                        handleConversationClick(conversation);
-                      }}
-                    >
-                      <AnimatePresence mode="wait">
-                        <motion.span
-                          key={displayText}
-                          initial={{ opacity: 0, y: -4 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: 4 }}
-                          transition={{ duration: 0.15 }}
-                          className={`truncate text-xs ${isNamed ? "font-medium" : "font-mono"}`}
+              return nonBlockedConversations.map(
+                (conversation, _renderIndex) => {
+                  const isActive = selectedConversation?.id === conversation.id;
+                  const isGroup = conversation instanceof Group;
+                  const groupName = isGroup ? conversation.name : null;
+                  const displayId =
+                    conversation.id.length > 20
+                      ? `${conversation.id.slice(0, 10)}...${conversation.id.slice(-6)}`
+                      : conversation.id;
+                  const displayText =
+                    isGroup && groupName && groupName !== "Agent Group"
+                      ? groupName
+                      : displayId;
+                  const isNamed =
+                    isGroup && groupName && groupName !== "Agent Group";
+
+                  return (
+                    <SidebarMenuItem key={conversation.id}>
+                      <div className="group/conversation relative flex w-full items-center">
+                        <SidebarMenuButton
+                          isActive={isActive}
+                          className="cursor-pointer flex-1"
+                          onClick={() => {
+                            handleConversationClick(conversation);
+                          }}
                         >
-                          {displayText}
-                        </motion.span>
-                      </AnimatePresence>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              });
+                          <AnimatePresence mode="wait">
+                            <motion.span
+                              key={displayText}
+                              initial={{ opacity: 0, y: -4 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: 4 }}
+                              transition={{ duration: 0.15 }}
+                              className={`truncate text-xs ${isNamed ? "font-medium" : "font-mono"}`}
+                            >
+                              {displayText}
+                            </motion.span>
+                          </AnimatePresence>
+                        </SidebarMenuButton>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="opacity-0 group-hover/conversation:opacity-100 h-6 w-6 p-0 ml-1 transition-opacity"
+                          onClick={(e) => {
+                            void handleDeleteConversation(conversation, e);
+                          }}
+                        >
+                          <TrashIcon size={14} />
+                        </Button>
+                      </div>
+                    </SidebarMenuItem>
+                  );
+                },
+              );
             })()
           )}
         </SidebarMenu>

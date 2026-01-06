@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { SidebarToggle } from "@/src/components/sidebar/sidebar-toggle";
 import { Button } from "@ui/button";
-import { ShareIcon, AddPeopleIcon, MenuIcon } from "@ui/icons";
+import { ShareIcon, AddPeopleIcon, MetadataIcon } from "@ui/icons";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@ui/tooltip";
 import {
   Dialog,
@@ -114,12 +114,98 @@ function AddPeopleDialog({
   );
 }
 
+function MetadataDialog({
+  open,
+  onOpenChange,
+  group,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  group: Group;
+}) {
+  const [metadata, setMetadata] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      void (async () => {
+        setIsLoading(true);
+        try {
+          console.log("[Metadata] Fetching group metadata");
+          const members = await group.members();
+          const groupData = {
+            id: group.id,
+            name: group.name,
+            description: group.description,
+            members: members.map((member) => ({
+              inboxId: member.inboxId,
+              accountIdentifiers: member.accountIdentifiers,
+              installationIds: member.installationIds,
+              permissionLevel: member.permissionLevel,
+              consentState: member.consentState,
+            })),
+          };
+          setMetadata(JSON.stringify(groupData, null, 2));
+          console.log("[Metadata] Group metadata fetched successfully");
+        } catch (err) {
+          console.error("[Metadata] Error fetching metadata:", err);
+          setMetadata(
+            JSON.stringify(
+              {
+                error:
+                  err instanceof Error
+                    ? err.message
+                    : "Failed to fetch metadata",
+              },
+              null,
+              2,
+            ),
+          );
+        } finally {
+          setIsLoading(false);
+        }
+      })();
+    }
+  }, [open, group]);
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>Group Metadata</DialogTitle>
+          <DialogDescription>
+            JSON details of the group including id, members, name, and
+            description.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4">
+          {isLoading ? (
+            <div className="py-8 text-center text-muted-foreground">
+              Loading metadata...
+            </div>
+          ) : (
+            <pre className="max-h-[60vh] overflow-auto rounded-md border border-border bg-muted p-4 text-sm">
+              <code>{metadata || "No data available"}</code>
+            </pre>
+          )}
+        </div>
+        <DialogFooter>
+          <Button variant="ghost" onClick={() => onOpenChange(false)}>
+            Close
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 export const ChatHeader = ({
   conversation,
 }: {
   conversation: Conversation | null;
 }) => {
   const [addPeopleOpen, setAddPeopleOpen] = useState(false);
+  const [metadataOpen, setMetadataOpen] = useState(false);
   const isGroup = conversation instanceof Group;
 
   return (
@@ -143,43 +229,53 @@ export const ChatHeader = ({
             <TooltipContent>Share conversation</TooltipContent>
           </Tooltip>
           {isGroup && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  className="h-8 px-2 md:h-fit md:px-2"
-                  variant="ghost"
-                  type="button"
-                  onClick={() => setAddPeopleOpen(true)}
-                >
-                  <AddPeopleIcon size={16} />
-                  <span className="ml-1 hidden md:inline text-sm">
-                    Add people
-                  </span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Add people to conversation</TooltipContent>
-            </Tooltip>
+            <>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    className="h-8 px-2 md:h-fit md:px-2"
+                    variant="ghost"
+                    type="button"
+                    onClick={() => setAddPeopleOpen(true)}
+                  >
+                    <AddPeopleIcon size={16} />
+                    <span className="ml-1 hidden md:inline text-sm">
+                      Add people
+                    </span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Add people to conversation</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    className="h-8 px-2 md:h-fit md:px-2"
+                    variant="ghost"
+                    type="button"
+                    onClick={() => setMetadataOpen(true)}
+                  >
+                    <MetadataIcon size={16} />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>View group metadata</TooltipContent>
+              </Tooltip>
+            </>
           )}
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                className="h-8 px-2 md:h-fit md:px-2"
-                variant="ghost"
-                type="button"
-              >
-                <MenuIcon size={16} />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>More options</TooltipContent>
-          </Tooltip>
         </div>
       </header>
       {isGroup && (
-        <AddPeopleDialog
-          open={addPeopleOpen}
-          onOpenChange={setAddPeopleOpen}
-          group={conversation}
-        />
+        <>
+          <AddPeopleDialog
+            open={addPeopleOpen}
+            onOpenChange={setAddPeopleOpen}
+            group={conversation}
+          />
+          <MetadataDialog
+            open={metadataOpen}
+            onOpenChange={setMetadataOpen}
+            group={conversation}
+          />
+        </>
       )}
     </>
   );
