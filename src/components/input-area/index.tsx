@@ -535,10 +535,8 @@ export function InputArea({
     if (isMultiAgentMode) {
       const agents = selectedAgents;
       const setAgents = setSelectedAgents as (agents: AgentConfig[]) => void;
-      if (agents.some((a) => a.address === agent.address)) {
-        return;
-      }
-      setAgents([...agents, agent]);
+      // Replace instead of add - single select
+      setAgents([agent]);
     } else {
       console.log(
         "[InputArea] handleAddAgent called in single-agent mode with agent:",
@@ -565,16 +563,9 @@ export function InputArea({
   };
 
   const handleAgentSelect = (agent: AgentConfig) => {
-    const now = Date.now();
-    const timeSinceLastEnter = now - lastEnterPressRef.current;
-    lastEnterPressRef.current = now;
-
     handleAddAgent(agent);
-
-    if (timeSinceLastEnter < 500) {
-      setOpenDialog(false);
-      textareaRef.current?.focus();
-    }
+    setOpenDialog(false);
+    textareaRef.current?.focus();
   };
 
   const handleRemoveAgent = (address: string) => {
@@ -913,6 +904,7 @@ export function InputArea({
                         onSelect={() => {
                           if (!isSelected) {
                             handleAddAgent(agent);
+                            setOpenPopover(false);
                           }
                         }}
                         className={cn(

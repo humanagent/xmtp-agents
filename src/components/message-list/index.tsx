@@ -84,7 +84,9 @@ export function MessageList({ messages }: { messages: Message[] }) {
                     <p className="leading-relaxed">{message.content}</p>
                   </div>
                 </div>
-                <div className={`flex items-center gap-1.5 mt-1 ${message.role === "user" ? "justify-end" : "justify-start"}`}>
+                <div
+                  className={`flex items-center gap-1.5 mt-1 ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                >
                   {message.sentAt && (
                     <span className="text-[10px] text-muted-foreground/60">
                       {formatTimeAgo(message.sentAt)}
@@ -167,6 +169,8 @@ export function ConversationView() {
     console.log(
       "[ConversationView] Pending conversation detected, creating...",
       pendingConversation.agentAddresses,
+      "autoMessage:",
+      pendingConversation.autoMessage,
     );
 
     let mounted = true;
@@ -175,6 +179,12 @@ export function ConversationView() {
       try {
         setIsCreatingConversation(true);
         setCreateError(null);
+
+        // Update status to "creating"
+        setPendingConversation({
+          ...pendingConversation,
+          status: "creating",
+        });
 
         const conversation = await createGroupWithAgentAddresses(
           client,
@@ -190,8 +200,77 @@ export function ConversationView() {
           conversation.id,
         );
 
-        setPendingConversation(null);
         setSelectedConversation(conversation);
+        navigate(`/conversation/${conversation.id}`);
+        void refreshConversations();
+
+          // Update status to "sending" and send auto message if provided
+          if (pendingConversation.autoMessage) {
+            setPendingConversation({
+              ...pendingConversation,
+              status: "sending",
+            });
+
+            console.log(
+              "[ConversationView] Sending auto message:",
+              pendingConversation.autoMessage,
+            );
+
+            // Add temporary user message for better UX
+            const tempMessage: Message = {
+              id: `temp-${Date.now()}`,
+              role: "user",
+              content: pendingConversation.autoMessage,
+              sentAt: new Date(),
+            };
+
+            setMessages((prev) => [...prev, tempMessage]);
+
+            // Scroll to bottom when message is added
+            setTimeout(() => {
+              scrollToBottom();
+            }, 100);
+
+            if (tempMessageTimeoutRef.current) {
+              clearTimeout(tempMessageTimeoutRef.current);
+            }
+            tempMessageTimeoutRef.current = setTimeout(() => {
+              setMessages((prev) => prev.filter((m) => m.id !== tempMessage.id));
+              tempMessageTimeoutRef.current = null;
+            }, 5000);
+
+            try {
+              await conversation.send(pendingConversation.autoMessage);
+
+              console.log(
+                "[ConversationView] Auto message sent, waiting for response",
+              );
+
+              setIsWaitingForAgent(true);
+              if (waitingTimeoutRef.current) {
+                clearTimeout(waitingTimeoutRef.current);
+              }
+              waitingTimeoutRef.current = setTimeout(() => {
+                setIsWaitingForAgent(false);
+                waitingTimeoutRef.current = null;
+              }, 10000);
+            } catch (error) {
+              console.error(
+                "[ConversationView] Failed to send auto message:",
+                error,
+              );
+              // Remove temp message on error
+              setMessages((prev) =>
+                prev.filter((m) => m.id !== tempMessage.id),
+              );
+              if (tempMessageTimeoutRef.current) {
+                clearTimeout(tempMessageTimeoutRef.current);
+                tempMessageTimeoutRef.current = null;
+              }
+            }
+          }
+
+        setPendingConversation(null);
         setIsCreatingConversation(false);
 
         console.log(
@@ -227,6 +306,7 @@ export function ConversationView() {
     setPendingConversation,
     setSelectedConversation,
     refreshConversations,
+    navigate,
   ]);
 
   // Reset view when agent is selected in input area
@@ -294,6 +374,14 @@ export function ConversationView() {
           "[ConversationView] Conversation not found in list, navigating to home",
         );
         navigate("/");
+      }
+    } else {
+      // Clear selected conversation when navigating to home (no conversationId in URL)
+      if (selectedConversation) {
+        console.log(
+          "[ConversationView] Clearing selected conversation - navigating to home",
+        );
+        setSelectedConversation(null);
       }
     }
   }, [
@@ -728,17 +816,24 @@ export function ConversationView() {
           className="absolute inset-0 touch-pan-y overflow-y-auto"
         >
           <div className="mx-auto flex min-w-0 max-w-4xl flex-col px-3 py-4 md:px-6 md:py-6">
-            {createError && (
+            {createError && !selectedConversation && (
               <ThinkingIndicator
                 error
                 message={`Error creating conversation: ${createError}`}
               />
             )}
             {(isCreatingConversation || pendingConversation) &&
-              !createError && (
-                <ThinkingIndicator message="Creating conversation..." />
+              !createError &&
+              !selectedConversation && (
+                <ThinkingIndicator
+                  message={
+                    pendingConversation?.status === "sending"
+                      ? "Sending message..."
+                      : "Creating conversation..."
+                  }
+                />
               )}
-            {syncError && (
+            {syncError && selectedConversation && (
               <ThinkingIndicator
                 error
                 message={`Error syncing conversation: ${syncError}`}
@@ -747,10 +842,11 @@ export function ConversationView() {
             {isSyncingConversation &&
               !syncError &&
               !isCreatingConversation &&
-              !pendingConversation && (
+              !pendingConversation &&
+              selectedConversation && (
                 <ThinkingIndicator message="Syncing conversation..." />
               )}
-            {loadError && (
+            {loadError && selectedConversation && (
               <ThinkingIndicator
                 error
                 message={`Error loading messages: ${loadError}`}
@@ -760,7 +856,8 @@ export function ConversationView() {
               !loadError &&
               !isSyncingConversation &&
               !isCreatingConversation &&
-              !pendingConversation && (
+              !pendingConversation &&
+              selectedConversation && (
                 <ThinkingIndicator message="Loading messages..." />
               )}
             {!selectedConversation &&

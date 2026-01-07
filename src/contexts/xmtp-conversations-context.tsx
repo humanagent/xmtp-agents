@@ -4,13 +4,22 @@ import { useXMTPConversations } from "@/src/components/sidebar/use-xmtp-conversa
 import type { ContentTypes } from "@/lib/xmtp/client";
 import type { AgentConfig } from "@/agent-registry/agents";
 
+type PendingConversationStatus = "creating" | "sending";
+
 type ConversationsContextType = ReturnType<typeof useXMTPConversations> & {
   pendingConversation: {
     agentAddresses: string[];
     agentConfigs: AgentConfig[];
+    autoMessage?: string;
+    status?: PendingConversationStatus;
   } | null;
   setPendingConversation: (
-    pending: { agentAddresses: string[]; agentConfigs: AgentConfig[] } | null,
+    pending: {
+      agentAddresses: string[];
+      agentConfigs: AgentConfig[];
+      autoMessage?: string;
+      status?: PendingConversationStatus;
+    } | null,
   ) => void;
 };
 
@@ -33,6 +42,8 @@ export function ConversationsProvider({
   const [pendingConversation, setPendingConversation] = useState<{
     agentAddresses: string[];
     agentConfigs: AgentConfig[];
+    autoMessage?: string;
+    status?: PendingConversationStatus;
   } | null>(null);
 
   const value: ConversationsContextType = {

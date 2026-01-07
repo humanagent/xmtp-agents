@@ -19,7 +19,10 @@ import { Group, Dm, ConsentState, ConsentEntityType } from "@xmtp/browser-sdk";
 import { useCallback, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 import { getGroupConsentState } from "@/lib/xmtp/consent";
-import { sortConversationsByLastMessage, type ConversationWithMeta } from "@/src/components/sidebar/utils";
+import {
+  sortConversationsByLastMessage,
+  type ConversationWithMeta,
+} from "@/src/components/sidebar/utils";
 import { cn } from "@/lib/utils";
 
 const SidebarLogo = ({ className }: { className?: string }) => (

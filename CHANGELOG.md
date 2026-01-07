@@ -1,5 +1,32 @@
 # Changelog
 
+## [0.1.24] - 2025-01-07
+
+### Fixed
+
+- Fixed conversation filtering to ensure blocked conversations are removed properly
+
+## [0.1.23] - 2025-01-07
+
+### Changed
+
+- Replaced user nav toggle icon with copy address icon for direct address copying
+
+## [0.1.22] - 2025-01-07
+
+### Changed
+
+- Removed base and world icons from agent cards
+- Removed deeplinks functionality from agent cards
+- Removed live indicator from agent cards
+
+## [0.1.21] - 2025-01-07
+
+### Fixed
+
+- Fixed "New Chat" button not clearing selected conversation when navigating to home
+- Fixed loading indicators appearing on home route when no conversation is selected
+
 ## [0.1.20] - 2025-01-07
 
 ### Added
