@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.23] - 2025-01-07
+
+### Changed
+
+- Replaced user nav toggle icon with copy address icon for direct address copying
+
 ## [0.1.22] - 2025-01-07
 
 ### Changed
