@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.21] - 2025-01-07
+
+### Fixed
+
+- Fixed "New Chat" button not clearing selected conversation when navigating to home
+- Fixed loading indicators appearing on home route when no conversation is selected
+
 ## [0.1.20] - 2025-01-07
 
 ### Added
