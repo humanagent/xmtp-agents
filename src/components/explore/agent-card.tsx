@@ -2,18 +2,6 @@ import type { AgentConfig } from "@/agent-registry/agents";
 import { ArrowUpIcon } from "@ui/icons";
 import { motion } from "framer-motion";
 
-function LiveIndicator() {
-  return (
-    <div className="relative flex items-center gap-1">
-      <span className="relative flex h-2 w-2">
-        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
-        <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
-      </span>
-      <span className="text-[9px] font-medium text-green-500 uppercase tracking-wide">Live</span>
-    </div>
-  );
-}
-
 type AgentCardProps = {
   agent: AgentConfig;
   onClick: () => void;
@@ -55,9 +43,10 @@ export function AgentCard({
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
                 <h3 className="font-semibold text-xs">{agent.name}</h3>
-                {agent.live && <LiveIndicator />}
               </div>
-              <p className="text-[10px] text-muted-foreground truncate">{description}</p>
+              <p className="text-[10px] text-muted-foreground truncate">
+                {description}
+              </p>
             </div>
           </div>
         </div>
@@ -86,7 +75,6 @@ export function AgentCard({
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <h3 className="truncate font-semibold text-xs">{agent.name}</h3>
-          {agent.live && <LiveIndicator />}
         </div>
         <p className="truncate text-[10px] text-muted-foreground">
           {description}

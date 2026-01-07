@@ -18,7 +18,7 @@ export const Greeting = ({ onOpenAgents }: { onOpenAgents?: () => void }) => {
     >
       <motion.div
         animate={{ opacity: 1, y: 0 }}
-        className="font-semibold text-lg flex items-center gap-2"
+        className="font-semibold text-xl md:text-2xl flex items-center gap-2"
         exit={{ opacity: 0, y: 8 }}
         initial={{ opacity: 0, y: 8 }}
         transition={{ delay: 0.1, duration: 0.15 }}
@@ -39,7 +39,7 @@ export const Greeting = ({ onOpenAgents }: { onOpenAgents?: () => void }) => {
       </motion.div>
       <motion.div
         animate={{ opacity: 1, y: 0 }}
-        className="text-sm text-muted-foreground"
+        className="text-base md:text-lg text-muted-foreground"
         exit={{ opacity: 0, y: 8 }}
         initial={{ opacity: 0, y: 8 }}
         transition={{ delay: 0.15, duration: 0.15 }}

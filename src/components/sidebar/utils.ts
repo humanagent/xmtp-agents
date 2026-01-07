@@ -18,16 +18,24 @@ export async function sortConversationsByLastMessage(
         let lastMessagePreview: string | undefined;
 
         if (lastMessage) {
-          const message = lastMessage as { sentAt?: Date; sentAtNs?: bigint; content?: unknown };
+          const message = lastMessage as {
+            sentAt?: Date;
+            sentAtNs?: bigint;
+            content?: unknown;
+          };
           if (message.sentAt) {
             sortTime = message.sentAt.getTime();
           } else if (message.sentAtNs) {
             sortTime = Number(message.sentAtNs) / 1_000_000;
           }
-          if (typeof message.content === "string" && message.content.length > 0) {
-            lastMessagePreview = message.content.length > 40 
-              ? `${message.content.slice(0, 40)}...` 
-              : message.content;
+          if (
+            typeof message.content === "string" &&
+            message.content.length > 0
+          ) {
+            lastMessagePreview =
+              message.content.length > 40
+                ? `${message.content.slice(0, 40)}...`
+                : message.content;
           }
         } else if (createdAt) {
           sortTime = createdAt.getTime();
@@ -51,8 +59,8 @@ export async function sortConversationsByLastMessage(
 
   return conversationsWithDates
     .sort((a, b) => b.sortTime - a.sortTime)
-    .map((item) => ({ 
-      conversation: item.conversation, 
-      lastMessagePreview: item.lastMessagePreview 
+    .map((item) => ({
+      conversation: item.conversation,
+      lastMessagePreview: item.lastMessagePreview,
     }));
 }
