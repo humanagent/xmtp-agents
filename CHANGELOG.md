@@ -1,5 +1,32 @@
 # Changelog
 
+## [0.1.16] - 2025-01-07
+
+### Added
+
+- Created centralized design system in `src/design/` folder
+- Added comprehensive design documentation (README.md, QUICK_REFERENCE.md)
+- Added design system changelog and version tracking
+- Added TypeScript exports for design tokens
+- Added design utilities and animation patterns
+
+### Changed
+
+- Centralized all design tokens in `src/design/tokens.css`
+- Updated accent color from lime green to orange-red (#CF1C0F)
+- Simplified `src/index.css` to import from design system
+- Applied consistent styling across all UI components (minimal radius, compact spacing)
+- Updated all button heights to h-7/h-8 for dense UI
+- Standardized text sizes to text-xs base
+- Updated all transitions to 200ms with consistent easing
+- Applied dark text on accent backgrounds for accessibility
+
+### Fixed
+
+- Fixed CSS import order issues for Tailwind compatibility
+- Removed @apply directives for Tailwind v4 compatibility
+- Fixed skeleton loading styles
+
 ## [0.1.15] - 2025-01-07
 
 ### Added
