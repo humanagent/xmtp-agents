@@ -43,6 +43,13 @@ import { Group } from "@xmtp/browser-sdk";
 import { AI_AGENTS, type AgentConfig } from "@/agent-registry/agents";
 import { cn } from "@/lib/utils";
 import { useConversationsContext } from "@/src/contexts/xmtp-conversations-context";
+import { useIsMobile } from "@hooks/use-mobile";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@ui/sheet";
 
 export type Message = {
   id: string;
@@ -356,6 +363,95 @@ function MetadataDialog({
   );
 }
 
+function MobileOptionsSheet({
+  open,
+  onOpenChange,
+  isMultiAgentMode,
+  conversation,
+  isGroup,
+  onAttachmentClick,
+  onShareClick,
+  onAddPeopleClick,
+  onMetadataClick,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  isMultiAgentMode: boolean;
+  conversation?: Conversation | null;
+  isGroup: boolean;
+  onAttachmentClick: () => void;
+  onShareClick: () => void;
+  onAddPeopleClick: () => void;
+  onMetadataClick: () => void;
+}) {
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent
+        side="bottom"
+        className="bg-zinc-950 border-t border-zinc-800 rounded-t p-0"
+      >
+        <SheetHeader className="px-4 pt-4 pb-2">
+          <SheetTitle className="text-left">Options</SheetTitle>
+        </SheetHeader>
+        <div className="flex flex-col gap-1 p-4">
+          {!isMultiAgentMode && (
+            <Button
+              className="h-10 w-full justify-start gap-3 px-4 bg-black hover:bg-zinc-800 border border-zinc-800 rounded text-foreground"
+              variant="ghost"
+              onClick={() => {
+                onAttachmentClick();
+                onOpenChange(false);
+              }}
+            >
+              <PaperclipIcon size={16} />
+              <span>Attachments</span>
+            </Button>
+          )}
+          {conversation && (
+            <Button
+              className="h-10 w-full justify-start gap-3 px-4 bg-black hover:bg-zinc-800 border border-zinc-800 rounded text-foreground"
+              variant="ghost"
+              onClick={() => {
+                onShareClick();
+                onOpenChange(false);
+              }}
+            >
+              <ShareIcon size={16} />
+              <span>Share</span>
+            </Button>
+          )}
+          {isGroup && (
+            <>
+              <Button
+                className="h-10 w-full justify-start gap-3 px-4 bg-black hover:bg-zinc-800 border border-zinc-800 rounded text-foreground"
+                variant="ghost"
+                onClick={() => {
+                  onAddPeopleClick();
+                  onOpenChange(false);
+                }}
+              >
+                <AddPeopleIcon size={16} />
+                <span>Add People</span>
+              </Button>
+              <Button
+                className="h-10 w-full justify-start gap-3 px-4 bg-black hover:bg-zinc-800 border border-zinc-800 rounded text-foreground"
+                variant="ghost"
+                onClick={() => {
+                  onMetadataClick();
+                  onOpenChange(false);
+                }}
+              >
+                <MetadataIcon size={16} />
+                <span>Metadata</span>
+              </Button>
+            </>
+          )}
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+}
+
 export function InputArea({
   selectedAgents,
   setSelectedAgents,
@@ -380,6 +476,7 @@ export function InputArea({
   const [openPopover, setOpenPopover] = useState(false);
   const [addPeopleOpen, setAddPeopleOpen] = useState(false);
   const [metadataOpen, setMetadataOpen] = useState(false);
+  const [mobileOptionsOpen, setMobileOptionsOpen] = useState(false);
   const [conversationAgents, setConversationAgents] = useState<AgentConfig[]>(
     [],
   );
@@ -387,6 +484,7 @@ export function InputArea({
   const isSubmittingRef = useRef(false);
   const lastEnterPressRef = useRef<number>(0);
   const isGroup = conversation instanceof Group;
+  const isMobile = useIsMobile();
 
   // Keyboard shortcut: CMD/CTRL + K to open agent selector
   useEffect(() => {
@@ -641,6 +739,16 @@ export function InputArea({
     }
   };
 
+  const handleAttachmentClick = () => {
+    // Attachment functionality to be implemented
+    console.log("[InputArea] Attachment clicked");
+  };
+
+  const handleShareClick = () => {
+    // Share functionality to be implemented
+    console.log("[InputArea] Share clicked");
+  };
+
   return (
     <div
       className={`relative flex w-full flex-col ${isMultiAgentMode ? "gap-2" : "gap-4"}`}
@@ -684,7 +792,18 @@ export function InputArea({
             <div
               className={`flex flex-row ${isMultiAgentMode ? "items-center" : "items-start"} gap-1 sm:gap-2`}
             >
-              {isMultiAgentMode ? (
+              {isMobile ? (
+                <Button
+                  className="h-10 w-10 p-0 shrink-0 md:h-7 md:w-7"
+                  type="button"
+                  variant="ghost"
+                  onClick={() => {
+                    setMobileOptionsOpen(true);
+                  }}
+                >
+                  <PlusIcon size={16} />
+                </Button>
+              ) : isMultiAgentMode ? (
                 <>
                   <AgentSelector
                     open={openDialog}
@@ -825,58 +944,62 @@ export function InputArea({
             </PromptInputTools>
 
             <div className="flex items-center gap-1">
-              {conversation && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      className={`${isMultiAgentMode ? "h-7 w-7 p-0" : "h-8 w-8 p-0"}`}
-                      variant="ghost"
-                      type="button"
-                    >
-                      <ShareIcon size={isMultiAgentMode ? 12 : 14} />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Share conversation</TooltipContent>
-                </Tooltip>
-              )}
-              {isGroup && (
+              {!isMobile && (
                 <>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        className={`${isMultiAgentMode ? "h-7 w-7 p-0" : "h-8 w-8 p-0"}`}
-                        variant="ghost"
-                        type="button"
-                        onClick={() => setAddPeopleOpen(true)}
-                      >
-                        <AddPeopleIcon size={isMultiAgentMode ? 12 : 14} />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Add people to conversation</TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        className={`${isMultiAgentMode ? "h-7 w-7 p-0" : "h-8 w-8 p-0"}`}
-                        variant="ghost"
-                        type="button"
-                        onClick={() => setMetadataOpen(true)}
-                      >
-                        <MetadataIcon size={isMultiAgentMode ? 12 : 14} />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>View group metadata</TooltipContent>
-                  </Tooltip>
+                  {conversation && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          className={`${isMultiAgentMode ? "h-7 w-7 p-0" : "h-8 w-8 p-0"}`}
+                          variant="ghost"
+                          type="button"
+                        >
+                          <ShareIcon size={isMultiAgentMode ? 12 : 14} />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Share conversation</TooltipContent>
+                    </Tooltip>
+                  )}
+                  {isGroup && (
+                    <>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            className={`${isMultiAgentMode ? "h-7 w-7 p-0" : "h-8 w-8 p-0"}`}
+                            variant="ghost"
+                            type="button"
+                            onClick={() => setAddPeopleOpen(true)}
+                          >
+                            <AddPeopleIcon size={isMultiAgentMode ? 12 : 14} />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Add people to conversation</TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            className={`${isMultiAgentMode ? "h-7 w-7 p-0" : "h-8 w-8 p-0"}`}
+                            variant="ghost"
+                            type="button"
+                            onClick={() => setMetadataOpen(true)}
+                          >
+                            <MetadataIcon size={isMultiAgentMode ? 12 : 14} />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>View group metadata</TooltipContent>
+                      </Tooltip>
+                    </>
+                  )}
                 </>
               )}
               <PromptInputSubmit
-                className={`rounded bg-accent text-accent-foreground transition-all duration-200 hover:bg-accent/90 hover:shadow-[0_0_12px_rgba(207,28,15,0.4)] active:scale-[0.97] disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none ${isMultiAgentMode ? "size-7" : "size-8"}`}
+                className={`rounded bg-accent text-accent-foreground transition-all duration-200 hover:bg-accent/90 hover:shadow-[0_0_12px_rgba(207,28,15,0.4)] active:scale-[0.97] disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none ${isMobile ? "size-10" : isMultiAgentMode ? "size-7" : "size-8"}`}
                 disabled={
                   !input.trim() ||
                   (isMultiAgentMode && currentSelectedAgents.length === 0)
                 }
               >
-                <ArrowUpIcon size={isMultiAgentMode ? 12 : 14} />
+                <ArrowUpIcon size={isMobile ? 16 : isMultiAgentMode ? 12 : 14} />
               </PromptInputSubmit>
             </div>
           </PromptInputToolbar>
@@ -950,6 +1073,17 @@ export function InputArea({
           />
         </>
       )}
+      <MobileOptionsSheet
+        open={mobileOptionsOpen}
+        onOpenChange={setMobileOptionsOpen}
+        isMultiAgentMode={isMultiAgentMode}
+        conversation={conversation}
+        isGroup={isGroup}
+        onAttachmentClick={handleAttachmentClick}
+        onShareClick={handleShareClick}
+        onAddPeopleClick={() => setAddPeopleOpen(true)}
+        onMetadataClick={() => setMetadataOpen(true)}
+      />
     </div>
   );
 }
