@@ -5,6 +5,14 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@ui/sidebar";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@ui/dialog";
 import { TrashIcon } from "@ui/icons";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRef, useState } from "react";
@@ -36,6 +44,7 @@ export function ConversationItem({
 
   const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
   const [isPressed, setIsPressed] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const handleTouchStart = (e: React.TouchEvent) => {
     setIsPressed(true);
@@ -98,24 +107,59 @@ export function ConversationItem({
               {displayText}
             </motion.span>
           </AnimatePresence>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="opacity-0 group-hover/conversation:opacity-100 md:opacity-0 md:group-hover/conversation:opacity-100 h-6 w-6 p-0 ml-1 transition-opacity group-data-[collapsible=icon]:hidden touch-manipulation active:scale-95"
-            onClick={onDelete}
-            onTouchStart={(e) => {
-              e.stopPropagation();
-              if (navigator.vibrate) {
-                navigator.vibrate(30);
-              }
-            }}
-            style={{ WebkitTapHighlightColor: "transparent" }}
-          >
-            <TrashIcon size={14} />
-          </Button>
         </SidebarMenuButton>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="absolute right-2 opacity-0 group-hover/conversation:opacity-100 md:opacity-0 md:group-hover/conversation:opacity-100 h-6 w-6 p-0 transition-opacity group-data-[collapsible=icon]:hidden touch-manipulation active:scale-95"
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowDeleteDialog(true);
+          }}
+          onTouchStart={(e) => {
+            e.stopPropagation();
+            if (navigator.vibrate) {
+              navigator.vibrate(30);
+            }
+          }}
+          style={{ WebkitTapHighlightColor: "transparent" }}
+        >
+          <TrashIcon size={14} />
+        </Button>
       </div>
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete conversation</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this conversation? This action
+              cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setShowDeleteDialog(false);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={(e) => {
+                setShowDeleteDialog(false);
+                onDelete(e);
+              }}
+            >
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </SidebarMenuItem>
   );
 }

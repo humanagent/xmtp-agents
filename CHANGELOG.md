@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.1.15] - 2025-01-07
+
+### Added
+
+- Added toast notification system for user feedback
+- Added delete confirmation dialog for conversations
+- Added auto-scroll functionality to message list
+- Added agent mention appending to messages for better context
+- Added comprehensive design system documentation
+
+### Changed
+
+- Improved message scrolling behavior with scroll to bottom on new messages
+- Enhanced conversation deletion with toast notifications
+- Updated waiting indicator logic to clear properly when assistant responds
+
+### Fixed
+
+- Fixed waiting state not clearing when assistant messages arrive
+- Fixed conversation deletion error handling with proper user feedback
+
 ## [0.1.14] - 2025-01-06
 
 ### Changed

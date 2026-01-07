@@ -110,6 +110,7 @@ export function ConversationView() {
   const waitingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const streamCleanupRef = useRef<(() => Promise<void>) | null>(null);
   const tempMessageTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const { client } = useXMTPClient();
   const {
     selectedConversation,
@@ -121,6 +122,13 @@ export function ConversationView() {
   } = useConversationsContext();
   const { conversationId } = useParams();
   const navigate = useNavigate();
+
+  const scrollToBottom = useCallback(() => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop =
+        scrollContainerRef.current.scrollHeight;
+    }
+  }, []);
 
   // Handle pending conversation creation (optimistic loading)
   useEffect(() => {
@@ -365,6 +373,24 @@ export function ConversationView() {
             );
             setMessages(chatMessages);
             setIsLoadingMessages(false);
+            // Clear waiting state if last message is from assistant
+            if (
+              chatMessages.length > 0 &&
+              chatMessages[chatMessages.length - 1]?.role === "assistant"
+            ) {
+              console.log(
+                "[ConversationView] Last message is from assistant, clearing waiting state",
+              );
+              setIsWaitingForAgent(false);
+              if (waitingTimeoutRef.current) {
+                clearTimeout(waitingTimeoutRef.current);
+                waitingTimeoutRef.current = null;
+              }
+            }
+            // Scroll to bottom when messages are loaded
+            setTimeout(() => {
+              scrollToBottom();
+            }, 100);
           }
 
           if (
@@ -458,7 +484,16 @@ export function ConversationView() {
                 return [...prev, newMessage];
               });
 
+              // Scroll to bottom when new message arrives
+              setTimeout(() => {
+                scrollToBottom();
+              }, 100);
+
               if (newMessage.role === "assistant" && mounted) {
+                console.log(
+                  "[ConversationView] Assistant message received, clearing waiting state",
+                  newMessage.id,
+                );
                 setIsWaitingForAgent(false);
                 if (waitingTimeoutRef.current) {
                   clearTimeout(waitingTimeoutRef.current);
@@ -507,7 +542,7 @@ export function ConversationView() {
         streamCleanupRef.current = null;
       }
     };
-  }, [client, selectedConversation]);
+  }, [client, selectedConversation, scrollToBottom]);
 
   useEffect(() => {
     return () => {
@@ -569,6 +604,11 @@ export function ConversationView() {
       };
 
       setMessages((prev) => [...prev, tempMessage]);
+
+      // Scroll to bottom when message is sent
+      setTimeout(() => {
+        scrollToBottom();
+      }, 100);
 
       if (tempMessageTimeoutRef.current) {
         clearTimeout(tempMessageTimeoutRef.current);
@@ -648,6 +688,7 @@ export function ConversationView() {
       selectedAgents,
       setSelectedConversation,
       refreshConversations,
+      scrollToBottom,
     ],
   );
 
@@ -656,7 +697,10 @@ export function ConversationView() {
       <ChatHeader conversation={selectedConversation} />
 
       <div className="relative flex-1">
-        <div className="absolute inset-0 touch-pan-y overflow-y-auto">
+        <div
+          ref={scrollContainerRef}
+          className="absolute inset-0 touch-pan-y overflow-y-auto"
+        >
           <div className="mx-auto flex min-w-0 max-w-4xl flex-col px-3 py-4 md:px-6 md:py-6">
             {createError && (
               <ThinkingIndicator
@@ -707,7 +751,9 @@ export function ConversationView() {
             {isWaitingForAgent &&
               !isCreatingConversation &&
               !isSyncingConversation &&
-              !isLoadingMessages && (
+              !isLoadingMessages &&
+              (messages.length === 0 ||
+                messages[messages.length - 1]?.role !== "assistant") && (
                 <ThinkingIndicator message="Waiting for agent response..." />
               )}
           </div>

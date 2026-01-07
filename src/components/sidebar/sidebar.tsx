@@ -10,6 +10,7 @@ import {
   SidebarMenuItem,
   Sidebar as SidebarUI,
 } from "@ui/sidebar";
+import { useToast } from "@ui/toast";
 import { SidebarToggle } from "@/src/components/sidebar/sidebar-toggle";
 import { SidebarUserNav } from "@/src/components/sidebar/user-nav";
 import { ConversationItem } from "@/src/components/sidebar/conversation-item";
@@ -38,6 +39,7 @@ export function Sidebar() {
     refreshConversations,
     setPendingConversation,
   } = useConversationsContext();
+  const { showToast } = useToast();
   const location = useLocation();
   const navigate = useNavigate();
   const [sortedConversations, setSortedConversations] = useState<
@@ -67,6 +69,7 @@ export function Sidebar() {
     async (conversation: Conversation, event: React.MouseEvent) => {
       event.stopPropagation();
       if (!client) {
+        showToast("Unable to delete conversation. Client not available.", "error");
         return;
       }
 
@@ -99,8 +102,10 @@ export function Sidebar() {
         }
 
         await refreshConversations();
-      } catch {
-        // Silently fail - conversation state unchanged
+        showToast("Conversation deleted successfully", "success");
+      } catch (error) {
+        console.error("Error deleting conversation:", error);
+        showToast("Failed to delete conversation. Please try again.", "error");
       }
     },
     [
@@ -108,6 +113,7 @@ export function Sidebar() {
       selectedConversation,
       setSelectedConversation,
       refreshConversations,
+      showToast,
     ],
   );
 

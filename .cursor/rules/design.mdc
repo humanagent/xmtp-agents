@@ -29,3 +29,246 @@ Monochrome base, single electric accent, hard-edged grid, terse UI chrome.
 - Forms: Dark fields (#13161A), white text, placeholder mid‑gray (#6A7179). Focus = accent ring; error = desat red underline; success = muted green tick.
 
 This styling communicates authority through restraint: black/white discipline, one energetic accent, grid‑tight layout, and minimal motion.
+
+---
+alwaysApply: true
+---
+
+# Design System - Black Theme
+
+## Philosophy
+
+**Pure black aesthetic**: Deep black backgrounds with elevated zinc surfaces  
+**Dense UI**: Small text, compact spacing, maximum information density  
+**Sharp edges**: Minimal border-radius, precise geometry  
+**Speed**: Fast 200ms transitions, buttery animations  
+**Precision**: Every pixel intentional, consistent spacing scale  
+**Modularity**: Composable, reusable primitives
+
+---
+
+## Color Palette
+
+### Backgrounds
+
+- **Main background**: `bg-black` (#000000) - Use hardcoded, not CSS variables
+- **Header/Panels**: `bg-zinc-950` (#09090b) - Use hardcoded, not CSS variables
+- **Panel with backdrop**: `bg-zinc-950/80` (80% opacity with backdrop-blur)
+- **Hover states**: `hover:bg-zinc-800` (#27272a)
+
+### Borders
+
+- **All borders**: `border-zinc-800` (#27272a) - Use hardcoded consistently
+
+### Text
+
+- **Primary text**: `text-foreground` (uses CSS variable, typically light gray)
+- **Muted text**: `text-muted-foreground` (uses CSS variable)
+
+### Accent
+
+- **Accent color**: Uses `bg-accent` / `text-accent-foreground` (CSS variable, typically bright green #c8ff3d)
+- **CRITICAL RULE**: Lime/accent backgrounds MUST ALWAYS use dark text (`#000000`), NEVER white text
+- **Light mode**: Dark text (`#000000`) on lime background for contrast
+- **Dark mode**: Dark text (`#000000`) on lime background for contrast
+
+### Feedback
+
+- Success: `#4CAF50`
+- Error: `#F48771`
+- Warning: `#F59E0B`
+
+---
+
+## Typography
+
+### Fonts
+
+- **System**: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif
+- **Monospace**: 'Menlo', 'Monaco', 'Courier New', monospace
+
+### Sizes
+
+- **Base**: `text-xs` (12px) - body text
+- **Small**: `text-[10px]` - badges, sublabels, metadata
+- **Base headings**: `text-base` (16px)
+- **Section headings**: `text-sm` (14px)
+
+### Weights
+
+- **Regular**: 400
+- **Medium**: 500
+- **Semibold**: 600 (headings)
+
+### Line Height
+
+- **Normal**: 1.5
+- **Tight**: 1.25 (dense areas)
+- **None**: 1.0 (badges)
+
+### Letter Spacing
+
+- **Headings**: `-0.01em`
+
+---
+
+## Spacing & Sizing
+
+### Component Heights
+
+- **Buttons (small)**: `h-7` (28px) or `h-8` (32px)
+- **Inputs**: `h-7` (28px)
+- **Icon buttons**: `h-10 w-10` (40px)
+- **Header**: `py-3` (12px vertical padding)
+
+### Padding
+
+- **Standard**: `px-3 py-2` or `px-4 py-3`
+- **Compact**: `px-2 py-1`
+- **Tight**: `px-2` or `px-3`
+
+### Gaps
+
+- **Standard gap**: `gap-2` or `gap-3`
+- **Icon rail gap**: `gap-1`
+
+---
+
+## Component Patterns
+
+### Header
+
+```tsx
+<header className="border-b border-zinc-800 bg-zinc-950">
+  <div className="px-4 py-3 flex items-center justify-between">{/* content */}</div>
+</header>
+```
+
+### Side Panel
+
+```tsx
+<div className="w-[420px] bg-zinc-950/80 backdrop-blur border-l border-zinc-800 flex flex-col">
+  <div className="border-b border-zinc-800 px-4 py-3">{/* header */}</div>
+</div>
+```
+
+### Icon Rail
+
+```tsx
+<div className="w-14 bg-zinc-950 border-l border-zinc-800 flex flex-col items-center py-2 gap-1">
+  {/* icon buttons */}
+</div>
+```
+
+### List Items
+
+```tsx
+<div className="px-3 py-2 rounded cursor-pointer transition-colors hover:bg-zinc-800">
+  {/* content */}
+</div>
+```
+
+### Selected State
+
+```tsx
+className={`px-3 py-2 rounded ${
+  selected ? 'bg-accent text-accent-foreground' : 'hover:bg-zinc-800'
+}`}
+```
+
+### Borders
+
+```tsx
+className = 'border border-zinc-800 rounded'
+```
+
+### Buttons
+
+```tsx
+// Default button (accent/lime background)
+<Button variant="default">Button</Button>
+// Uses: bg-accent text-accent-foreground
+// Light mode: Dark text (#000000) on lime background for contrast
+// Dark mode: Dark text (#000000) on lime background for contrast
+
+// Ghost button (transparent, hover zinc-800)
+<Button variant="ghost" className="text-foreground hover:bg-zinc-800">
+  Ghost Button
+</Button>
+
+// Outline button (transparent, border, hover zinc-800)
+<Button variant="outline" className="border-zinc-800 text-foreground hover:bg-zinc-800">
+  Outline Button
+</Button>
+```
+
+**CRITICAL TEXT COLOR RULES**:
+
+- **On zinc backgrounds** (zinc-950, zinc-800): Always use `text-foreground` (light) or `text-muted-foreground` (muted light). Never use dark text.
+- **On lime/accent backgrounds** (`bg-accent`): Always use `text-accent-foreground` (dark `#000000`). NEVER use white or light text.
+
+---
+
+## Layout Structure
+
+### Main Container
+
+- Background: `bg-black` (hardcoded #000000)
+- Full height: `h-screen` or `min-h-screen`
+
+### Headers/Panels
+
+- Background: `bg-zinc-950` (hardcoded #09090b)
+- Border: `border-zinc-800` (hardcoded #27272a)
+- Padding: `px-4 py-3`
+
+### Side Panels with Backdrop
+
+- Background: `bg-zinc-950/80 backdrop-blur`
+- Border: `border-zinc-800`
+
+---
+
+## Interactions
+
+### Transitions
+
+- **Standard**: `transition-colors` on interactive elements
+- **Duration**: 200ms (default Tailwind)
+
+### Hover States
+
+- **Interactive elements**: `hover:bg-zinc-800` (#27272a)
+- **Transitions**: Always apply `transition-colors`
+
+### Focus States
+
+- **Ring**: Standard Tailwind focus ring
+- **Color**: Uses accent color via CSS variables
+
+---
+
+## Implementation Notes
+
+- **Don't use CSS variables** for main backgrounds - use hardcoded `bg-black` and `bg-zinc-950`
+- **Use CSS variables** for text colors (`text-foreground`, `text-muted-foreground`) to support theme toggle
+- **Consistent border color** - Always `border-zinc-800`
+- **Backdrop blur** - Apply to semi-transparent panels for depth
+- **Accent colors** - Use CSS variables (`bg-accent`, `text-accent-foreground`) for selection states
+- **Lime background rule** - NEVER use white or light text on lime/accent backgrounds. Always use dark text (`text-accent-foreground` = `#000000`)
+
+---
+
+## Best Practices
+
+1. **Pure black backgrounds** - Use `bg-black` for main container, not CSS variables
+2. **Zinc-950 for elevated surfaces** - Headers, panels, sidebars use `bg-zinc-950`
+3. **Zinc-800 for borders** - All borders use `border-zinc-800`
+4. **Zinc-800 for hovers** - Hover states use `hover:bg-zinc-800`
+5. **Backdrop blur on panels** - Side panels use `bg-zinc-950/80 backdrop-blur`
+6. **Small, dense UI** - Text sizes are small (xs, 10px), compact spacing
+7. **Sharp corners** - Minimal border radius (0.125rem default)
+8. **Accent for selection** - Selected items use `bg-accent text-accent-foreground`
+9. **Light text on zinc** - Always use `text-foreground` or `text-muted-foreground` on zinc backgrounds (zinc-950, zinc-800). Never use dark text.
+10. **Dark text on lime** - Always use dark text (`text-accent-foreground`, `#000000`) on lime/accent backgrounds. NEVER use white or light text on lime backgrounds.
+11. **Button text colors** - Ghost/outline buttons on zinc backgrounds must explicitly use `text-foreground` class. Accent buttons must use `text-accent-foreground` (dark).

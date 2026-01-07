@@ -562,6 +562,19 @@ export function InputArea({
     }
   };
 
+  const appendAgentMentions = (message: string): string => {
+    // Use conversationAgents if available (existing conversation), otherwise use selected agents
+    const agentsToMention = conversationAgents.length > 0 
+      ? conversationAgents 
+      : currentSelectedAgents;
+    
+    if (agentsToMention.length === 0) {
+      return message;
+    }
+    const mentions = agentsToMention.map((agent) => `@${agent.name}`).join(" ");
+    return `${message} ${mentions}`;
+  };
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     e.stopPropagation();
@@ -583,8 +596,10 @@ export function InputArea({
     isSubmittingRef.current = true;
 
     try {
+      const messageToSend = appendAgentMentions(messageContent);
+      console.log("[InputArea] Sending message with mentions:", messageToSend);
       sendMessage?.(
-        messageContent,
+        messageToSend,
         isMultiAgentMode ? currentSelectedAgents : undefined,
       );
       setInput("");
@@ -599,8 +614,10 @@ export function InputArea({
 
   const handleSuggestionClick = (suggestion: string) => {
     if (sendMessage) {
+      const messageToSend = appendAgentMentions(suggestion);
+      console.log("[InputArea] Sending suggestion with mentions:", messageToSend);
       sendMessage(
-        suggestion,
+        messageToSend,
         isMultiAgentMode ? currentSelectedAgents : undefined,
       );
     }
