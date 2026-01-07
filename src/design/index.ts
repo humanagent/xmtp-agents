@@ -29,6 +29,13 @@ export const designTokens = {
     buttonHeightLg: '2.5rem',
     inputHeight: '1.75rem',
   },
+  typography: {
+    xs: '0.875rem',   // 14px
+    sm: '1rem',       // 16px
+    base: '1.125rem', // 18px
+    lg: '1.25rem',    // 20px
+    xl: '1.5rem',     // 24px
+  },
   radius: {
     default: '0.125rem',
   },

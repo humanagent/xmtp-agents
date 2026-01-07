@@ -18,7 +18,7 @@ src/design/
 To update the primary brand color throughout the app:
 
 1. Open `tokens.css`
-2. Find the `COLORS - Base Palette` section
+2. Find the `COLORS - Base Palette` section (around line 33)
 3. Update the `--accent` variable:
 
 ```css
@@ -29,7 +29,20 @@ To update the primary brand color throughout the app:
 --accent: #YOUR_HEX_COLOR;
 ```
 
-**That's it!** The color will update everywhere:
+4. **IMPORTANT:** Also update the direct references in the sidebar section (around lines 91-96):
+```css
+--sidebar-primary: #CF1C0F;      /* Update this too */
+--sidebar-ring: #CF1C0F;         /* And this */
+```
+
+5. And in the chart colors section (around line 100):
+```css
+--chart-1: #CF1C0F;              /* Update this too */
+```
+
+**Note:** We use direct hex values instead of CSS variable references to avoid circular dependencies.
+
+**After updating, the color will appear everywhere:**
 - All buttons with `variant="default"`
 - Selected states in sidebar
 - User message bubbles

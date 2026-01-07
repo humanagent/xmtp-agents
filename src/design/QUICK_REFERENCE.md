@@ -39,16 +39,16 @@
 ### 3. Make Text Bigger
 
 **File:** `src/design/tokens.css`  
-**Lines:** ~110-115
+**Lines:** ~132-136
 
 ```css
-/* Current (Small) */
---text-xs: 0.75rem;    /* 12px */
---text-sm: 0.875rem;   /* 14px */
-
-/* Change to (Larger) */
+/* Current (Readable) */
 --text-xs: 0.875rem;   /* 14px */
 --text-sm: 1rem;       /* 16px */
+
+/* Change to (Larger) */
+--text-xs: 1rem;       /* 16px */
+--text-sm: 1.125rem;   /* 18px */
 ```
 
 ### 4. Make Corners More Rounded
@@ -165,5 +165,11 @@ Read the full documentation: [`src/design/README.md`](./README.md)
 
 **Last Updated:** Jan 2026  
 **Current Accent:** #CF1C0F (Orange-red)  
-**Current Typography:** Small (12px base)  
+**Current Typography:** Readable (14px base, increased from 12px)  
 **Current Spacing:** Dense (28px/32px buttons)
+
+## 🔧 Recent Fixes (v0.1.16)
+
+- **Fixed:** Removed circular CSS variable references that prevented accent color from showing
+- **Fixed:** Increased base font size from 12px to 14px for better readability
+- **Note:** All colors now reference direct hex values to avoid cascade issues

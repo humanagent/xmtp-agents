@@ -81,44 +81,29 @@
   --muted: var(--surface-muted);
   --muted-foreground: var(--text-muted);
   
-  /* Accent (duplicate for shadcn compatibility) */
-  --accent: var(--accent);
-  --accent-foreground: var(--accent-foreground);
+  /* Note: --accent, --success, --warning, --destructive already defined above */
+  /* No circular references - using direct values only */
   
-  /* Destructive */
-  --destructive: var(--destructive);
-  --destructive-foreground: var(--destructive-foreground);
-  
-  /* Success */
-  --success: var(--success);
-  --success-foreground: var(--success-foreground);
-  
-  /* Warning */
-  --warning: var(--warning);
-  --warning-foreground: var(--warning-foreground);
-  
-  /* Borders */
-  --border: var(--border);
+  /* Input (for Tailwind compatibility) */
   --input: var(--input-bg);
-  --ring: var(--ring);
   
   /* Sidebar */
   --sidebar-background: var(--surface-elevated);
   --sidebar-foreground: var(--text-primary);
-  --sidebar-primary: var(--accent);
-  --sidebar-primary-foreground: var(--accent-foreground);
+  --sidebar-primary: #CF1C0F;
+  --sidebar-primary-foreground: #000000;
   --sidebar-accent: var(--surface-card);
   --sidebar-accent-foreground: var(--text-primary);
-  --sidebar-border: var(--border);
-  --sidebar-ring: var(--ring);
+  --sidebar-border: #27272a;
+  --sidebar-ring: #CF1C0F;
   --sidebar: var(--surface-elevated);
   
   /* Chart Colors */
-  --chart-1: var(--accent);
-  --chart-2: var(--success);
-  --chart-3: var(--warning);
-  --chart-4: var(--destructive);
-  --chart-5: var(--text-muted);
+  --chart-1: #CF1C0F;              /* Accent/orange-red */
+  --chart-2: #4CAF50;              /* Success/green */
+  --chart-3: #F59E0B;              /* Warning/amber */
+  --chart-4: #F48771;              /* Destructive/red */
+  --chart-5: #a1a1aa;              /* Muted */
   
   
   /* ========================================
@@ -144,12 +129,12 @@
   --icon-lg: 20px;                 /* Headers, featured elements */
   --icon-xl: 24px;                 /* Empty states, large features */
   
-  /* Typography Scale */
-  --text-xs: 0.75rem;              /* 12px - body text, UI labels */
-  --text-sm: 0.875rem;             /* 14px - headings, emphasis */
-  --text-base: 1rem;               /* 16px - rarely used */
-  --text-lg: 1.125rem;             /* 18px - section headings */
-  --text-xl: 1.25rem;              /* 20px - page titles */
+  /* Typography Scale - Updated for better readability */
+  --text-xs: 0.875rem;             /* 14px - body text, UI labels (increased from 12px) */
+  --text-sm: 1rem;                 /* 16px - headings, emphasis (increased from 14px) */
+  --text-base: 1.125rem;           /* 18px - standard text (increased from 16px) */
+  --text-lg: 1.25rem;              /* 20px - section headings (increased from 18px) */
+  --text-xl: 1.5rem;               /* 24px - page titles (increased from 20px) */
   
   
   /* ========================================

@@ -2,6 +2,24 @@
 
 All notable changes to the design system will be documented in this file.
 
+## [1.0.1] - 2026-01-07
+
+### Fixed
+- **CRITICAL:** Removed circular CSS variable references that prevented accent color from displaying
+  - Changed `--accent: var(--accent)` to direct hex values
+  - Changed `--success: var(--success)` to direct hex values  
+  - Changed all color references to use direct values to avoid cascade issues
+- Increased base typography scale for better readability:
+  - `--text-xs`: 12px → 14px (body text)
+  - `--text-sm`: 14px → 16px (headings)
+  - `--text-base`: 16px → 18px
+  - `--text-lg`: 18px → 20px
+  - `--text-xl`: 20px → 24px
+
+### Changed
+- Updated sidebar and chart color references to use direct hex values
+- Added explicit `--input` mapping for Tailwind compatibility
+
 ## [1.0.0] - 2026-01-07
 
 ### Initial Release
