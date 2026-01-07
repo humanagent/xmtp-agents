@@ -5,8 +5,6 @@ import { AgentCard } from "./agent-card";
 import { useXMTPClient } from "@hooks/use-xmtp-client";
 import { useConversationsContext } from "@/src/contexts/xmtp-conversations-context";
 import { createGroupWithAgentAddresses } from "@/lib/xmtp/conversations";
-import { SidebarToggle } from "@/src/components/sidebar/sidebar-toggle";
-import { ShareButton } from "./share-button";
 import { Input } from "@ui/input";
 import { SearchIcon } from "@ui/icons";
 
@@ -123,11 +121,6 @@ export function ExplorePage() {
 
   return (
     <div className="flex h-dvh min-w-0 flex-col bg-black">
-      <header className="sticky top-0 flex items-center gap-2 bg-zinc-950 border-b border-zinc-800 px-2 py-1.5 md:px-2">
-        <SidebarToggle />
-        <ShareButton />
-      </header>
-
       <div className="flex-1 overflow-y-auto">
         <div className="mx-auto max-w-6xl px-4 py-8 md:px-8">
           <div className="mb-8">

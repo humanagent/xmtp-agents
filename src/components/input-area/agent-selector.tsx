@@ -58,10 +58,12 @@ export function AgentSelector({
                       if (e.key === "Enter") {
                         e.preventDefault();
                         onSelectAgent(agent);
+                        onOpenChange(false);
                       }
                     }}
                     onSelect={() => {
                       onSelectAgent(agent);
+                      onOpenChange(false);
                     }}
                     className={cn(
                       "flex items-center gap-2",

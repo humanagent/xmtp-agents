@@ -295,6 +295,14 @@ export function ConversationView() {
         );
         navigate("/");
       }
+    } else {
+      // Clear selected conversation when navigating to home (no conversationId in URL)
+      if (selectedConversation) {
+        console.log(
+          "[ConversationView] Clearing selected conversation - navigating to home",
+        );
+        setSelectedConversation(null);
+      }
     }
   }, [
     conversationId,
@@ -728,39 +736,45 @@ export function ConversationView() {
           className="absolute inset-0 touch-pan-y overflow-y-auto"
         >
           <div className="mx-auto flex min-w-0 max-w-4xl flex-col px-3 py-4 md:px-6 md:py-6">
-            {createError && (
-              <ThinkingIndicator
-                error
-                message={`Error creating conversation: ${createError}`}
-              />
-            )}
+            {createError &&
+              !selectedConversation && (
+                <ThinkingIndicator
+                  error
+                  message={`Error creating conversation: ${createError}`}
+                />
+              )}
             {(isCreatingConversation || pendingConversation) &&
-              !createError && (
+              !createError &&
+              !selectedConversation && (
                 <ThinkingIndicator message="Creating conversation..." />
               )}
-            {syncError && (
-              <ThinkingIndicator
-                error
-                message={`Error syncing conversation: ${syncError}`}
-              />
-            )}
+            {syncError &&
+              selectedConversation && (
+                <ThinkingIndicator
+                  error
+                  message={`Error syncing conversation: ${syncError}`}
+                />
+              )}
             {isSyncingConversation &&
               !syncError &&
               !isCreatingConversation &&
-              !pendingConversation && (
+              !pendingConversation &&
+              selectedConversation && (
                 <ThinkingIndicator message="Syncing conversation..." />
               )}
-            {loadError && (
-              <ThinkingIndicator
-                error
-                message={`Error loading messages: ${loadError}`}
-              />
-            )}
+            {loadError &&
+              selectedConversation && (
+                <ThinkingIndicator
+                  error
+                  message={`Error loading messages: ${loadError}`}
+                />
+              )}
             {isLoadingMessages &&
               !loadError &&
               !isSyncingConversation &&
               !isCreatingConversation &&
-              !pendingConversation && (
+              !pendingConversation &&
+              selectedConversation && (
                 <ThinkingIndicator message="Loading messages..." />
               )}
             {!selectedConversation &&
