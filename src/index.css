@@ -1,20 +1,79 @@
 @import "tailwindcss";
 
 /* ========================================
-   DESIGN SYSTEM
-   
-   All design tokens are centralized in src/design/
-   To change colors, spacing, or other design values,
-   edit src/design/tokens.css
-   
-   Documentation: src/design/README.md
+   DESIGN TOKENS - Black Theme
+   Pure black aesthetic, sharp edges, dense UI, single accent
    ======================================== */
 
-/* Import design tokens */
-@import "./design/tokens.css";
+:root,
+.dark {
+  /* Colors */
+  --background: #000000;
+  --foreground: #fafafa;
+  --surface-elevated: #09090b;
+  --surface-card: #27272a;
+  --surface-muted: #3f3f46;
+  --text-primary: #fafafa;
+  --text-muted: #a1a1aa;
+  --accent: #CF1C0F;
+  --accent-foreground: #000000;
+  --success: #4CAF50;
+  --success-foreground: #fafafa;
+  --warning: #F59E0B;
+  --warning-foreground: #000000;
+  --destructive: #F48771;
+  --destructive-foreground: #fafafa;
+  --border: #27272a;
+  --input-bg: #09090b;
+  --ring: #CF1C0F;
 
-/* Import design utilities */
-@import "./design/utilities.css";
+  /* Mappings */
+  --card: var(--surface-card);
+  --card-foreground: var(--text-primary);
+  --popover: var(--surface-card);
+  --popover-foreground: var(--text-primary);
+  --primary: var(--accent);
+  --primary-foreground: var(--accent-foreground);
+  --secondary: var(--surface-card);
+  --secondary-foreground: var(--text-primary);
+  --muted: var(--surface-muted);
+  --muted-foreground: var(--text-muted);
+  --input: var(--input-bg);
+  --sidebar-background: var(--surface-elevated);
+  --sidebar-foreground: var(--text-primary);
+  --sidebar-primary: #CF1C0F;
+  --sidebar-primary-foreground: #000000;
+  --sidebar-accent: var(--surface-card);
+  --sidebar-accent-foreground: var(--text-primary);
+  --sidebar-border: #27272a;
+  --sidebar-ring: #CF1C0F;
+  --sidebar: var(--surface-elevated);
+  --chart-1: #CF1C0F;
+  --chart-2: #4CAF50;
+  --chart-3: #F59E0B;
+  --chart-4: #F48771;
+  --chart-5: #a1a1aa;
+
+  /* Spacing */
+  --radius: 0.125rem;
+  --button-height-sm: 1.75rem;
+  --button-height-default: 2rem;
+  --input-height: 1.75rem;
+
+  /* Typography */
+  --text-xs: 0.875rem;
+  --text-sm: 1rem;
+  --text-base: 1.125rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5rem;
+
+  /* Motion */
+  --duration-fast: 150ms;
+  --duration-default: 200ms;
+  --ease-default: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --slide-sm: 8px;
+  --scale-active: 0.97;
+}
 
 /* custom variant for setting dark mode programmatically */
 @custom-variant dark (&:is(.dark, .dark *));
@@ -96,7 +155,90 @@
   }
 }
 
-/* Touch utilities and text-balance are now in design/utilities.css */
+/* ========================================
+   UTILITIES & ANIMATIONS
+   ======================================== */
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fade-in var(--duration-fast) var(--ease-default);
+  }
+  .animate-slide-up {
+    animation: slide-up var(--duration-fast) var(--ease-default);
+  }
+  .animate-slide-down {
+    animation: slide-down var(--duration-fast) var(--ease-default);
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(var(--slide-sm)); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(calc(var(--slide-sm) * -1)); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@utility text-balance { text-wrap: balance; }
+@utility -webkit-overflow-scrolling-touch { -webkit-overflow-scrolling: touch; }
+@utility touch-pan-y { touch-action: pan-y; }
+@utility touch-manipulation { touch-action: manipulation; }
+@utility touch-pan-x { touch-action: pan-x; }
+@utility overscroll-behavior-contain { overscroll-behavior: contain; }
+
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+  transition: background var(--duration-default) var(--ease-default);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+::-webkit-scrollbar-corner { background: transparent; }
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+/* Skeleton */
+.skeleton {
+  pointer-events: none;
+}
+.skeleton * {
+  pointer-events: none !important;
+}
+.skeleton *[class^="text-"] {
+  color: transparent;
+  border-radius: var(--radius);
+  background-color: rgba(250, 250, 250, 0.2);
+  user-select: none;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+.skeleton .skeleton-bg {
+  background-color: rgba(250, 250, 250, 0.1);
+}
+.skeleton .skeleton-div {
+  background-color: rgba(250, 250, 250, 0.2);
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.tap-highlight-transparent {
+  -webkit-tap-highlight-color: transparent;
+}
+.smooth-scroll {
+  scroll-behavior: smooth;
+}
 
 @layer base {
   * {
@@ -140,7 +282,6 @@
   }
 }
 
-/* Skeleton styles are now in design/utilities.css */
 
 .ProseMirror {
   outline: none;
@@ -182,7 +323,6 @@
   @apply bg-blue-200 hover:bg-blue-300 dark:hover:bg-blue-400/50 dark:text-blue-50 dark:bg-blue-500/40;
 }
 
-/* Scrollbar styles are now in design/utilities.css */
 
 @theme inline {
   --color-sidebar: var(--sidebar);
@@ -226,4 +366,3 @@
   }
 }
 
-/* Animation utilities are now in design/utilities.css */

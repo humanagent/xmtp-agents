@@ -2,291 +2,80 @@
 alwaysApply: true
 ---
 
-# 🎨 Centralized Design System
+# XMTP Agents Design System
 
-**IMPORTANT: All design tokens are centralized in `src/design/`**
+**Pure black aesthetic, sharp edges, dense UI, single accent color.**
 
-To change colors, spacing, typography, or any design values:
-1. Edit `src/design/tokens.css` (contains all design tokens)
-2. Read `src/design/README.md` (comprehensive documentation)
-3. Utilities and animations are in `src/design/utilities.css`
+## Core Principles
 
-**Quick Changes:**
-- **Change accent color**: Edit `--accent` in `src/design/tokens.css`
-- **Change spacing**: Edit component heights in `src/design/tokens.css`
-- **Change typography**: Edit text scale in `src/design/tokens.css`
+- **Pure black** (#000000) backgrounds with **zinc-950** (#09090b) elevated surfaces
+- **Sharp edges**: `rounded` (2px) - minimal border radius everywhere
+- **Dense UI**: `text-xs` (14px) base, `h-7`/`h-8` buttons, compact spacing
+- **Single accent**: Orange-red `#CF1C0F` with dark text `#000000` for contrast
+- **Fast motion**: 200ms transitions, `cubic-bezier(0.2, 0.8, 0.2, 1)` easing
 
-All changes in `src/design/tokens.css` automatically propagate throughout the app.
+## Design Tokens (in `src/index.css`)
 
----
+**Colors:**
+- Background: `#000000` (pure black)
+- Surfaces: `#09090b` (zinc-950), `#27272a` (zinc-800)
+- Text: `#fafafa` (primary), `#a1a1aa` (muted)
+- Accent: `#CF1C0F` (orange-red) - **CHANGE THIS** to update brand color
+- Borders: `#27272a` (zinc-800) - use `border-zinc-800` hardcoded
 
-Monochrome base, single electric accent, hard-edged grid, terse UI chrome.
+**Typography:**
+- Base: `text-xs` (14px)
+- Headings: `text-sm` (16px)
+- Scale: xs(14px) → sm(16px) → base(18px) → lg(20px) → xl(24px)
 
-- Base palette: Near‑black (#0B0B0D to #111316), off‑white text (#F2F3F5), mid‑gray surfaces (#1A1D20, #22262A). Contrast is high; backgrounds stay dark, text stays crisp.
+**Spacing:**
+- Buttons: `h-7` (28px) or `h-8` (32px)
+- Inputs: `h-7` (28px)
+- Radius: `rounded` (2px) - minimal everywhere
 
-- Accent color: One assertive hue used sparingly—electric blue (#2E7BFF or #1F6BFF). Apply only to links, primary CTAs, and interactive focus. No gradients; solid fills.
-
-- Secondary states: Muted teal or green for success (#18C29C), amber for warnings (#FFB020), desaturated red for errors (#E45151). Keep saturation restrained.
-
-- Typography: Bold, declarative sans for headings (e.g., Inter, Neue Haas Grotesk, or Söhne). Headline weight 700–800, tight tracking. Body set in geometric sans at 400–500 weight. Uppercase micro‑labels for system states.
-
-- Spacing + grid: 12‑column grid, generous gutters. Slabbed, full‑bleed sections. Hierarchy from scale and whitespace; avoid borders—use contrast and spacing.
-
-- Buttons/links: High‑contrast pills: dark surface, white text; accent outline or fill on primary. Hover = subtle 4–6% lighten; focus = 2px accent ring, no shadow.
-
-- Cards/sections: Flat layers with subtle separators: 1px hairline in #2A2E33 or soft inner padding. No drop shadows; rely on stacking order and spacing.
-
-- Iconography: Thin‑line system icons, 1.5–2px strokes, monochrome by default; switch to accent on active/selected.
-
-- Imagery: Blurred, subdued hero backgrounds; abstract “world/network” mark. Keep photos low‑saturation, cool temperature.
-
-- Motion: Crisp fades, 120–180ms; slide distances short (8–12px). No parallax; exits match entries. Easing: standard or cubic-bezier(0.2, 0.8, 0.2, 1).
-
-- Dividers + rules: Hairlines only; avoid heavy borders. Use negative space to separate blocks.
-
-- Forms: Dark fields (#13161A), white text, placeholder mid‑gray (#6A7179). Focus = accent ring; error = desat red underline; success = muted green tick.
-
-This styling communicates authority through restraint: black/white discipline, one energetic accent, grid‑tight layout, and minimal motion.
-
----
-alwaysApply: true
----
-
-# Design System - Black Theme
-
-## Philosophy
-
-**Pure black aesthetic**: Deep black backgrounds with elevated zinc surfaces  
-**Dense UI**: Small text, compact spacing, maximum information density  
-**Sharp edges**: Minimal border-radius, precise geometry  
-**Speed**: Fast 200ms transitions, buttery animations  
-**Precision**: Every pixel intentional, consistent spacing scale  
-**Modularity**: Composable, reusable primitives
-
----
-
-## Color Palette
-
-### Backgrounds
-
-- **Main background**: `bg-black` (#000000) - Use hardcoded, not CSS variables
-- **Header/Panels**: `bg-zinc-950` (#09090b) - Use hardcoded, not CSS variables
-- **Panel with backdrop**: `bg-zinc-950/80` (80% opacity with backdrop-blur)
-- **Hover states**: `hover:bg-zinc-800` (#27272a)
-
-### Borders
-
-- **All borders**: `border-zinc-800` (#27272a) - Use hardcoded consistently
-
-### Text
-
-- **Primary text**: `text-foreground` (uses CSS variable, typically light gray)
-- **Muted text**: `text-muted-foreground` (uses CSS variable)
-
-### Accent
-
-- **Accent color**: Uses `bg-accent` / `text-accent-foreground` (CSS variable, typically bright green #c8ff3d)
-- **CRITICAL RULE**: Lime/accent backgrounds MUST ALWAYS use dark text (`#000000`), NEVER white text
-- **Light mode**: Dark text (`#000000`) on lime background for contrast
-- **Dark mode**: Dark text (`#000000`) on lime background for contrast
-
-### Feedback
-
-- Success: `#4CAF50`
-- Error: `#F48771`
-- Warning: `#F59E0B`
-
----
-
-## Typography
-
-### Fonts
-
-- **System**: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif
-- **Monospace**: 'Menlo', 'Monaco', 'Courier New', monospace
-
-### Sizes
-
-- **Base**: `text-xs` (12px) - body text
-- **Small**: `text-[10px]` - badges, sublabels, metadata
-- **Base headings**: `text-base` (16px)
-- **Section headings**: `text-sm` (14px)
-
-### Weights
-
-- **Regular**: 400
-- **Medium**: 500
-- **Semibold**: 600 (headings)
-
-### Line Height
-
-- **Normal**: 1.5
-- **Tight**: 1.25 (dense areas)
-- **None**: 1.0 (badges)
-
-### Letter Spacing
-
-- **Headings**: `-0.01em`
-
----
-
-## Spacing & Sizing
-
-### Component Heights
-
-- **Buttons (small)**: `h-7` (28px) or `h-8` (32px)
-- **Inputs**: `h-7` (28px)
-- **Icon buttons**: `h-10 w-10` (40px)
-- **Header**: `py-3` (12px vertical padding)
-
-### Padding
-
-- **Standard**: `px-3 py-2` or `px-4 py-3`
-- **Compact**: `px-2 py-1`
-- **Tight**: `px-2` or `px-3`
-
-### Gaps
-
-- **Standard gap**: `gap-2` or `gap-3`
-- **Icon rail gap**: `gap-1`
-
----
+**Motion:**
+- Duration: 200ms default, 150ms fast
+- Easing: `cubic-bezier(0.2, 0.8, 0.2, 1)`
+- Active scale: `active:scale-[0.97]`
 
 ## Component Patterns
 
-### Header
-
+**Headers/Panels:**
 ```tsx
-<header className="border-b border-zinc-800 bg-zinc-950">
-  <div className="px-4 py-3 flex items-center justify-between">{/* content */}</div>
-</header>
+<header className="bg-zinc-950 border-b border-zinc-800 px-4 py-3">
 ```
 
-### Side Panel
-
+**Buttons:**
 ```tsx
-<div className="w-[420px] bg-zinc-950/80 backdrop-blur border-l border-zinc-800 flex flex-col">
-  <div className="border-b border-zinc-800 px-4 py-3">{/* header */}</div>
-</div>
-```
+// Accent (primary)
+<Button className="bg-accent text-accent-foreground">Button</Button>
 
-### Icon Rail
-
-```tsx
-<div className="w-14 bg-zinc-950 border-l border-zinc-800 flex flex-col items-center py-2 gap-1">
-  {/* icon buttons */}
-</div>
-```
-
-### List Items
-
-```tsx
-<div className="px-3 py-2 rounded cursor-pointer transition-colors hover:bg-zinc-800">
-  {/* content */}
-</div>
-```
-
-### Selected State
-
-```tsx
-className={`px-3 py-2 rounded ${
-  selected ? 'bg-accent text-accent-foreground' : 'hover:bg-zinc-800'
-}`}
-```
-
-### Borders
-
-```tsx
-className = 'border border-zinc-800 rounded'
-```
-
-### Buttons
-
-```tsx
-// Default button (accent/lime background)
-<Button variant="default">Button</Button>
-// Uses: bg-accent text-accent-foreground
-// Light mode: Dark text (#000000) on lime background for contrast
-// Dark mode: Dark text (#000000) on lime background for contrast
-
-// Ghost button (transparent, hover zinc-800)
+// Ghost
 <Button variant="ghost" className="text-foreground hover:bg-zinc-800">
-  Ghost Button
-</Button>
-
-// Outline button (transparent, border, hover zinc-800)
-<Button variant="outline" className="border-zinc-800 text-foreground hover:bg-zinc-800">
-  Outline Button
-</Button>
 ```
 
-**CRITICAL TEXT COLOR RULES**:
+**Selected State:**
+```tsx
+className={selected ? 'bg-accent text-accent-foreground' : 'hover:bg-zinc-800'}
+```
 
-- **On zinc backgrounds** (zinc-950, zinc-800): Always use `text-foreground` (light) or `text-muted-foreground` (muted light). Never use dark text.
-- **On lime/accent backgrounds** (`bg-accent`): Always use `text-accent-foreground` (dark `#000000`). NEVER use white or light text.
+**Hover States:**
+- Zinc surfaces: `hover:bg-zinc-800`
+- Accent buttons: `hover:bg-accent/90`
+- Always: `transition-colors duration-200`
 
----
+## Critical Rules
 
-## Layout Structure
+1. **Hardcoded colors**: Use `bg-black`, `bg-zinc-950`, `border-zinc-800` (not CSS vars)
+2. **Text on accent**: Always `text-accent-foreground` (#000000) on accent backgrounds
+3. **Text on zinc**: Always `text-foreground` or `text-muted-foreground` (light) on zinc
+4. **No rounded-full**: Use `rounded` (2px) everywhere
+5. **Consistent transitions**: `duration-200` with `cubic-bezier(0.2, 0.8, 0.2, 1)`
 
-### Main Container
+## Quick Changes
 
-- Background: `bg-black` (hardcoded #000000)
-- Full height: `h-screen` or `min-h-screen`
+**Change accent color:** Edit `--accent: #CF1C0F;` in `src/index.css` (line ~20)
+**Change font sizes:** Edit `--text-xs`, `--text-sm` etc. in `src/index.css`
+**Change spacing:** Edit `--button-height-*` in `src/index.css`
 
-### Headers/Panels
-
-- Background: `bg-zinc-950` (hardcoded #09090b)
-- Border: `border-zinc-800` (hardcoded #27272a)
-- Padding: `px-4 py-3`
-
-### Side Panels with Backdrop
-
-- Background: `bg-zinc-950/80 backdrop-blur`
-- Border: `border-zinc-800`
-
----
-
-## Interactions
-
-### Transitions
-
-- **Standard**: `transition-colors` on interactive elements
-- **Duration**: 200ms (default Tailwind)
-
-### Hover States
-
-- **Interactive elements**: `hover:bg-zinc-800` (#27272a)
-- **Transitions**: Always apply `transition-colors`
-
-### Focus States
-
-- **Ring**: Standard Tailwind focus ring
-- **Color**: Uses accent color via CSS variables
-
----
-
-## Implementation Notes
-
-- **Don't use CSS variables** for main backgrounds - use hardcoded `bg-black` and `bg-zinc-950`
-- **Use CSS variables** for text colors (`text-foreground`, `text-muted-foreground`) to support theme toggle
-- **Consistent border color** - Always `border-zinc-800`
-- **Backdrop blur** - Apply to semi-transparent panels for depth
-- **Accent colors** - Use CSS variables (`bg-accent`, `text-accent-foreground`) for selection states
-- **Lime background rule** - NEVER use white or light text on lime/accent backgrounds. Always use dark text (`text-accent-foreground` = `#000000`)
-
----
-
-## Best Practices
-
-1. **Pure black backgrounds** - Use `bg-black` for main container, not CSS variables
-2. **Zinc-950 for elevated surfaces** - Headers, panels, sidebars use `bg-zinc-950`
-3. **Zinc-800 for borders** - All borders use `border-zinc-800`
-4. **Zinc-800 for hovers** - Hover states use `hover:bg-zinc-800`
-5. **Backdrop blur on panels** - Side panels use `bg-zinc-950/80 backdrop-blur`
-6. **Small, dense UI** - Text sizes are small (xs, 10px), compact spacing
-7. **Sharp corners** - Minimal border radius (0.125rem default)
-8. **Accent for selection** - Selected items use `bg-accent text-accent-foreground`
-9. **Light text on zinc** - Always use `text-foreground` or `text-muted-foreground` on zinc backgrounds (zinc-950, zinc-800). Never use dark text.
-10. **Dark text on lime** - Always use dark text (`text-accent-foreground`, `#000000`) on lime/accent backgrounds. NEVER use white or light text on lime backgrounds.
-11. **Button text colors** - Ghost/outline buttons on zinc backgrounds must explicitly use `text-foreground` class. Accent buttons must use `text-accent-foreground` (dark).
+All tokens are in `src/index.css` - no separate design folder.
