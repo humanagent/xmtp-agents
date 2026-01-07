@@ -26,6 +26,8 @@
 - Fixed CSS import order issues for Tailwind compatibility
 - Removed @apply directives for Tailwind v4 compatibility
 - Fixed skeleton loading styles
+- **CRITICAL:** Removed circular CSS variable references that prevented accent color from displaying
+- Increased base typography scale for better readability (12px → 14px base)
 
 ## [0.1.15] - 2025-01-07
 
