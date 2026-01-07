@@ -45,15 +45,15 @@ export function MessageList({ messages }: { messages: Message[] }) {
             className="fade-in w-full animate-in duration-150"
           >
             <div
-              className={`group flex w-full items-start ${message.role === "user" ? "justify-end" : "justify-start"} mb-6`}
+              className={`group flex w-full items-start ${message.role === "user" ? "justify-end" : "justify-start"} mb-4`}
             >
               <div
                 className={`flex flex-col ${message.role === "user" ? "items-end" : "items-start"} max-w-[85%] sm:max-w-[80%] md:max-w-[70%]`}
               >
                 <div
-                  className={`flex flex-col overflow-hidden text-sm w-fit break-words rounded-lg px-4 py-3 ${
+                  className={`flex flex-col overflow-hidden text-xs w-fit break-words rounded px-4 py-3 ${
                     message.role === "user"
-                      ? "bg-primary text-primary-foreground"
+                      ? "bg-accent text-accent-foreground"
                       : "text-foreground"
                   }`}
                 >
@@ -693,7 +693,7 @@ export function ConversationView() {
   );
 
   return (
-    <div className="overscroll-behavior-contain flex h-dvh min-w-0 touch-pan-y flex-col bg-background">
+    <div className="overscroll-behavior-contain flex h-dvh min-w-0 touch-pan-y flex-col bg-black">
       <ChatHeader conversation={selectedConversation} />
 
       <div className="relative flex-1">
@@ -760,7 +760,7 @@ export function ConversationView() {
         </div>
       </div>
 
-      <div className="sticky bottom-0 z-1 mx-auto flex w-full max-w-4xl gap-2 border-t-0 bg-background px-2 pb-3 md:px-4 md:pb-4">
+      <div className="sticky bottom-0 z-1 mx-auto flex w-full max-w-4xl gap-2 border-t-0 bg-black px-2 pb-3 md:px-4 md:pb-4">
         <InputArea
           {...(selectedConversation
             ? {}

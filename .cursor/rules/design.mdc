@@ -2,6 +2,24 @@
 alwaysApply: true
 ---
 
+# 🎨 Centralized Design System
+
+**IMPORTANT: All design tokens are centralized in `src/design/`**
+
+To change colors, spacing, typography, or any design values:
+1. Edit `src/design/tokens.css` (contains all design tokens)
+2. Read `src/design/README.md` (comprehensive documentation)
+3. Utilities and animations are in `src/design/utilities.css`
+
+**Quick Changes:**
+- **Change accent color**: Edit `--accent` in `src/design/tokens.css`
+- **Change spacing**: Edit component heights in `src/design/tokens.css`
+- **Change typography**: Edit text scale in `src/design/tokens.css`
+
+All changes in `src/design/tokens.css` automatically propagate throughout the app.
+
+---
+
 Monochrome base, single electric accent, hard-edged grid, terse UI chrome.
 
 - Base palette: Near‑black (#0B0B0D to #111316), off‑white text (#F2F3F5), mid‑gray surfaces (#1A1D20, #22262A). Contrast is high; backgrounds stay dark, text stays crisp.

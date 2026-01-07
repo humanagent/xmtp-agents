@@ -99,8 +99,8 @@ export function ExplorePage() {
   };
 
   return (
-    <div className="flex h-dvh min-w-0 flex-col bg-background">
-      <header className="sticky top-0 flex items-center gap-2 bg-background px-2 py-1.5 md:px-2">
+    <div className="flex h-dvh min-w-0 flex-col bg-black">
+      <header className="sticky top-0 flex items-center gap-2 bg-zinc-950 border-b border-zinc-800 px-2 py-1.5 md:px-2">
         <SidebarToggle />
         <ShareButton />
       </header>
@@ -108,19 +108,19 @@ export function ExplorePage() {
       <div className="flex-1 overflow-y-auto">
         <div className="mx-auto max-w-6xl px-4 py-8 md:px-8">
           <div className="mb-8">
-            <h1 className="mb-2 font-semibold text-3xl">XMTP Agents</h1>
-            <p className="text-muted-foreground">
+            <h1 className="mb-2 font-semibold text-xl">XMTP Agents</h1>
+            <p className="text-xs text-muted-foreground">
               Chat with your favorite XMTP agents
             </p>
           </div>
 
-          <div className="mb-6 flex gap-2 border-b border-border">
+          <div className="mb-6 flex gap-2 border-b border-zinc-800">
             {categories.map((category) => (
               <button
                 key={category}
-                className={`border-b-2 px-4 py-2 text-sm font-medium transition-colors ${
+                className={`border-b-2 px-4 py-2 text-xs font-medium transition-colors duration-200 ${
                   selectedCategory === category
-                    ? "border-primary text-primary"
+                    ? "border-accent text-accent"
                     : "border-transparent text-muted-foreground hover:text-foreground"
                 }`}
                 onClick={() => setSelectedCategory(category)}
@@ -153,7 +153,7 @@ export function ExplorePage() {
 
           {filteredAgents.length === 0 && (
             <div className="flex flex-col items-center justify-center py-12 text-center">
-              <p className="text-muted-foreground">
+              <p className="text-xs text-muted-foreground">
                 No agents found in this category.
               </p>
             </div>

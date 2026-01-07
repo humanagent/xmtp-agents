@@ -85,9 +85,9 @@ export function ConversationItem({
           className={`
             flex-1
             touch-manipulation
-            ${isPressed ? "scale-[0.97] bg-sidebar-accent" : ""}
-            active:scale-[0.97] active:bg-sidebar-accent
-            transition-transform duration-150
+            ${isPressed ? "scale-[0.97] bg-zinc-800" : ""}
+            active:scale-[0.97] active:bg-zinc-800
+            transition-all duration-200
           `}
           onClick={onClick}
           onTouchStart={handleTouchStart}
@@ -111,8 +111,8 @@ export function ConversationItem({
         <Button
           type="button"
           variant="ghost"
-          size="sm"
-          className="absolute right-2 opacity-0 group-hover/conversation:opacity-100 md:opacity-0 md:group-hover/conversation:opacity-100 h-6 w-6 p-0 transition-opacity group-data-[collapsible=icon]:hidden touch-manipulation active:scale-95"
+          size="icon-sm"
+          className="absolute right-2 opacity-0 group-hover/conversation:opacity-100 md:opacity-0 md:group-hover/conversation:opacity-100 h-7 w-7 p-0 transition-all duration-200 group-data-[collapsible=icon]:hidden touch-manipulation active:scale-[0.97]"
           onClick={(e) => {
             e.stopPropagation();
             setShowDeleteDialog(true);

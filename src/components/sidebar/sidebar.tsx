@@ -26,7 +26,7 @@ const SidebarLogo = ({ className }: { className?: string }) => (
   <img
     src="/icon.svg"
     alt="XMTP Agents"
-    className={cn("size-8 rounded-md p-2 hover:bg-sidebar-accent", className)}
+    className={cn("size-8 rounded p-2 hover:bg-zinc-800 transition-colors duration-200", className)}
   />
 );
 
@@ -166,7 +166,7 @@ export function Sidebar() {
         </SidebarMenu>
         <SidebarMenu className="group-data-[collapsible=icon]:hidden">
           {!sortedConversations || sortedConversations.length === 0 ? (
-            <div className="flex w-full flex-row items-center justify-center gap-2 px-2 py-2 text-sm text-muted-foreground">
+            <div className="flex w-full flex-row items-center justify-center gap-2 px-2 py-2 text-xs text-muted-foreground">
               Your conversations will appear here once you start chatting!
             </div>
           ) : (

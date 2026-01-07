@@ -47,7 +47,7 @@ type PromptInputProps = HTMLAttributes<HTMLFormElement>;
 const PromptInput = ({ className, ...props }: PromptInputProps) => (
   <form
     className={cn(
-      "w-full overflow-hidden rounded-md border bg-background",
+      "w-full overflow-hidden rounded border border-zinc-800 bg-black",
       className,
     )}
     {...props}
@@ -152,7 +152,7 @@ const PromptInputSubmit = ({
 }: PromptInputSubmitProps) => {
   return (
     <Button
-      className={cn("gap-1.5 rounded-md", className)}
+      className={cn("gap-1.5 rounded", className)}
       size={size}
       type="submit"
       variant={variant}
@@ -241,7 +241,7 @@ function AddPeopleDialog({
             }}
             disabled={isAdding}
           />
-          {error && <p className="text-sm text-destructive">{error}</p>}
+          {error && <p className="text-xs text-destructive">{error}</p>}
         </div>
         <DialogFooter>
           <Button
@@ -330,7 +330,7 @@ function MetadataDialog({
               Loading metadata...
             </div>
           ) : (
-            <pre className="flex-1 min-h-0 overflow-auto rounded-md border border-border bg-muted p-4 text-[10px]">
+            <pre className="flex-1 min-h-0 overflow-auto rounded border border-zinc-800 bg-zinc-950 p-4 text-[10px]">
               <code className="block whitespace-pre-wrap break-words">{metadata || "No data available"}</code>
             </pre>
           )}
@@ -635,10 +635,10 @@ export function InputArea({
             {suggestedActions.map((suggestedAction, index) => (
               <motion.div
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 20 }}
-                initial={{ opacity: 0, y: 20 }}
+                exit={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 10 }}
                 key={suggestedAction}
-                transition={{ delay: 0.05 * index }}
+                transition={{ delay: 0.05 * index, duration: 0.15 }}
               >
                 <Button
                   className="h-auto w-full whitespace-normal p-3 text-left"
@@ -659,7 +659,7 @@ export function InputArea({
         onOpenChange={setOpenPopover}
       >
         <PromptInput
-          className={`rounded-md border border-border bg-background transition-all duration-150 focus-within:border-border hover:border-muted-foreground/50 ${isMultiAgentMode ? "p-2" : "p-3"}`}
+          className={`rounded border border-zinc-800 bg-black transition-all duration-200 focus-within:border-zinc-700 hover:border-zinc-700 ${isMultiAgentMode ? "p-2" : "p-3"}`}
           onSubmit={handleSubmit}
         >
           <PopoverAnchor asChild>
@@ -697,7 +697,7 @@ export function InputArea({
                 </Button>
               )}
               <PromptInputTextarea
-                className={`grow resize-none border-0! border-none! bg-transparent text-sm outline-none ring-0 [-ms-overflow-style:none] [scrollbar-width:none] placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 [&::-webkit-scrollbar]:hidden ${isMultiAgentMode ? "px-1 py-1 min-h-[24px] max-h-[120px]" : "p-2"}`}
+                className={`grow resize-none border-0! border-none! bg-transparent text-xs outline-none ring-0 [-ms-overflow-style:none] [scrollbar-width:none] placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 [&::-webkit-scrollbar]:hidden ${isMultiAgentMode ? "px-1 py-1 min-h-[24px] max-h-[120px]" : "p-2"}`}
                 placeholder="Send a message..."
                 value={input}
                 onChange={(e) => {
@@ -732,16 +732,16 @@ export function InputArea({
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.8 }}
                             transition={{ duration: 0.15 }}
-                            className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-2.5 py-1 text-xs text-secondary-foreground h-6"
+                            className="inline-flex items-center gap-1 rounded bg-zinc-800 px-2 py-0.5 text-xs text-foreground h-6"
                           >
                             {agent.image ? (
                               <img
                                 alt={agent.name}
-                                className="h-4 w-4 shrink-0 rounded-full object-cover"
+                                className="h-4 w-4 shrink-0 rounded object-cover"
                                 src={agent.image}
                               />
                             ) : (
-                              <div className="h-4 w-4 shrink-0 rounded-full bg-muted" />
+                              <div className="h-4 w-4 shrink-0 rounded bg-muted" />
                             )}
                             <span>{agent.name}</span>
                             <button
@@ -749,7 +749,7 @@ export function InputArea({
                               onClick={() => {
                                 handleRemoveAgent(agent.address);
                               }}
-                              className="rounded-full hover:bg-secondary-foreground/20 p-0.5 transition-colors"
+                              className="rounded hover:bg-zinc-700 p-0.5 transition-colors duration-200 active:scale-[0.97]"
                             >
                               <XIcon size={12} />
                             </button>
@@ -770,7 +770,7 @@ export function InputArea({
                     title="Select Agent"
                   />
                   <Button
-                    className="h-8 w-[200px] justify-between gap-2 px-2"
+                    className="h-7 w-[200px] justify-between gap-2 px-2"
                     variant="ghost"
                     onClick={() => {
                       setOpenDialog(true);
@@ -779,11 +779,11 @@ export function InputArea({
                     {singleAgent?.image ? (
                       <img
                         alt={singleAgent.name}
-                        className="h-5 w-5 shrink-0 rounded-full object-cover"
+                        className="h-5 w-5 shrink-0 rounded object-cover"
                         src={singleAgent.image}
                       />
                     ) : (
-                      <div className="h-5 w-5 shrink-0 rounded-full bg-muted" />
+                      <div className="h-5 w-5 shrink-0 rounded bg-muted" />
                     )}
                     <span className="flex-1 truncate text-left">
                       {singleAgent?.name || "Select agent"}
@@ -839,7 +839,7 @@ export function InputArea({
                 </>
               )}
               <PromptInputSubmit
-                className={`rounded-full bg-primary text-primary-foreground transition-colors duration-150 hover:bg-[#3d8aff] disabled:bg-muted disabled:text-muted-foreground ${isMultiAgentMode ? "size-7" : "size-8"}`}
+                className={`rounded bg-accent text-accent-foreground transition-all duration-200 hover:bg-accent/90 active:scale-[0.97] disabled:bg-muted disabled:text-muted-foreground ${isMultiAgentMode ? "size-7" : "size-8"}`}
                 disabled={
                   !input.trim() ||
                   (isMultiAgentMode && currentSelectedAgents.length === 0)
@@ -883,11 +883,11 @@ export function InputArea({
                         {agent.image ? (
                           <img
                             alt={agent.name}
-                            className="h-6 w-6 shrink-0 rounded-full object-cover"
+                            className="h-6 w-6 shrink-0 rounded object-cover"
                             src={agent.image}
                           />
                         ) : (
-                          <div className="h-6 w-6 shrink-0 rounded-full bg-muted" />
+                          <div className="h-6 w-6 shrink-0 rounded bg-muted" />
                         )}
                         <span className="flex-1 truncate text-left">
                           {agent.name}

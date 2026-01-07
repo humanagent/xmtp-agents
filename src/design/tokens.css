@@ -1,0 +1,192 @@
+/**
+ * Design Tokens - Black Theme
+ * 
+ * This file contains all design tokens for the XMTP Agents application.
+ * To change the design system, update values here and they will propagate throughout the app.
+ * 
+ * Philosophy:
+ * - Pure black aesthetic with elevated zinc surfaces
+ * - Sharp edges (minimal border radius)
+ * - Dense UI (small text, compact spacing)
+ * - Fast transitions (150-200ms)
+ * - Single accent color with high contrast
+ */
+
+:root,
+.dark {
+  /* ========================================
+     COLORS - Base Palette
+     ======================================== */
+  
+  /* Background Colors */
+  --background: #000000;           /* Pure black - main background */
+  --foreground: #fafafa;           /* Light text on dark backgrounds */
+  
+  /* Surface Colors - Zinc scale for elevation */
+  --surface-elevated: #09090b;     /* zinc-950 - headers, panels, sidebar */
+  --surface-card: #27272a;         /* zinc-800 - cards, elevated elements */
+  --surface-muted: #3f3f46;        /* zinc-700 - muted backgrounds */
+  
+  /* Text Colors */
+  --text-primary: #fafafa;         /* zinc-50 - primary text */
+  --text-muted: #a1a1aa;           /* zinc-400 - secondary, muted text */
+  
+  /* Accent Color - CHANGE THIS to update the primary brand color */
+  --accent: #CF1C0F;               /* Orange-red - buttons, highlights, selected states */
+  --accent-foreground: #000000;    /* Dark text on accent (for accessibility) */
+  
+  /* Semantic Colors */
+  --success: #4CAF50;              /* Green - success states */
+  --success-foreground: #fafafa;   /* Text on success */
+  --warning: #F59E0B;              /* Amber - warning states */
+  --warning-foreground: #000000;   /* Dark text on warning */
+  --destructive: #F48771;          /* Red - error/destructive states */
+  --destructive-foreground: #fafafa; /* Text on destructive */
+  
+  /* Border Colors */
+  --border: #27272a;               /* zinc-800 - all borders */
+  --border-muted: #3f3f46;         /* zinc-700 - subtle borders */
+  
+  /* Input Colors */
+  --input-bg: #09090b;             /* zinc-950 - input backgrounds */
+  --input-border: #27272a;         /* zinc-800 - input borders */
+  --input-border-hover: #52525b;   /* zinc-600 - input hover state */
+  
+  /* Focus Ring */
+  --ring: #CF1C0F;                 /* Accent color for focus rings */
+  
+  
+  /* ========================================
+     CSS VARIABLE MAPPINGS
+     (Maps tokens to Tailwind/shadcn conventions)
+     ======================================== */
+  
+  /* Card */
+  --card: var(--surface-card);
+  --card-foreground: var(--text-primary);
+  
+  /* Popover */
+  --popover: var(--surface-card);
+  --popover-foreground: var(--text-primary);
+  
+  /* Primary (Accent) */
+  --primary: var(--accent);
+  --primary-foreground: var(--accent-foreground);
+  
+  /* Secondary */
+  --secondary: var(--surface-card);
+  --secondary-foreground: var(--text-primary);
+  
+  /* Muted */
+  --muted: var(--surface-muted);
+  --muted-foreground: var(--text-muted);
+  
+  /* Accent (duplicate for shadcn compatibility) */
+  --accent: var(--accent);
+  --accent-foreground: var(--accent-foreground);
+  
+  /* Destructive */
+  --destructive: var(--destructive);
+  --destructive-foreground: var(--destructive-foreground);
+  
+  /* Success */
+  --success: var(--success);
+  --success-foreground: var(--success-foreground);
+  
+  /* Warning */
+  --warning: var(--warning);
+  --warning-foreground: var(--warning-foreground);
+  
+  /* Borders */
+  --border: var(--border);
+  --input: var(--input-bg);
+  --ring: var(--ring);
+  
+  /* Sidebar */
+  --sidebar-background: var(--surface-elevated);
+  --sidebar-foreground: var(--text-primary);
+  --sidebar-primary: var(--accent);
+  --sidebar-primary-foreground: var(--accent-foreground);
+  --sidebar-accent: var(--surface-card);
+  --sidebar-accent-foreground: var(--text-primary);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--ring);
+  --sidebar: var(--surface-elevated);
+  
+  /* Chart Colors */
+  --chart-1: var(--accent);
+  --chart-2: var(--success);
+  --chart-3: var(--warning);
+  --chart-4: var(--destructive);
+  --chart-5: var(--text-muted);
+  
+  
+  /* ========================================
+     SPACING & SIZING
+     ======================================== */
+  
+  /* Border Radius - Minimal for sharp edges */
+  --radius: 0.125rem;              /* 2px - minimal radius for all UI elements */
+  --radius-sm: calc(var(--radius) - 0.0625rem); /* 1px */
+  --radius-md: var(--radius);      /* 2px */
+  --radius-lg: var(--radius);      /* 2px - no large radius in this system */
+  
+  /* Component Heights - Dense UI */
+  --button-height-sm: 1.75rem;     /* 28px - h-7 */
+  --button-height-default: 2rem;   /* 32px - h-8 */
+  --button-height-lg: 2.5rem;      /* 40px - h-10 */
+  --input-height: 1.75rem;         /* 28px - h-7 */
+  
+  /* Icon Sizes */
+  --icon-xs: 12px;                 /* Badges, inline indicators */
+  --icon-sm: 14px;                 /* Buttons, UI elements */
+  --icon-md: 16px;                 /* Default icons */
+  --icon-lg: 20px;                 /* Headers, featured elements */
+  --icon-xl: 24px;                 /* Empty states, large features */
+  
+  /* Typography Scale */
+  --text-xs: 0.75rem;              /* 12px - body text, UI labels */
+  --text-sm: 0.875rem;             /* 14px - headings, emphasis */
+  --text-base: 1rem;               /* 16px - rarely used */
+  --text-lg: 1.125rem;             /* 18px - section headings */
+  --text-xl: 1.25rem;              /* 20px - page titles */
+  
+  
+  /* ========================================
+     MOTION & ANIMATION
+     ======================================== */
+  
+  /* Transition Durations */
+  --duration-fast: 150ms;          /* Fast interactions (scales, hovers) */
+  --duration-default: 200ms;       /* Default transitions (colors, opacity) */
+  --duration-slow: 300ms;          /* Slower animations (rarely used) */
+  
+  /* Easing Functions */
+  --ease-default: cubic-bezier(0.2, 0.8, 0.2, 1); /* Snappy, responsive */
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);    /* Standard easing */
+  
+  /* Animation Distances - Slide animations */
+  --slide-sm: 8px;                 /* Small slide distance */
+  --slide-md: 10px;                /* Medium slide distance */
+  --slide-lg: 12px;                /* Maximum slide distance */
+  
+  /* Scale Effects */
+  --scale-active: 0.97;            /* Button active state */
+  --scale-modal: 0.95;             /* Modal zoom in/out */
+  
+  
+  /* ========================================
+     INTERACTION STATES
+     ======================================== */
+  
+  /* Hover States */
+  --hover-zinc: #27272a;           /* zinc-800 - hover on zinc backgrounds */
+  --hover-accent: rgba(207, 28, 15, 0.9); /* accent/90 - hover on accent */
+  
+  /* Focus States */
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 0px;
+  
+  /* Disabled States */
+  --disabled-opacity: 0.5;
+}

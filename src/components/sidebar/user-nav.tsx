@@ -27,10 +27,10 @@ export function SidebarUserNav() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
-              className="h-10 justify-between bg-transparent data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              className="h-9 justify-between bg-transparent data-[state=open]:bg-zinc-800 data-[state=open]:text-foreground"
               data-testid="user-nav-button"
             >
-              <div className="flex aspect-square size-6 items-center justify-center rounded-full bg-sidebar-primary text-sidebar-primary-foreground">
+              <div className="flex aspect-square size-6 items-center justify-center rounded bg-accent text-accent-foreground">
                 <span className="text-xs font-semibold">{initial}</span>
               </div>
               <span
