@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.1.26] - 2025-01-07
+
+### Changed
+
+- Simplified input area component by removing code duplication and consolidating button logic
+- Removed unused PaperclipIcon button from message list mode
+- Added + icon button in both chat area and message list modes (opens mobile options sheet in message list, agent selector in chat area)
+- Converted AgentSelector from Dialog to Sheet with slide-from-bottom animation to match MobileOptionsSheet pattern
+- Constrained sheet containers (AgentSelector and MobileOptionsSheet) to match input area width on desktop
+
 ## [0.1.25] - 2025-01-07
 
 ### Added
