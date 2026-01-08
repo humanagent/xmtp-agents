@@ -7,6 +7,7 @@ import { ConversationsProvider } from "@/src/contexts/xmtp-conversations-context
 import { ToastProvider } from "@ui/toast";
 import { BrowserRouter, Routes, Route } from "react-router";
 import { ExplorePage } from "@components/explore/index";
+import { AnalyticsPage } from "@components/analytics/index";
 import { useSwipeGesture } from "@hooks/use-swipe-gesture";
 
 function SidebarInsetWithSwipe() {
@@ -27,6 +28,7 @@ function SidebarInsetWithSwipe() {
     <SidebarInset {...combinedHandlers}>
       <Routes>
         <Route path="/explore" element={<ExplorePage />} />
+        <Route path="/analytics" element={<AnalyticsPage />} />
         <Route
           path="/conversation/:conversationId"
           element={<ConversationView />}

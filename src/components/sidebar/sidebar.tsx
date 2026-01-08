@@ -1,6 +1,6 @@
 import { useXMTPClient } from "@hooks/use-xmtp-client";
 import { useConversationsContext } from "@/src/contexts/xmtp-conversations-context";
-import { ExploreIcon, PlusIcon } from "@ui/icons";
+import { ExploreIcon, PlusIcon, AnalyticsIcon } from "@ui/icons";
 import {
   SidebarContent,
   SidebarFooter,
@@ -16,10 +16,9 @@ import { SidebarToggle } from "@/src/components/sidebar/sidebar-toggle";
 import { SidebarUserNav } from "@/src/components/sidebar/user-nav";
 import { ConversationItem } from "@/src/components/sidebar/conversation-item";
 import type { Conversation } from "@xmtp/browser-sdk";
-import { Group, Dm, ConsentState, ConsentEntityType } from "@xmtp/browser-sdk";
 import { useCallback, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
-import { getGroupConsentState } from "@/lib/xmtp/consent";
+import { denyConversation } from "@/lib/xmtp/consent";
 import {
   sortConversationsByLastMessage,
   type ConversationWithMeta,
@@ -85,28 +84,7 @@ export function Sidebar() {
       }
 
       try {
-        if (conversation instanceof Group) {
-          const currentState = await getGroupConsentState(conversation);
-          const newState =
-            currentState === ConsentState.Allowed
-              ? ConsentState.Denied
-              : ConsentState.Allowed;
-          await client.preferences.setConsentStates([
-            {
-              entity: conversation.id,
-              entityType: ConsentEntityType.GroupId,
-              state: newState,
-            },
-          ]);
-        } else if (conversation instanceof Dm) {
-          await client.preferences.setConsentStates([
-            {
-              entity: conversation.id,
-              entityType: ConsentEntityType.ConversationId,
-              state: ConsentState.Denied,
-            },
-          ]);
-        }
+        await denyConversation(conversation, client);
 
         if (selectedConversation?.id === conversation.id) {
           setSelectedConversation(null);
@@ -176,6 +154,20 @@ export function Sidebar() {
                 <ExploreIcon size={16} />
                 <span className="group-data-[collapsible=icon]:hidden">
                   Explore
+                </span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              isActive={location.pathname === "/analytics"}
+              tooltip="Analytics"
+            >
+              <Link to="/analytics">
+                <AnalyticsIcon size={16} />
+                <span className="group-data-[collapsible=icon]:hidden">
+                  Analytics
                 </span>
               </Link>
             </SidebarMenuButton>

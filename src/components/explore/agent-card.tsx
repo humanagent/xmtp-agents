@@ -43,6 +43,15 @@ export function AgentCard({
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
                 <h3 className="font-semibold text-xs">{agent.name}</h3>
+                <span
+                  className={`text-[9px] px-1.5 py-0.5 rounded font-medium ${
+                    agent.live
+                      ? "bg-green-500/20 text-green-500"
+                      : "bg-zinc-800 text-zinc-500"
+                  }`}
+                >
+                  {agent.live ? "ONLINE" : "DOWN"}
+                </span>
               </div>
               <p className="text-[10px] text-muted-foreground truncate">
                 {description}
@@ -75,6 +84,15 @@ export function AgentCard({
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <h3 className="truncate font-semibold text-xs">{agent.name}</h3>
+          <span
+            className={`text-[9px] px-1.5 py-0.5 rounded font-medium shrink-0 ${
+              agent.live
+                ? "bg-green-500/20 text-green-500"
+                : "bg-zinc-800 text-zinc-500"
+            }`}
+          >
+            {agent.live ? "ONLINE" : "DOWN"}
+          </span>
         </div>
         <p className="truncate text-[10px] text-muted-foreground">
           {description}

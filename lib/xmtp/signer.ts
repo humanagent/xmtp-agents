@@ -100,3 +100,10 @@ export function getOrCreateEphemeralAccountKey(): PrivateKey {
   accountKeyCache = newKey;
   return newKey;
 }
+
+export function clearEphemeralAccountKey(): void {
+  console.log("[XMTP] Clearing ephemeral account key cache and storage");
+  accountKeyCache = null;
+  const STORAGE_KEY = "xmtp-ephemeral-account-key";
+  localStorage.removeItem(STORAGE_KEY);
+}

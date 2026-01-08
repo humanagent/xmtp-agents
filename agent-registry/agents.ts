@@ -28,7 +28,7 @@ export const AI_AGENTS: AgentConfig[] = [
       "@elsa Generate ideas for a blog post",
       "@elsa Write a poem about technology",
     ],
-    domain: "elsa.base.eth",
+    domain: "elsa",
     image:
       "https://ipfs.io/ipfs/bafkreibjqv4kxzjx62hq5scjskkaocegji4rnyjf6avbxnz6u442szo2im",
   },
@@ -55,22 +55,22 @@ export const AI_AGENTS: AgentConfig[] = [
       "@mamo Explain a technical concept",
       "@mamo Review my code",
     ],
-    domain: "mamo.base.eth",
+    domain: "mamo",
     image:
       "https://ipfs.io/ipfs/bafybeicgjmetc4iyla4k5ndm65xuvo6yutptloy3vdkydrat5u6tewijdu",
   },
   {
-    name: "alphie.base.eth",
+    name: "alphie",
     address: "0x5154C8707f7Fa18961E03F5b51edB2fb56a206dc",
     networks: ["production"],
     live: true,
     category: "Games",
     suggestions: [
-      "@alphie.base.eth Help with blockchain development",
-      "@alphie.base.eth Explain smart contracts",
-      "@alphie.base.eth Guide me through DeFi",
+      "@alphie Help with blockchain development",
+      "@alphie Explain smart contracts",
+      "@alphie Guide me through DeFi",
     ],
-    domain: "alphie.base.eth",
+    domain: "alphie",
     image:
       "https://ipfs.io/ipfs/bafkreibaa5gfjhisegdugksqb63bwkwstmbeitxc3hkpnq3ughtmpyioq4",
   },
@@ -100,7 +100,7 @@ export const AI_AGENTS: AgentConfig[] = [
       "@jesse Optimize my algorithm",
       "@jesse Review my implementation",
     ],
-    domain: "jessexbt.base.eth",
+    domain: "jessexbt",
     image:
       "https://ipfs.io/ipfs/bafkreigqyohpla5hihjqrprmynmoroce6pf7a4hniv6t77ad6yy3em7nyq",
   },
@@ -115,7 +115,7 @@ export const AI_AGENTS: AgentConfig[] = [
       "@freysa Create a color palette",
       "@freysa Suggest design improvements",
     ],
-    domain: "hifreysa.base.eth",
+    domain: "hifreysa",
     image:
       "https://ipfs.io/ipfs/bafkreihzf4frxkt3j42peowhm2w3ryihbbumfq6od5ace2xx2puwcyxwby",
   },
@@ -154,7 +154,7 @@ export const AI_AGENTS: AgentConfig[] = [
       "@bankr Analyze market trends",
       "@bankr Explain investment strategies",
     ],
-    domain: "bankr.base.eth",
+    domain: "bankr",
     image:
       "https://ipfs.io/ipfs/bafkreig3hwrxfm2zkzgvlja6kgctu6qcnwztbppxrkbikvhmspfj7bpnqu",
   },
@@ -164,7 +164,7 @@ export const AI_AGENTS: AgentConfig[] = [
     networks: ["production"],
     live: true,
     category: "Business",
-    domain: "askbasemate.base.eth",
+    domain: "askbasemate",
     image:
       "https://ipfs.io/ipfs/bafkreib6sck2doq64pwx7zqq3mvgjf5odrtdenzp6kc36enfzjl7s6zs64",
     suggestions: [
