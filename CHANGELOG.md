@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.1.29] - 2026-01-09
+
+### Changed
+
+- Organized input area components by extracting sub-components, hooks, and dialogs into separate files
+- Reduced main InputArea component from 1039 lines to 397 lines for better maintainability
+- Extracted utility functions (shuffleArray, truncateAddress, appendAgentMentions) to utils.ts
+- Extracted custom hooks (use-input-area-modes, use-conversation-agents, use-agent-management) to hooks folder
+- Extracted dialog components (MetadataDialog, AddAgentDialog, RemoveAgentDialog) to dialogs folder
+- Extracted prompt input components (PromptInput, PromptInputTextarea, etc.) to prompt-input.tsx
+- Extracted agent chips and suggested actions to separate components
+- Cleaned up console.log statements for production readiness
+- Improved code organization with clear separation of concerns
+
 ## [0.1.28] - 2026-01-09
 
 ### Changed
