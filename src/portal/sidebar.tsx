@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from "react-router";
 import {
   SidebarContent,
+  SidebarFooter,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -10,6 +11,7 @@ import {
 } from "@ui/sidebar";
 import { CodeIcon, AnalyticsIcon, HelpIcon } from "@ui/icons";
 import { SidebarToggle } from "@/src/components/sidebar/sidebar-toggle";
+import { SidebarUserNav } from "@/src/components/sidebar/user-nav";
 import { cn } from "@/lib/utils";
 
 const SidebarLogo = ({
@@ -122,6 +124,11 @@ export function PortalSidebar() {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarContent>
+      <SidebarFooter className="group-data-[collapsible=icon]:p-0">
+        <div className="group-data-[collapsible=icon]:hidden">
+          <SidebarUserNav />
+        </div>
+      </SidebarFooter>
     </SidebarUI>
   );
 }

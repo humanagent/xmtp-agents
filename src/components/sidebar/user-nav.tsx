@@ -15,9 +15,6 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@ui/dropdown-menu";
 import { Button } from "@ui/button";
@@ -127,21 +124,14 @@ export function SidebarUserNav() {
                 <span>{copied ? "Copied!" : "Copy address"}</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger>
-                  <CodeIcon size={16} />
-                  <span>Developer</span>
-                </DropdownMenuSubTrigger>
-                <DropdownMenuSubContent>
-                  <DropdownMenuItem
-                    onClick={() => {
-                      navigate("/dev-portal");
-                    }}
-                  >
-                    <span>Developer Portal</span>
-                  </DropdownMenuItem>
-                </DropdownMenuSubContent>
-              </DropdownMenuSub>
+              <DropdownMenuItem
+                onClick={() => {
+                  navigate("/dev-portal");
+                }}
+              >
+                <CodeIcon size={16} />
+                <span>Developer Portal</span>
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => {
