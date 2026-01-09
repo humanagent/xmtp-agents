@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.1.33] - 2026-01-10
+
+### Added
+
+- Added identity box (user nav) to dev portal sidebar footer
+
+### Changed
+
+- Simplified developer menu item from submenu to direct navigation item
+
 ## [0.1.32] - 2026-01-10
 
 ### Fixed
