@@ -1,5 +1,5 @@
 import type { Conversation, Client } from "@xmtp/browser-sdk";
-import { Group, Dm, ConsentState } from "@xmtp/browser-sdk";
+import { Group, ConsentState, ConsentEntityType } from "@xmtp/browser-sdk";
 import type { ContentTypes } from "@/lib/xmtp/client";
 
 /**
@@ -21,17 +21,19 @@ export async function isGroupDenied(group: Group): Promise<boolean> {
 }
 
 /**
- * Check if a DM peer is allowed.
+ * Deny a conversation by setting its consent state to Denied.
  */
-export async function isDmPeerAllowed(
-  dm: Dm,
+export async function denyConversation(
+  conversation: Conversation,
   client: Client<ContentTypes>,
-): Promise<boolean> {
-  const peerInboxId = dm.peerInboxId as unknown as string;
-  if (!peerInboxId) {
-    return true;
-  }
-  return await (client.preferences as any).isAllowed(peerInboxId);
+): Promise<void> {
+  await client.preferences.setConsentStates([
+    {
+      entity: conversation.id,
+      entityType: ConsentEntityType.GroupId,
+      state: ConsentState.Denied,
+    },
+  ]);
 }
 
 /**
@@ -43,9 +45,6 @@ export async function isConversationAllowed(
 ): Promise<boolean> {
   if (conversation instanceof Group) {
     return !(await isGroupDenied(conversation));
-  }
-  if (conversation instanceof Dm) {
-    return await isDmPeerAllowed(conversation, client);
   }
   return true;
 }

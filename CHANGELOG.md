@@ -1,5 +1,94 @@
 # Changelog
 
+## [0.1.32] - 2026-01-10
+
+### Fixed
+
+- Fixed infinite conversation creation loop when clicking agents in explore page
+- Removed automatic conversation creation - conversations now only created when user clicks send button
+- Fixed explore page to pre-select agent without auto-creating conversation
+
+### Changed
+
+- Removed pending conversation creation logic that caused infinite loops
+- Simplified conversation creation flow to be explicit (user must send message)
+- Updated explore page navigation to pass agent via location state instead of auto-creating
+
+## [0.1.31] - 2026-01-09
+
+### Changed
+
+- Refactored portal structure by moving analytics and dev-portal components to portal directory
+- Updated imports and references across App, sidebar, and message-list components
+- Improved code organization with centralized portal components
+
+## [0.1.30] - 2026-01-09
+
+### Added
+
+- Added Developer Portal page for publishing and managing XMTP agents
+- Added agent CRUD operations (Create, Read, Update, Delete) with localStorage persistence
+- Added developer portal navigation item in sidebar with code icon
+- Added agent form component with fields: name, address, description, category, domain, image, suggestions, and live status
+- Added agent list view with inline edit and delete actions
+- Integrated user-submitted agents into Explore page alongside registry agents
+- Added agent storage utility (`lib/agent-storage.ts`) for managing user agents
+
+## [0.1.29] - 2026-01-09
+
+### Changed
+
+- Organized input area components by extracting sub-components, hooks, and dialogs into separate files
+- Reduced main InputArea component from 1039 lines to 397 lines for better maintainability
+- Extracted utility functions (shuffleArray, truncateAddress, appendAgentMentions) to utils.ts
+- Extracted custom hooks (use-input-area-modes, use-conversation-agents, use-agent-management) to hooks folder
+- Extracted dialog components (MetadataDialog, AddAgentDialog, RemoveAgentDialog) to dialogs folder
+- Extracted prompt input components (PromptInput, PromptInputTextarea, etc.) to prompt-input.tsx
+- Extracted agent chips and suggested actions to separate components
+- Cleaned up console.log statements for production readiness
+- Improved code organization with clear separation of concerns
+
+## [0.1.28] - 2026-01-09
+
+### Changed
+
+- Refactored input area component by extracting unified-selector and plus-panel into separate components
+- Simplified input-area/index.tsx by removing code duplication and consolidating logic
+- Improved code organization and maintainability of input area components
+
+## [0.1.27] - 2025-01-07
+
+### Added
+
+- Added Analytics page with agent performance metrics
+- Added response time charts per agent (last 7 days)
+- Added average response time trend visualization
+- Added total agents count and average response time stats
+- Added Analytics navigation item to sidebar with chart icon
+
+## [0.1.26] - 2025-01-07
+
+### Changed
+
+- Simplified input area component by removing code duplication and consolidating button logic
+- Removed unused PaperclipIcon button from message list mode
+- Added + icon button in both chat area and message list modes (opens mobile options sheet in message list, agent selector in chat area)
+- Converted AgentSelector from Dialog to Sheet with slide-from-bottom animation to match MobileOptionsSheet pattern
+- Constrained sheet containers (AgentSelector and MobileOptionsSheet) to match input area width on desktop
+
+## [0.1.25] - 2025-01-07
+
+### Added
+
+- Added floating mobile navigation button with glassmorphism styling (top-left corner)
+- Added swipe-left gesture support from anywhere on the view to open sidebar on mobile
+- Added instant sidebar animations (0ms duration) for immediate response
+
+### Changed
+
+- Optimized sidebar animation performance with GPU acceleration
+- Removed edge threshold restriction for swipe gestures (now works from anywhere)
+
 ## [0.1.24] - 2025-01-07
 
 ### Fixed

@@ -1,6 +1,6 @@
 {
   "name": "xmtp-agents",
-  "version": "0.1.24",
+  "version": "0.1.32",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,7 +11,8 @@
     "format": "prettier -w .",
     "format:check": "prettier -c .",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "ngrok": "ngrok http 5173"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",
@@ -41,9 +42,11 @@
     "plausible-tracker": "^0.3.9",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-is": "^19.2.3",
     "react-markdown": "^10.1.0",
     "react-router": "^7.9.4",
     "react-virtuoso": "^4.14.1",
+    "recharts": "^3.6.0",
     "remark-gfm": "^4.0.1",
     "tailwind-merge": "^3.4.0",
     "tailwindcss-animate": "^1.0.7",
@@ -69,6 +72,7 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
     "globals": "^17.0.0",
+    "ngrok": "^5.0.0-beta.2",
     "postcss": "^8",
     "prettier": "^3.6.2",
     "sharp": "^0.34.5",

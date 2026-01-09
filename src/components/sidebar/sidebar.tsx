@@ -1,6 +1,6 @@
 import { useXMTPClient } from "@hooks/use-xmtp-client";
 import { useConversationsContext } from "@/src/contexts/xmtp-conversations-context";
-import { ExploreIcon, PlusIcon } from "@ui/icons";
+import { ExploreIcon, PlusIcon, AnalyticsIcon } from "@ui/icons";
 import {
   SidebarContent,
   SidebarFooter,
@@ -9,28 +9,43 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   Sidebar as SidebarUI,
+  useSidebar,
 } from "@ui/sidebar";
 import { useToast } from "@ui/toast";
 import { SidebarToggle } from "@/src/components/sidebar/sidebar-toggle";
 import { SidebarUserNav } from "@/src/components/sidebar/user-nav";
 import { ConversationItem } from "@/src/components/sidebar/conversation-item";
 import type { Conversation } from "@xmtp/browser-sdk";
-import { Group, Dm, ConsentState, ConsentEntityType } from "@xmtp/browser-sdk";
 import { useCallback, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
-import { getGroupConsentState } from "@/lib/xmtp/consent";
+import { denyConversation } from "@/lib/xmtp/consent";
 import {
   sortConversationsByLastMessage,
   type ConversationWithMeta,
 } from "@/src/components/sidebar/utils";
 import { cn } from "@/lib/utils";
 
-const SidebarLogo = ({ className }: { className?: string }) => (
+const SidebarLogo = ({
+  className,
+  onClick,
+}: {
+  className?: string;
+  onClick?: () => void;
+}) => (
   <img
     src="/icon.svg"
     alt="XMTP Agents"
+    onClick={onClick}
+    onKeyDown={(e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        onClick?.();
+      }
+    }}
+    role="button"
+    tabIndex={0}
     className={cn(
-      "size-10 rounded p-2 hover:bg-zinc-800 transition-colors duration-200",
+      "size-10 rounded p-2 hover:bg-zinc-800 transition-colors duration-200 cursor-pointer",
       className,
     )}
   />
@@ -48,6 +63,7 @@ export function Sidebar() {
   const { showToast } = useToast();
   const location = useLocation();
   const navigate = useNavigate();
+  const { isMobile, setOpenMobile } = useSidebar();
   const [sortedConversations, setSortedConversations] = useState<
     ConversationWithMeta[]
   >([]);
@@ -83,28 +99,7 @@ export function Sidebar() {
       }
 
       try {
-        if (conversation instanceof Group) {
-          const currentState = await getGroupConsentState(conversation);
-          const newState =
-            currentState === ConsentState.Allowed
-              ? ConsentState.Denied
-              : ConsentState.Allowed;
-          await client.preferences.setConsentStates([
-            {
-              entity: conversation.id,
-              entityType: ConsentEntityType.GroupId,
-              state: newState,
-            },
-          ]);
-        } else if (conversation instanceof Dm) {
-          await client.preferences.setConsentStates([
-            {
-              entity: conversation.id,
-              entityType: ConsentEntityType.ConversationId,
-              state: ConsentState.Denied,
-            },
-          ]);
-        }
+        await denyConversation(conversation, client);
 
         if (selectedConversation?.id === conversation.id) {
           setSelectedConversation(null);
@@ -129,6 +124,9 @@ export function Sidebar() {
   const handleConversationClick = (conversation: Conversation) => {
     setSelectedConversation(conversation);
     navigate(`/conversation/${conversation.id}`);
+    if (isMobile) {
+      setOpenMobile(false);
+    }
   };
 
   return (
@@ -136,7 +134,17 @@ export function Sidebar() {
       <SidebarHeader className="group-data-[collapsible=icon]:p-0">
         <SidebarMenu>
           <div className="flex flex-row items-center justify-between group-data-[collapsible=icon]:justify-center">
-            <SidebarLogo className="group-data-[collapsible=icon]:hidden" />
+            <SidebarLogo
+              className="group-data-[collapsible=icon]:hidden"
+              onClick={() => {
+                setSelectedConversation(null);
+                setPendingConversation(null);
+                navigate("/", { replace: true });
+                if (isMobile) {
+                  setOpenMobile(false);
+                }
+              }}
+            />
             <SidebarToggle />
           </div>
         </SidebarMenu>
@@ -150,6 +158,9 @@ export function Sidebar() {
                 setSelectedConversation(null);
                 setPendingConversation(null);
                 navigate("/", { replace: true });
+                if (isMobile) {
+                  setOpenMobile(false);
+                }
               }}
             >
               <PlusIcon size={16} />
@@ -172,6 +183,20 @@ export function Sidebar() {
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
+          {/* <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              isActive={location.pathname === "/analytics"}
+              tooltip="Analytics"
+            >
+              <Link to="/analytics">
+                <AnalyticsIcon size={16} />
+                <span className="group-data-[collapsible=icon]:hidden">
+                  Analytics
+                </span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem> */}
         </SidebarMenu>
         <SidebarMenu className="group-data-[collapsible=icon]:hidden">
           {!sortedConversations || sortedConversations.length === 0 ? (
@@ -198,7 +223,16 @@ export function Sidebar() {
       </SidebarContent>
       <SidebarFooter className="group-data-[collapsible=icon]:p-0">
         <div className="hidden group-data-[collapsible=icon]:flex items-center justify-center">
-          <SidebarLogo />
+          <SidebarLogo
+            onClick={() => {
+              setSelectedConversation(null);
+              setPendingConversation(null);
+              navigate("/", { replace: true });
+              if (isMobile) {
+                setOpenMobile(false);
+              }
+            }}
+          />
         </div>
         <div className="group-data-[collapsible=icon]:hidden">
           <SidebarUserNav />
