@@ -17,8 +17,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@ui/tooltip";
-import { generateConversationMetadata } from "@/lib/generate-conversation-name";
-import { AI_AGENTS } from "@/agent-registry/agents";
 
 function formatTimeAgo(date: Date): string {
   const now = new Date();
@@ -505,59 +503,6 @@ export function ConversationView() {
             }, 100);
           }
 
-          if (
-            mounted &&
-            selectedConversation instanceof Group &&
-            selectedConversation.name === "Agent Group" &&
-            chatMessages.length > 0
-          ) {
-            console.log(
-              "[ConversationView] Conversation needs naming, generating metadata...",
-            );
-            try {
-              const firstUserMessage = chatMessages.find(
-                (msg) => msg.role === "user",
-              );
-              if (firstUserMessage) {
-                const members = await selectedConversation.members();
-                const allAddresses = members.flatMap((member) =>
-                  member.accountIdentifiers
-                    .filter((id) => id.identifierKind === "Ethereum")
-                    .map((id) => id.identifier.toLowerCase()),
-                );
-
-                const agentAddresses = allAddresses.filter((addr) => {
-                  const normalizedAddr = addr.toLowerCase();
-                  return AI_AGENTS.some(
-                    (agent) => agent.address.toLowerCase() === normalizedAddr,
-                  );
-                });
-
-                if (agentAddresses.length > 0) {
-                  const metadata = await generateConversationMetadata(
-                    firstUserMessage.content,
-                    agentAddresses,
-                  );
-                  console.log(
-                    "[ConversationView] Generated metadata:",
-                    metadata,
-                  );
-                  await selectedConversation.updateName(metadata.name);
-                  if (metadata.description) {
-                    await selectedConversation.updateDescription(
-                      metadata.description,
-                    );
-                  }
-                  void refreshConversations();
-                }
-              }
-            } catch (error) {
-              console.error(
-                "[ConversationView] Error generating conversation metadata on selection:",
-                error,
-              );
-            }
-          }
 
           const stream = await selectedConversation.stream({
             onValue: (message: DecodedMessage<unknown>) => {
@@ -744,45 +689,6 @@ export function ConversationView() {
           waitingTimeoutRef.current = null;
         }, 10000);
 
-        if (
-          conversation instanceof Group &&
-          conversation.name === "Agent Group"
-        ) {
-          console.log("[ConversationView] Generating conversation metadata...");
-          try {
-            const members = await conversation.members();
-            const allAddresses = members.flatMap((member) =>
-              member.accountIdentifiers
-                .filter((id) => id.identifierKind === "Ethereum")
-                .map((id) => id.identifier.toLowerCase()),
-            );
-
-            const agentAddresses = allAddresses.filter((addr) => {
-              const normalizedAddr = addr.toLowerCase();
-              return AI_AGENTS.some(
-                (agent) => agent.address.toLowerCase() === normalizedAddr,
-              );
-            });
-
-            if (agentAddresses.length > 0) {
-              const metadata = await generateConversationMetadata(
-                content,
-                agentAddresses,
-              );
-              console.log("[ConversationView] Generated metadata:", metadata);
-              await conversation.updateName(metadata.name);
-              if (metadata.description) {
-                await conversation.updateDescription(metadata.description);
-              }
-              void refreshConversations();
-            }
-          } catch (error) {
-            console.error(
-              "[ConversationView] Error generating conversation metadata:",
-              error,
-            );
-          }
-        }
       } catch {
         setMessages((prev) => prev.filter((m) => m.id !== tempMessage.id));
         setIsWaitingForAgent(false);

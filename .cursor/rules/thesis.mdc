@@ -1,0 +1,182 @@
+---
+alwaysApply: true
+---
+
+## what it is
+
+**agent hub = agent app store, expressed as conversations**
+
+- browse agent directory
+- chat with any agent
+- agents are peers, not APIs hidden behind UIs
+- embeddable in any xmtp app
+
+**not:**
+- ❌ agent hosting platform
+- ❌ centralized AI product
+- ❌ experimental playground
+
+**it's:**
+- ✅ real, usable surface for interoperable agents
+- ✅ privacy-preserving by design
+- ✅ decentralized infrastructure
+
+---
+
+## the core insight
+
+**most AI products:**
+- centralize intelligence
+- centralize data
+- hide agents behind proprietary UIs
+- force single-agent, single-vendor experiences
+
+**we believe the opposite wins:**
+
+multiple agents, owned by different parties, communicating inside shared conversations — without giving up privacy or control.
+
+xmtp enables this at the network layer.
+
+---
+
+## the play
+
+**phase 1: build + prove**
+- build agent hub pwa (new repo, ai-assisted)
+- deploy with 5-10 agents (gm bot, bankr, etc)
+- show it works with real usage
+
+**phase 2: embed everywhere**
+- base embeds it → 100k users
+- world embeds it → verified agents
+- farcaster embeds it → social discovery
+- or they fork it
+
+**phase 3: network effects**
+- more agents listed → more users
+- more users → more apps embed
+- more apps → more agents
+- you become infrastructure
+
+---
+
+## decentralization, practically
+
+**agents are:**
+- self-hosted
+- self-deployed
+- owned by whoever runs them
+
+**xmtp does not:**
+- see prompts
+- see messages
+- run models
+- host agents
+
+**xmtp maintains:**
+- registry/directory for discoverability
+- metadata only (capabilities, version, verification)
+- no runtime control, no message access
+
+**developers distribute agents as:**
+- open-source repos
+- dockerized agents
+- plug-and-play deployments (railway, fly.io, local)
+
+---
+
+## privacy is the north star
+
+**if privacy matters, agents must be runnable by the user**
+
+models should be:
+- open-source
+- lightweight
+- replaceable
+- locally deployable
+
+examples: ollama, llama, mistral variants, task-specific local models
+
+basic features (labeling, summarization, classification) should work **without leaking messages to centralized services**
+
+---
+
+## why you win
+
+**neutral infrastructure position:**
+
+like uniswap (dex), etherscan (explorer), ens (naming)
+
+you're not competing with partners - you're providing shared infrastructure they all need
+
+**network effects compound:**
+- agent deploys once → works in base/world/farcaster
+- list once → instant distribution
+- usage data across ecosystem
+- hard to compete once embedded
+
+**timing advantage:**
+- agents already exist on xmtp
+- developers asking "where do users find my agent?"
+- partners won't build this themselves
+- first mover becomes default
+
+---
+
+## the stack
+
+**xmtp protocol** = network layer
+**agents** = the nodes
+**agent hub** = the directory
+**chat apps** = the clients
+
+**platform lock-in vs network portability:**
+
+chatgpt: owns directory, owns distribution, ban you = lose everything
+
+xmtp: deploy once, works everywhere, can't be banned from protocol
+
+---
+
+## why this matters (especially for world/whirl)
+
+this complements identity layers, doesn't compete
+
+**identity answers:** who is this user?
+**this answers:** who owns the intelligence they're talking to?
+
+together:
+- verified humans
+- sovereign agents
+- private conversations
+
+that's the future stack.
+
+---
+
+## the catchphrase
+
+**"private by default. interoperable by design."**
+
+**"your agents. your data. your conversations."**
+
+**"chat is the runtime."**
+
+---
+
+## success metrics
+
+**phase 1 (prove):**
+- 10+ agents listed
+- 1k+ users trying agents
+- usage across multiple apps
+
+**phase 2 (scale):**
+- embedded in base/world/farcaster
+- 50+ agents listed
+- cross-app agent usage
+
+**phase 3 (infrastructure):**
+- default agent directory for xmtp
+- 100+ agents
+- can't build xmtp app without it
