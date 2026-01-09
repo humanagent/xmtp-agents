@@ -25,12 +25,27 @@ import {
 } from "@/src/components/sidebar/utils";
 import { cn } from "@/lib/utils";
 
-const SidebarLogo = ({ className }: { className?: string }) => (
+const SidebarLogo = ({
+  className,
+  onClick,
+}: {
+  className?: string;
+  onClick?: () => void;
+}) => (
   <img
     src="/icon.svg"
     alt="XMTP Agents"
+    onClick={onClick}
+    onKeyDown={(e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        onClick?.();
+      }
+    }}
+    role="button"
+    tabIndex={0}
     className={cn(
-      "size-10 rounded p-2 hover:bg-zinc-800 transition-colors duration-200",
+      "size-10 rounded p-2 hover:bg-zinc-800 transition-colors duration-200 cursor-pointer",
       className,
     )}
   />
@@ -119,7 +134,17 @@ export function Sidebar() {
       <SidebarHeader className="group-data-[collapsible=icon]:p-0">
         <SidebarMenu>
           <div className="flex flex-row items-center justify-between group-data-[collapsible=icon]:justify-center">
-            <SidebarLogo className="group-data-[collapsible=icon]:hidden" />
+            <SidebarLogo
+              className="group-data-[collapsible=icon]:hidden"
+              onClick={() => {
+                setSelectedConversation(null);
+                setPendingConversation(null);
+                navigate("/", { replace: true });
+                if (isMobile) {
+                  setOpenMobile(false);
+                }
+              }}
+            />
             <SidebarToggle />
           </div>
         </SidebarMenu>
@@ -198,7 +223,16 @@ export function Sidebar() {
       </SidebarContent>
       <SidebarFooter className="group-data-[collapsible=icon]:p-0">
         <div className="hidden group-data-[collapsible=icon]:flex items-center justify-center">
-          <SidebarLogo />
+          <SidebarLogo
+            onClick={() => {
+              setSelectedConversation(null);
+              setPendingConversation(null);
+              navigate("/", { replace: true });
+              if (isMobile) {
+                setOpenMobile(false);
+              }
+            }}
+          />
         </div>
         <div className="group-data-[collapsible=icon]:hidden">
           <SidebarUserNav />

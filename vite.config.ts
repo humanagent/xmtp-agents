@@ -13,7 +13,7 @@ export default defineConfig({
       registerType: "autoUpdate",
       includeAssets: ["favicon.ico", "icon.svg"],
       manifest: {
-        name: "xmtp agents",
+        name: "XMTP Agents",
         short_name: "XMTP Agents",
         description: "Chat with XMTP agents",
         theme_color: "#0b0b0d",

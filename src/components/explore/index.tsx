@@ -2,8 +2,6 @@ import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { AI_AGENTS, type AgentConfig } from "@/agent-registry/agents";
 import { AgentCard } from "./agent-card";
-import { useXMTPClient } from "@hooks/use-xmtp-client";
-import { useConversationsContext } from "@/src/contexts/xmtp-conversations-context";
 import { Input } from "@ui/input";
 import { SearchIcon } from "@ui/icons";
 import { getUserAgents } from "@/lib/agent-storage";
@@ -13,8 +11,6 @@ export function ExplorePage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
-  const { client } = useXMTPClient();
-  const { setPendingConversation } = useConversationsContext();
 
   useEffect(() => {
     const agents = getUserAgents();
@@ -65,31 +61,18 @@ export function ExplorePage() {
     return agents;
   }, [allAgents, selectedCategory, searchQuery]);
 
-  const handleAgentClick = async (agent: AgentConfig) => {
-    if (!client) {
-      console.warn(
-        "[Explore] Cannot create conversation: client not available",
-      );
-      return;
-    }
-
+  const handleAgentClick = (agent: AgentConfig) => {
     console.log(
-      "[Explore] Starting optimistic navigation for agent:",
+      "[Explore] Navigating to chat with agent:",
       agent.name,
       agent.address,
     );
 
-    // Get the first suggestion as the auto message, or default to "@{name} Hello"
-    const autoMessage = agent.suggestions?.[0] || `@${agent.name} Hello`;
-
-    setPendingConversation({
-      agentAddresses: [agent.address],
-      agentConfigs: [agent],
-      autoMessage,
-      status: "creating",
+    // Navigate with agent in state to pre-select it
+    navigate("/", {
+      replace: true,
+      state: { selectedAgent: agent },
     });
-
-    navigate("/", { replace: true });
   };
 
   return (
