@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.35] - 2026-01-10
+
+### Fixed
+
+- Fixed sidebar navigation to clear selected conversation when clicking explore
+- Fixed conversation active state to only highlight when on conversation route
+- Improved user nav styling with border and alignment fixes
+
 ## [0.1.34] - 2026-01-10
 
 ### Added
