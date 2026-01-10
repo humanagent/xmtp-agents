@@ -133,14 +133,15 @@ export function SidebarUserNav() {
             <DropdownMenuContent
               align="start"
               side="top"
-              alignOffset={-8}
-              className="w-[calc(var(--sidebar-width)-1rem)]"
+              sideOffset={0}
+              alignOffset={0}
+              className="w-[calc(var(--sidebar-width)-1rem)] border-0 shadow-none rounded-b-none"
             >
-              <DropdownMenuLabel className="text-xs">
+              <DropdownMenuLabel className="px-2 py-1.5 text-xs">
                 {displayAddress}
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleCopyAddress}>
+              <DropdownMenuItem onClick={handleCopyAddress} className="w-full">
                 {copied ? (
                   <CheckIcon className="text-green-500" size={16} />
                 ) : (
@@ -157,6 +158,7 @@ export function SidebarUserNav() {
                     navigate("/dev-portal");
                   }
                 }}
+                className="w-full"
               >
                 <CodeIcon size={16} />
                 <span>{isPortal ? "Back to App" : "Developer Portal"}</span>
@@ -166,7 +168,7 @@ export function SidebarUserNav() {
                 onClick={() => {
                   setShowResetDialog(true);
                 }}
-                className="text-destructive focus:text-destructive"
+                className="w-full text-destructive focus:text-destructive"
               >
                 <ResetIcon size={16} />
                 <span>Reset identity</span>

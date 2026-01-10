@@ -98,9 +98,12 @@ export default defineConfig({
   },
   server: {
     port: 3000,
+    host: true,
+    allowedHosts: ["amazed-hedgehog-actual.ngrok-free.app"],
     watch: {
       usePolling: false,
     },
+    hmr: false,
   },
   logLevel: "info",
   onLog(level, log, _options) {

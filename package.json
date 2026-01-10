@@ -12,7 +12,7 @@
     "format:check": "prettier -c .",
     "lint": "eslint .",
     "preview": "vite preview",
-    "ngrok": "ngrok http 5173"
+    "ngrok": "ngrok http 3000 --domain=amazed-hedgehog-actual.ngrok-free.app"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",
