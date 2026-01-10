@@ -16,6 +16,7 @@ export function useAgentManagement({
   setPlusPanelOpen,
   onOpenAgentsDialogChange,
   textareaRef,
+  setSingleAgent,
 }: {
   conversation?: Conversation | null;
   isMultiAgentMode: boolean;
@@ -27,6 +28,7 @@ export function useAgentManagement({
   setPlusPanelOpen: (open: boolean) => void;
   onOpenAgentsDialogChange?: (open: boolean) => void;
   textareaRef: React.RefObject<HTMLTextAreaElement>;
+  setSingleAgent?: (agent: AgentConfig | undefined) => void;
 }) {
   const [confirmAddAgentOpen, setConfirmAddAgentOpen] = useState(false);
   const [agentToAdd, setAgentToAdd] = useState<AgentConfig | null>(null);
@@ -47,6 +49,9 @@ export function useAgentManagement({
         // Add to array instead of replace
         setAgents([...agents, agent]);
       }
+      setPlusPanelOpen(false);
+      onOpenAgentsDialogChange?.(false);
+      textareaRef.current?.focus();
     } else {
       if (conversation) {
         // If conversation exists and it's a group, show confirmation dialog
