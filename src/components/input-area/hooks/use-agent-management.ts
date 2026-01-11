@@ -101,7 +101,7 @@ export function useAgentManagement({
     }
   };
 
-  const handleRemoveAgent = (address: string) => {
+  const handleRemoveAgent = async (address: string) => {
     if (isMultiAgentMode) {
       const agents = selectedAgents || [];
       const setAgents = setSelectedAgents as (agents: AgentConfig[]) => void;
@@ -112,6 +112,11 @@ export function useAgentManagement({
         (a) => a.address.toLowerCase() === address.toLowerCase(),
       );
       if (agent && isGroup && conversation instanceof Group) {
+        // Check member count - don't show modal if there are only 2 members
+        const members = await conversation.members();
+        if (members.length <= 2) {
+          return;
+        }
         setAgentToRemove(agent);
         setConfirmRemoveAgentOpen(true);
       }

@@ -158,7 +158,6 @@ const SidebarProvider = React.forwardRef<
                 "--sidebar-width": SIDEBAR_WIDTH,
                 "--sidebar-width-icon": SIDEBAR_WIDTH_ICON,
                 minHeight: "100svh",
-                minHeight: "-webkit-fill-available",
                 ...style,
               } as React.CSSProperties
             }
@@ -354,7 +353,6 @@ const SidebarInset = React.forwardRef<
       ref={ref}
       style={{
         minHeight: "100svh",
-        minHeight: "-webkit-fill-available",
       }}
       {...props}
     />

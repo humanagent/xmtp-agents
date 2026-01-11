@@ -232,7 +232,6 @@ export function ConversationView({
 
       // Cleanup previous stream
       if (streamCleanupRef.current) {
-        console.log("[ConversationView] Cleaning up previous stream");
         void streamCleanupRef.current();
         streamCleanupRef.current = null;
       }
@@ -310,11 +309,6 @@ export function ConversationView({
   ]);
 
   useEffect(() => {
-    console.log(
-      "[ConversationView] selectedConversation changed:",
-      selectedConversation?.id,
-    );
-
     // Clear messages immediately when conversation changes
     setMessages([]);
     setSyncError(null);
@@ -325,7 +319,6 @@ export function ConversationView({
 
     // Cleanup previous stream
     if (streamCleanupRef.current) {
-      console.log("[ConversationView] Cleaning up previous stream");
       void streamCleanupRef.current();
       streamCleanupRef.current = null;
     }
@@ -480,7 +473,6 @@ export function ConversationView({
           });
 
           streamCleanupRef.current = async () => {
-            console.log("[ConversationView] Ending stream");
             await stream.end();
           };
         } catch (error) {
@@ -511,7 +503,6 @@ export function ConversationView({
     void setupMessages();
 
     return () => {
-      console.log("[ConversationView] Cleanup effect");
       mounted = false;
       if (streamCleanupRef.current) {
         void streamCleanupRef.current();
