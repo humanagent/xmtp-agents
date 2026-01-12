@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.40] - 2026-01-10
+
+### Added
+
+- Added address copy functionality to agent cards with visual feedback
+- Added copy button to both featured and regular agent cards
+- Refactored message content tooltips to use Tooltip component instead of custom hover
+
 ## [0.1.39] - 2026-01-10
 
 ### Changed
