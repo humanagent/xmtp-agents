@@ -1,25 +1,18 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router";
 import { AI_AGENTS, type AgentConfig } from "@/agent-registry/agents";
 import { AgentCard } from "./agent-card";
 import { Input } from "@ui/input";
 import { SearchIcon } from "@ui/icons";
-import { getUserAgents } from "@/lib/agent-storage";
 
 export function ExplorePage() {
-  const [userAgents, setUserAgents] = useState<AgentConfig[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const agents = getUserAgents();
-    setUserAgents(agents);
-  }, []);
-
   const allAgents = useMemo(() => {
-    return [...AI_AGENTS, ...userAgents];
-  }, [userAgents]);
+    return AI_AGENTS;
+  }, []);
 
   const categories = useMemo(() => {
     const uniqueCategories = new Set(

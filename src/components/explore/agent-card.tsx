@@ -1,6 +1,7 @@
 import type { AgentConfig } from "@/agent-registry/agents";
-import { ArrowUpIcon } from "@ui/icons";
+import { ArrowUpIcon, CopyIcon, CheckIcon } from "@ui/icons";
 import { motion } from "framer-motion";
+import { useState, useCallback } from "react";
 
 type AgentCardProps = {
   agent: AgentConfig;
@@ -13,10 +14,28 @@ export function AgentCard({
   onClick,
   featured = false,
 }: AgentCardProps) {
+  const [copied, setCopied] = useState(false);
   const description =
     agent.description ||
     agent.suggestions?.[0]?.replace(`@${agent.name}`, "").trim() ||
     "AI agent ready to assist you";
+
+  const handleCopy = useCallback(
+    async (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (!agent.address) return;
+      try {
+        await navigator.clipboard.writeText(agent.address);
+        setCopied(true);
+        setTimeout(() => {
+          setCopied(false);
+        }, 2000);
+      } catch (error) {
+        console.error("Failed to copy address:", error);
+      }
+    },
+    [agent.address],
+  );
 
   if (featured) {
     return (
@@ -57,6 +76,24 @@ export function AgentCard({
               <p className="text-[10px] text-muted-foreground truncate">
                 {description}
               </p>
+              {agent.address && (
+                <div className="flex items-center gap-1.5 mt-1">
+                  <span className="text-[9px] font-mono text-muted-foreground truncate">
+                    {agent.address.slice(0, 6)}...{agent.address.slice(-4)}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleCopy}
+                    className="shrink-0 text-muted-foreground hover:text-foreground transition-colors duration-200"
+                  >
+                    {copied ? (
+                      <CheckIcon size={10} className="text-green-500" />
+                    ) : (
+                      <CopyIcon size={10} />
+                    )}
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -98,6 +135,24 @@ export function AgentCard({
         <p className="truncate text-[10px] text-muted-foreground">
           {description}
         </p>
+        {agent.address && (
+          <div className="flex items-center gap-1.5 mt-1">
+            <span className="text-[9px] font-mono text-muted-foreground truncate">
+              {agent.address.slice(0, 6)}...{agent.address.slice(-4)}
+            </span>
+            <button
+              type="button"
+              onClick={handleCopy}
+              className="shrink-0 text-muted-foreground hover:text-foreground transition-colors duration-200"
+            >
+              {copied ? (
+                <CheckIcon size={10} className="text-green-500" />
+              ) : (
+                <CopyIcon size={10} />
+              )}
+            </button>
+          </div>
+        )}
       </div>
       <ArrowUpIcon
         className="shrink-0 rotate-45 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
