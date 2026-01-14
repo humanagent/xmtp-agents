@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.1.41] - 2026-01-10
+
+### Changed
+
+- Reframed application as agent appstore - browsing agents is now primary, chat is secondary interaction method
+- Updated routes: root path (/) now shows Agent Store, /chat route for new conversations
+- Renamed sidebar navigation: "Explore" → "Browse", "New Chat" → "Chats"
+- Updated ExplorePage heading to "Agent Store" with subtitle "Discover and interact with XMTP agents"
+- Added MessageIcon for Chats button in sidebar
+- Updated all navigation to use new route structure
+
+## [0.1.40] - 2026-01-10
+
+### Added
+
+- Added address copy functionality to agent cards with visual feedback
+- Added copy button to both featured and regular agent cards
+- Refactored message content tooltips to use Tooltip component instead of custom hover
+
 ## [0.1.39] - 2026-01-10
 
 ### Changed

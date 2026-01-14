@@ -1,25 +1,18 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router";
 import { AI_AGENTS, type AgentConfig } from "@/agent-registry/agents";
 import { AgentCard } from "./agent-card";
 import { Input } from "@ui/input";
 import { SearchIcon } from "@ui/icons";
-import { getUserAgents } from "@/lib/agent-storage";
 
 export function ExplorePage() {
-  const [userAgents, setUserAgents] = useState<AgentConfig[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const agents = getUserAgents();
-    setUserAgents(agents);
-  }, []);
-
   const allAgents = useMemo(() => {
-    return [...AI_AGENTS, ...userAgents];
-  }, [userAgents]);
+    return AI_AGENTS;
+  }, []);
 
   const categories = useMemo(() => {
     const uniqueCategories = new Set(
@@ -68,8 +61,8 @@ export function ExplorePage() {
       agent.address,
     );
 
-    // Navigate with agent in state to pre-select it
-    navigate("/", {
+    // Navigate to chat with agent in state to pre-select it
+    navigate("/chat", {
       replace: true,
       state: { selectedAgent: agent },
     });
@@ -80,9 +73,9 @@ export function ExplorePage() {
       <div className="flex-1 overflow-y-auto">
         <div className="mx-auto max-w-6xl px-4 py-8 md:px-8">
           <div className="mb-8">
-            <h1 className="mb-2 font-semibold text-xl">XMTP Agents</h1>
+            <h1 className="mb-2 font-semibold text-xl">Agent Store</h1>
             <p className="text-xs text-muted-foreground">
-              Chat with your favorite XMTP agents
+              Discover and interact with XMTP agents
             </p>
           </div>
 

@@ -92,6 +92,23 @@ export const SidebarLeftIcon = ({ size = 16 }: { size?: number }) => (
   </svg>
 );
 
+export const SidebarRightIcon = ({ size = 16 }: { size?: number }) => (
+  <svg
+    height={size}
+    strokeLinejoin="round"
+    style={{ color: "currentcolor" }}
+    viewBox="0 0 16 16"
+    width={size}
+  >
+    <path
+      clipRule="evenodd"
+      d="M9.755 2.5H1.5V12.5C1.5 13.0523 1.94772 13.5 2.5 13.5H9.755V2.5ZM11.005 2.5H14.5V12.5C14.5 13.0523 14.0523 13.5 13.5 13.5H11.005V2.5ZM16 1H14.5H1.5H0V2.5V12.5C0 13.8807 1.11929 15 2.5 15H13.5C14.8807 15 16 13.8807 16 12.5V2.5V1Z"
+      fill="currentColor"
+      fillRule="evenodd"
+    />
+  </svg>
+);
+
 export const Loader2Icon = ({
   size = 16,
   className = "",
@@ -600,6 +617,27 @@ export const EditIcon = ({
     <path
       clipRule="evenodd"
       d="M11.8536 1.14645C12.0488 1.34171 12.0488 1.65829 11.8536 1.85355L5.35355 8.35355C5.15829 8.54882 4.84171 8.54882 4.64645 8.35355L2.14645 5.85355C1.95118 5.65829 1.95118 5.34171 2.14645 5.14645C2.34171 4.95118 2.65829 4.95118 2.85355 5.14645L5 7.29289L11.1464 1.14645C11.3417 0.951184 11.6583 0.951184 11.8536 1.14645ZM2 11.5C2 11.2239 2.22386 11 2.5 11H13.5C13.7761 11 14 11.2239 14 11.5C14 11.7761 13.7761 12 13.5 12H2.5C2.22386 12 2 11.7761 2 11.5Z"
+      fill="currentColor"
+      fillRule="evenodd"
+    />
+  </svg>
+);
+
+export const MessageIcon = ({
+  size = 16,
+  ...props
+}: { size?: number } & React.SVGProps<SVGSVGElement>) => (
+  <svg
+    height={size}
+    strokeLinejoin="round"
+    style={{ color: "currentcolor", ...props.style }}
+    viewBox="0 0 16 16"
+    width={size}
+    {...props}
+  >
+    <path
+      clipRule="evenodd"
+      d="M1 3.5C1 2.67157 1.67157 2 2.5 2H13.5C14.3284 2 15 2.67157 15 3.5V11.5C15 12.3284 14.3284 13 13.5 13H5.20711L2.85355 15.3536C2.65829 15.5488 2.34171 15.5488 2.14645 15.3536C1.95118 15.1583 1.95118 14.8417 2.14645 14.6464L4.5 12.2929H13.5C13.7761 12.2929 14 12.0168 14 11.7407V3.5C14 3.22386 13.7761 3 13.5 3H2.5C2.22386 3 2 3.22386 2 3.5V11.7407C2 12.0168 2.22386 12.2929 2.5 12.2929H3.5V11.2929H2.5C1.67157 11.2929 1 10.6213 1 9.79289V3.5Z"
       fill="currentColor"
       fillRule="evenodd"
     />

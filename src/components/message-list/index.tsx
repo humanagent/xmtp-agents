@@ -16,6 +16,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@ui/tooltip";
+import { MessageContent } from "./message-content";
+import { RightNav } from "@components/right-nav";
+import { FloatingRightNavToggle } from "@components/right-nav/floating-toggle-button";
+import { Group } from "@xmtp/browser-sdk";
 
 function formatTimeAgo(date: Date): string {
   const now = new Date();
@@ -40,7 +44,15 @@ function getMessageSentAt(msg: DecodedMessage<unknown>): Date | undefined {
   return undefined;
 }
 
-export function MessageList({ messages }: { messages: Message[] }) {
+export function MessageList({
+  messages,
+  onMentionClick,
+  isGroup = false,
+}: {
+  messages: Message[];
+  onMentionClick?: (agent: AgentConfig) => void;
+  isGroup?: boolean;
+}) {
   const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
 
   const handleCopy = useCallback(async (content: string, messageId: string) => {
@@ -78,7 +90,11 @@ export function MessageList({ messages }: { messages: Message[] }) {
                   }`}
                 >
                   <div className="space-y-2 whitespace-normal size-full [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&_code]:whitespace-pre-wrap [&_code]:break-words [&_pre]:max-w-full [&_pre]:overflow-x-auto">
-                    <p className="leading-relaxed">{message.content}</p>
+                    <MessageContent
+                      content={message.content}
+                      onMentionClick={onMentionClick}
+                      isGroup={isGroup}
+                    />
                   </div>
                 </div>
                 <div
@@ -142,6 +158,9 @@ export function ConversationView({
   const [syncError, setSyncError] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [isWaitingForAgent, setIsWaitingForAgent] = useState(false);
+  const [rightNavOpen, setRightNavOpen] = useState(false);
+  const [selectedAgent, setSelectedAgent] = useState<AgentConfig | null>(null);
+  const [rightNavTab, setRightNavTab] = useState<"transactions" | "permissions">("transactions");
   const waitingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const streamCleanupRef = useRef<(() => Promise<void>) | null>(null);
   const tempMessageTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -219,7 +238,7 @@ export function ConversationView({
       // Clear conversation to show fresh chat area
       if (selectedConversation) {
         setSelectedConversation(null);
-        navigate("/", { replace: true });
+        navigate("/chat", { replace: true });
       }
 
       // Clear all messages and state
@@ -252,6 +271,15 @@ export function ConversationView({
   // Sync selected conversation with URL params
   const prevConversationIdRef = useRef<string | undefined>(conversationId);
   const prevSelectedConversationRef = useRef(selectedConversation);
+
+  // Clear selected agent when conversation changes
+  useEffect(() => {
+    if (selectedConversation !== prevSelectedConversationRef.current) {
+      setSelectedAgent(null);
+      setRightNavTab("transactions");
+    }
+    prevSelectedConversationRef.current = selectedConversation;
+  }, [selectedConversation]);
   useEffect(() => {
     if (conversationId) {
       const conversation = conversations.find((c) => c.id === conversationId);
@@ -263,9 +291,9 @@ export function ConversationView({
         setSelectedConversation(conversation);
       } else if (!conversation && conversations.length > 0) {
         console.log(
-          "[ConversationView] Conversation not found in list, navigating to home",
+          "[ConversationView] Conversation not found in list, navigating to chat",
         );
-        navigate("/");
+        navigate("/chat");
       }
     } else {
       // Clear selected conversation when navigating to home (no conversationId in URL)
@@ -691,7 +719,20 @@ export function ConversationView({
                       }}
                     />
                   ))}
-            {messages.length > 0 && <MessageList messages={messages} />}
+            {messages.length > 0 && (
+              <MessageList
+                messages={messages}
+                isGroup={selectedConversation instanceof Group}
+                onMentionClick={(agent) => {
+                  console.log("[ConversationView] Mention clicked:", agent.name);
+                  if (selectedConversation instanceof Group) {
+                    setSelectedAgent(agent);
+                    setRightNavTab("permissions");
+                    setRightNavOpen(true);
+                  }
+                }}
+              />
+            )}
             {isWaitingForAgent &&
               !isCreatingConversation &&
               !isSyncingConversation &&
@@ -721,6 +762,27 @@ export function ConversationView({
           conversation={selectedConversation ?? undefined}
         />
       </div>
+
+      <RightNav
+        conversation={selectedConversation}
+        open={rightNavOpen}
+        onOpenChange={(open) => {
+          setRightNavOpen(open);
+          if (!open) {
+            setSelectedAgent(null);
+            setRightNavTab("transactions");
+          }
+        }}
+        selectedAgent={selectedAgent}
+        activeTab={rightNavTab}
+        onTabChange={setRightNavTab}
+      />
+      {selectedConversation instanceof Group && (
+        <FloatingRightNavToggle
+          onClick={() => setRightNavOpen(!rightNavOpen)}
+          visible={true}
+        />
+      )}
     </div>
   );
 }
