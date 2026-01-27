@@ -1,7 +1,7 @@
 import { ConversationView } from "@components/message-list/index";
 import { Sidebar } from "@components/sidebar/sidebar";
 import { FloatingNavButton } from "@components/sidebar/floating-nav-button";
-import { useAgentClient } from "@hooks/use-agent-client";
+import { useClient } from "@xmtp/hooks/use-client";
 import { SidebarInset, SidebarProvider, useSidebar } from "@ui/sidebar";
 import { ConversationsProvider } from "@/src/contexts/xmtp-conversations-context";
 import { ToastProvider } from "@ui/toast";
@@ -49,7 +49,7 @@ function AppContent() {
 }
 
 export default function App() {
-  const { client } = useAgentClient();
+  const { client } = useClient();
 
   return (
     <BrowserRouter>

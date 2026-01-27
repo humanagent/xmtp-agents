@@ -12,7 +12,8 @@
       "@/*": ["./*"],
       "@hooks/*": ["./src/hooks/*"],
       "@components/*": ["./src/components/*"],
-      "@ui/*": ["./src/ui/*"]
+      "@ui/*": ["./src/ui/*"],
+      "@xmtp/*": ["./src/xmtp/*"]
     },
     "resolveJsonModule": true,
     "skipLibCheck": true,

@@ -6,8 +6,8 @@ import type {
 } from "@xmtp/browser-sdk";
 import { Group } from "@xmtp/browser-sdk";
 import { useCallback, useEffect, useState, useRef } from "react";
-import type { ContentTypes } from "./utils";
-import { toError } from "./utils";
+import type { ContentTypes } from "../utils";
+import { toError, assignMessageRole } from "../utils";
 
 export type Message = {
   id: string;
@@ -23,7 +23,7 @@ function getMessageSentAt(msg: DecodedMessage<unknown>): Date | undefined {
   return undefined;
 }
 
-export function useAgentConversation(
+export function useConversation(
   conversationId: string | null | undefined,
   client: Client<ContentTypes> | null,
 ) {
@@ -92,7 +92,7 @@ export function useAgentConversation(
           )
           .map((msg) => ({
             id: msg.id,
-            role: msg.senderInboxId === client.inboxId ? "user" : "assistant",
+            role: assignMessageRole(msg, client.inboxId),
             content: msg.content as string,
             sentAt: getMessageSentAt(msg),
           }));
@@ -122,8 +122,7 @@ export function useAgentConversation(
 
             const newMessage: Message = {
               id: message.id,
-              role:
-                message.senderInboxId === client.inboxId ? "user" : "assistant",
+              role: assignMessageRole(message, client.inboxId),
               content: message.content,
               sentAt: getMessageSentAt(message),
             };

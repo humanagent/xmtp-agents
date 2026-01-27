@@ -6,11 +6,12 @@ import { RemoteAttachmentCodec } from "@xmtp/content-type-remote-attachment";
 import { ReplyCodec } from "@xmtp/content-type-reply";
 import { TransactionReferenceCodec } from "@xmtp/content-type-transaction-reference";
 import { WalletSendCallsCodec } from "@xmtp/content-type-wallet-send-calls";
-import type { Signer } from "@xmtp/browser-sdk";
+import type { Signer, GroupMember, DecodedMessage } from "@xmtp/browser-sdk";
 import { toBytes, type Hex } from "viem";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { Group, ConsentState, ConsentEntityType } from "@xmtp/browser-sdk";
 import type { Conversation } from "@xmtp/browser-sdk";
+import type { AgentConfig } from "@/src/agents";
 
 type PrivateKey = Hex;
 
@@ -202,4 +203,51 @@ export async function createGroupWithAgentAddresses(
   );
 
   return group;
+}
+
+// Business logic utilities
+
+/**
+ * Extracts Ethereum addresses from group members
+ */
+export function extractMemberAddresses(members: GroupMember[]): string[] {
+  const addresses = new Set<string>();
+  for (const member of members) {
+    for (const identifier of member.accountIdentifiers) {
+      if (identifier.identifierKind === "Ethereum") {
+        addresses.add(identifier.identifier.toLowerCase());
+      }
+    }
+  }
+  return Array.from(addresses);
+}
+
+/**
+ * Matches group members against an agent list
+ * Returns agents whose addresses match member addresses
+ */
+export function matchAgentsFromMembers(
+  members: GroupMember[],
+  agentList: AgentConfig[],
+): AgentConfig[] {
+  const memberAddresses = new Set(extractMemberAddresses(members));
+  return agentList.filter((agent) =>
+    memberAddresses.has(agent.address.toLowerCase()),
+  );
+}
+
+/**
+ * Assigns a role to a message based on sender
+ * @param message - The decoded message
+ * @param clientInboxId - The current client's inbox ID
+ * @param options - Optional role names (defaults to "user" and "assistant")
+ * @returns The assigned role
+ */
+export function assignMessageRole(
+  message: DecodedMessage<unknown>,
+  clientInboxId: string,
+  _options?: { userRole?: string; assistantRole?: string },
+): "user" | "assistant" {
+  const isFromClient = message.senderInboxId === clientInboxId;
+  return isFromClient ? "user" : "assistant";
 }

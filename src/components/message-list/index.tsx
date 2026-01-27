@@ -1,12 +1,12 @@
 import { ChatHeader, Greeting } from "@components/chat-area/index";
 import { InputArea, type Message } from "@components/input-area";
-import { useAgentClient } from "@hooks/use-agent-client";
+import { useClient } from "@xmtp/hooks/use-client";
 import { useCallback, useEffect, useState, useRef } from "react";
-import type { DecodedMessage } from "@/src/hooks";
+import type { DecodedMessage } from "@xmtp/browser-sdk";
 import { useConversationsContext } from "@/src/contexts/xmtp-conversations-context";
 import { useParams, useNavigate, useLocation } from "react-router";
 import { ThinkingIndicator } from "@ui/thinking-indicator";
-import { createGroupWithAgentAddresses } from "@/src/hooks/utils";
+import { createGroupWithAgentAddresses } from "@xmtp/utils";
 import type { AgentConfig } from "@/src/agents";
 import { CopyIcon, CheckIcon } from "@ui/icons";
 import { Button } from "@ui/button";
@@ -19,7 +19,7 @@ import {
 import { MessageContent } from "./message-content";
 import { RightNav } from "@components/right-nav";
 import { FloatingRightNavToggle } from "@components/right-nav/floating-toggle-button";
-import { Group } from "@/src/hooks";
+import { Group } from "@xmtp/browser-sdk";
 import { formatTimeAgo } from "@/src/utils";
 
 function getMessageSentAt(msg: DecodedMessage<unknown>): Date | undefined {
@@ -154,7 +154,7 @@ export function ConversationView({
   const tempMessageTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const isSendingRef = useRef(false);
-  const { client } = useAgentClient();
+  const { client } = useClient();
   const {
     selectedConversation,
     setSelectedConversation,

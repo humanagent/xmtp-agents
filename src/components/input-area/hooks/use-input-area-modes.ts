@@ -1,5 +1,5 @@
 import type { AgentConfig } from "@/src/agents";
-import type { Conversation } from "@/src/hooks";
+import type { Conversation } from "@xmtp/browser-sdk";
 
 export function useInputAreaModes({
   selectedAgents,

@@ -13,16 +13,14 @@ yarn add agent-mini-app-hooks
 ## Quick Start
 
 ```tsx
-import {
-  useAgentClient,
-  useAgentConversations,
-  useAgentConversation,
-} from "agent-mini-app-hooks";
+import { useClient } from "@xmtp/hooks/use-client";
+import { useConversations } from "@xmtp/hooks/use-conversations";
+import { useConversation } from "@xmtp/hooks/use-conversation";
 
 function MyAgentApp() {
-  const { client, isLoading } = useAgentClient();
-  const { conversations } = useAgentConversations(client);
-  const { messages, send } = useAgentConversation(conversationId, client);
+  const { client, isLoading } = useClient();
+  const { conversations } = useConversations(client);
+  const { messages, send } = useConversation(conversationId, client);
 
   if (isLoading) return <div>Loading...</div>;
 
@@ -39,9 +37,15 @@ function MyAgentApp() {
 
 ## Hooks API
 
-### `useAgentClient()`
+### `useClient()`
 
 Initialize XMTP client. Returns singleton client instance.
+
+**Import:**
+
+```tsx
+import { useClient } from "@xmtp/hooks/use-client";
+```
 
 **Returns:**
 
@@ -52,18 +56,24 @@ Initialize XMTP client. Returns singleton client instance.
 **Example:**
 
 ```tsx
-const { client, isLoading, error } = useAgentClient();
+const { client, isLoading, error } = useClient();
 ```
 
 ---
 
-### `useAgentConversations(client)`
+### `useConversations(client)`
 
 List and manage all conversations.
 
+**Import:**
+
+```tsx
+import { useConversations } from "@xmtp/hooks/use-conversations";
+```
+
 **Parameters:**
 
-- `client` - XMTP Client (from `useAgentClient`)
+- `client` - XMTP Client (from `useClient`)
 
 **Returns:**
 
@@ -75,8 +85,8 @@ List and manage all conversations.
 **Example:**
 
 ```tsx
-const { client } = useAgentClient();
-const { conversations, isLoading, refresh } = useAgentConversations(client);
+const { client } = useClient();
+const { conversations, isLoading, refresh } = useConversations(client);
 
 // Refresh conversations
 await refresh();
@@ -84,14 +94,20 @@ await refresh();
 
 ---
 
-### `useAgentConversation(conversationId, client)`
+### `useConversation(conversationId, client)`
 
 **All-in-one hook for conversation operations.** Handles messages, sending, members, and group operations.
+
+**Import:**
+
+```tsx
+import { useConversation } from "@xmtp/hooks/use-conversation";
+```
 
 **Parameters:**
 
 - `conversationId` - string | null | undefined
-- `client` - XMTP Client (from `useAgentClient`)
+- `client` - XMTP Client (from `useClient`)
 
 **Returns:**
 
@@ -125,26 +141,40 @@ if (isGroup) {
 
 ---
 
-### `useAgentConversationAgents(conversationId, client)`
+### `useConversationMembers(conversationId, client)`
 
-Get agents in a conversation (filters from known agent list).
+Get members in a conversation. Returns raw XMTP members data.
+
+**Import:**
+
+```tsx
+import { useConversationMembers } from "@xmtp/hooks/use-conversation-members";
+import { matchAgentsFromMembers } from "@xmtp/utils";
+```
 
 **Parameters:**
 
 - `conversationId` - string | null | undefined
-- `client` - XMTP Client (from `useAgentClient`)
+- `client` - XMTP Client (from `useClient`)
 
 **Returns:**
 
-- `agents` - AgentConfig[] - Agents found in conversation
+- `members` - GroupMember[] - Members in conversation
 - `isLoading` - boolean
 - `error` - Error | null
 
 **Example:**
 
 ```tsx
-const { client } = useAgentClient();
-const { agents } = useAgentConversationAgents(conversationId, client);
+import { useConversationMembers } from "@xmtp/hooks/use-conversation-members";
+import { matchAgentsFromMembers } from "@xmtp/utils";
+import { AI_AGENTS } from "@/src/agents";
+
+const { client } = useClient();
+const { members } = useConversationMembers(conversationId, client);
+
+// Match agents from members (business logic in utility)
+const agents = matchAgentsFromMembers(members, AI_AGENTS);
 ```
 
 ---
@@ -170,22 +200,20 @@ const { selectedAgents, addAgent, removeAgent } = useAgentSelection();
 ## Complete Example
 
 ```tsx
-import {
-  useAgentClient,
-  useAgentConversations,
-  useAgentConversation,
-} from "agent-mini-app-hooks";
+import { useClient } from "@xmtp/hooks/use-client";
+import { useConversations } from "@xmtp/hooks/use-conversations";
+import { useConversation } from "@xmtp/hooks/use-conversation";
 
 function ChatApp() {
-  const { client, isLoading: clientLoading } = useAgentClient();
-  const { conversations } = useAgentConversations(client);
+  const { client, isLoading: clientLoading } = useClient();
+  const { conversations } = useConversations(client);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const {
     messages,
     send,
     isLoading: convLoading,
-  } = useAgentConversation(selectedId, client);
+  } = useConversation(selectedId, client);
 
   if (clientLoading) return <div>Connecting...</div>;
 
@@ -228,8 +256,33 @@ function ChatApp() {
 All hooks are fully typed. Import types as needed:
 
 ```tsx
-import type { AgentConfig, Message } from "agent-mini-app-hooks";
+// XMTP types from browser-sdk
+import type {
+  Conversation,
+  Group,
+  DecodedMessage,
+  Client,
+} from "@xmtp/browser-sdk";
+
+// Message type from conversation hook
+import type { Message } from "@xmtp/hooks/use-conversation";
+
+// Content types
+import type { ContentTypes } from "@xmtp/utils";
+
+// Agent config
+import type { AgentConfig } from "@/src/agents";
 ```
+
+## Architecture
+
+**Hooks are generic data fetchers only.** Business logic (agent matching, role assignment, filtering) belongs in utilities or components.
+
+- Hooks return raw XMTP data
+- Utilities handle business logic (e.g., `matchAgentsFromMembers`, `assignMessageRole`)
+- Components compose hooks with utilities
+
+This ensures hooks are reusable, testable, and maintain clear separation of concerns.
 
 ## License
 

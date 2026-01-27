@@ -2,8 +2,8 @@ import { XIcon } from "@ui/icons";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import type { AgentConfig } from "@/src/agents";
-import type { Conversation } from "@/src/hooks";
-import { Group } from "@/src/hooks";
+import type { Conversation } from "@xmtp/browser-sdk";
+import { Group } from "@xmtp/browser-sdk";
 import { shortAddress } from "@/src/utils";
 
 type AgentChipsProps = {

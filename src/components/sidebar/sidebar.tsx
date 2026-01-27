@@ -1,4 +1,4 @@
-import { useAgentClient } from "@hooks/use-agent-client";
+import { useClient } from "@xmtp/hooks/use-client";
 import { useConversationsContext } from "@/src/contexts/xmtp-conversations-context";
 import { MessageIcon } from "@ui/icons";
 import {
@@ -15,10 +15,10 @@ import { useToast } from "@ui/toast";
 import { SidebarToggle } from "@/src/components/sidebar/sidebar-toggle";
 import { SidebarUserNav } from "@/src/components/sidebar/user-nav";
 import { ConversationItem } from "@/src/components/sidebar/conversation-item";
-import type { Conversation } from "@/src/hooks";
+import type { Conversation } from "@xmtp/browser-sdk";
 import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
-import { denyConversation } from "@/src/hooks/utils";
+import { denyConversation } from "@xmtp/utils";
 import {
   sortConversationsByLastMessage,
   type ConversationWithMeta,
@@ -52,7 +52,7 @@ const SidebarLogo = ({
 );
 
 export function Sidebar() {
-  const { client } = useAgentClient();
+  const { client } = useClient();
   const {
     conversations,
     selectedConversation,

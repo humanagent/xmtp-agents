@@ -1,11 +1,11 @@
 import type { Client, Conversation } from "@xmtp/browser-sdk";
 import { useCallback, useEffect, useState } from "react";
-import type { ContentTypes } from "./utils";
+import type { ContentTypes } from "../utils";
 import {
   isConversationAllowed,
   toError,
   deduplicateConversations,
-} from "./utils";
+} from "../utils";
 
 async function filterAllowedConversations(
   conversations: Conversation[],
@@ -28,7 +28,7 @@ async function filterAllowedConversations(
   return allowedList;
 }
 
-export function useAgentConversations(client: Client<ContentTypes> | null) {
+export function useConversations(client: Client<ContentTypes> | null) {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);

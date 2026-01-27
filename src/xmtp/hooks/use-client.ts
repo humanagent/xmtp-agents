@@ -5,7 +5,7 @@ import {
   getOrCreateEphemeralAccountKey,
   type ContentTypes,
   toError,
-} from "./utils";
+} from "../utils";
 
 let globalClientPromise: Promise<Client<ContentTypes>> | null = null;
 let globalClient: Client<ContentTypes> | null = null;
@@ -67,7 +67,7 @@ async function initializeClient(): Promise<Client<ContentTypes>> {
   return globalClientPromise;
 }
 
-export function useAgentClient() {
+export function useClient() {
   const [client, setClient] = useState<Client<ContentTypes> | null>(
     globalClient,
   );

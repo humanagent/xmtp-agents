@@ -1,4 +1,4 @@
-import { useAgentClient } from "@hooks/use-agent-client";
+import { useClient } from "@xmtp/hooks/use-client";
 import { CopyIcon, CheckIcon, ResetIcon, ChevronDownIcon } from "@ui/icons";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@ui/sidebar";
 import {
@@ -20,7 +20,7 @@ import {
 import { Button } from "@ui/button";
 import { Skeleton } from "@ui/skeleton";
 import { shortAddress } from "@/src/utils";
-import { clearEphemeralAccountKey } from "@/src/hooks/utils";
+import { clearEphemeralAccountKey } from "@xmtp/utils";
 import { useState, useCallback, useMemo } from "react";
 
 function generateGradient(address: string): string {
@@ -35,7 +35,7 @@ function generateGradient(address: string): string {
 }
 
 export function SidebarUserNav() {
-  const { client, isLoading } = useAgentClient();
+  const { client, isLoading } = useClient();
   const [copied, setCopied] = useState(false);
   const [showResetDialog, setShowResetDialog] = useState(false);
   const address = client?.accountIdentifier?.identifier;

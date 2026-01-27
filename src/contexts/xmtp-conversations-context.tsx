@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
-import { useAgentConversations } from "@/src/hooks/use-agent-conversations";
-import type { Client, Conversation, ContentTypes } from "@/src/hooks";
+import { useConversations } from "@xmtp/hooks/use-conversations";
+import type { Client, Conversation } from "@xmtp/browser-sdk";
+import type { ContentTypes } from "@xmtp/utils";
 import type { AgentConfig } from "@/src/agents";
 
 type PendingConversationStatus = "creating" | "sending";
@@ -39,8 +40,7 @@ export function ConversationsProvider({
   client: Client<ContentTypes> | null;
   children: ReactNode;
 }) {
-  const { conversations, isLoading, error, refresh } =
-    useAgentConversations(client);
+  const { conversations, isLoading, error, refresh } = useConversations(client);
   const [selectedConversation, setSelectedConversation] =
     useState<Conversation | null>(null);
   const [pendingConversation, setPendingConversation] = useState<{

@@ -2,8 +2,8 @@ import { useIsMobile } from "@hooks/use-mobile";
 import { Button } from "@ui/button";
 import { ArrowUpIcon, MetadataIcon, PlusIcon } from "@ui/icons";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@ui/tooltip";
-import type { Conversation } from "@/src/hooks";
-import { Group } from "@/src/hooks";
+import type { Conversation } from "@xmtp/browser-sdk";
+import { Group } from "@xmtp/browser-sdk";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { type AgentConfig, AI_AGENTS } from "@/src/agents";
 import { cn } from "@/src/utils";
@@ -21,8 +21,10 @@ import { MetadataDialog } from "./dialogs/metadata-dialog";
 import { AddAgentDialog } from "./dialogs/add-agent-dialog";
 import { RemoveAgentDialog } from "./dialogs/remove-agent-dialog";
 import { useInputAreaModes } from "./hooks/use-input-area-modes";
-import { useAgentConversationAgents } from "@/src/hooks/use-agent-conversation-agents";
-import { useAgentClient } from "@/src/hooks/use-agent-client";
+import { useConversationMembers } from "@xmtp/hooks/use-conversation-members";
+import { useClient } from "@xmtp/hooks/use-client";
+import { matchAgentsFromMembers } from "@xmtp/utils";
+import { AI_AGENTS } from "@/src/agents";
 import { useAgentManagement } from "./hooks/use-agent-management";
 import { shuffleArray, appendAgentMentions } from "./utils";
 
@@ -56,7 +58,7 @@ export function InputArea({
   const isSubmittingRef = useRef(false);
   const isGroup = conversation instanceof Group;
   const isMobile = useIsMobile();
-  const { client } = useAgentClient();
+  const { client } = useClient();
 
   // Determine modes
   const { isChatAreaMode, isMessageListMode, isMultiAgentMode } =
@@ -71,10 +73,14 @@ export function InputArea({
     shuffleArray(AI_AGENTS.filter((agent) => agent.live)),
   );
 
-  // Load conversation agents
-  const { agents: conversationAgents } = useAgentConversationAgents(
+  // Load conversation members and match agents
+  const { members: conversationMembers } = useConversationMembers(
     conversation?.id || null,
     client,
+  );
+  const conversationAgents = matchAgentsFromMembers(
+    conversationMembers,
+    AI_AGENTS,
   );
 
   // State for single agent (can be set when adding agent before conversation exists)
