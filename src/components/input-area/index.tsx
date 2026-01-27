@@ -1,6 +1,6 @@
 import { useIsMobile } from "@hooks/use-mobile";
 import { Button } from "@ui/button";
-import { ArrowUpIcon, MetadataIcon, PlusIcon } from "@ui/icons";
+import { ArrowUpIcon, PlusIcon } from "@ui/icons";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@ui/tooltip";
 import type { Conversation } from "@xmtp/browser-sdk";
 import { Group } from "@xmtp/browser-sdk";
@@ -16,10 +16,8 @@ import {
   PromptInputTools,
   PromptInputSubmit,
 } from "./prompt-input";
-import { MetadataDialog } from "./dialogs/metadata-dialog";
 import { AddAgentDialog } from "./dialogs/add-agent-dialog";
 import { RemoveAgentDialog } from "./dialogs/remove-agent-dialog";
-import { useInputAreaModes } from "./hooks/use-input-area-modes";
 import { useConversationMembers } from "@xmtp/use-conversation-members";
 import { useClient } from "@xmtp/use-client";
 import { matchAgentsFromMembers } from "@xmtp/utils";
@@ -31,6 +29,7 @@ export type Message = {
   role: "user" | "assistant";
   content: string;
   sentAt?: Date;
+  sending?: boolean;
 };
 
 export function InputArea({
@@ -50,7 +49,6 @@ export function InputArea({
 }) {
   const [input, setInput] = useState("");
   const [plusPanelOpen, setPlusPanelOpen] = useState(false);
-  const [metadataOpen, setMetadataOpen] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const isSubmittingRef = useRef(false);
@@ -59,15 +57,24 @@ export function InputArea({
   const { client } = useClient();
 
   // Determine modes
-  const { isMessageListMode, isMultiAgentMode } = useInputAreaModes({
-    selectedAgents,
-    setSelectedAgents,
-    conversation,
-  });
+  // Chat Area Mode: selectedAgents provided AND conversation is null/undefined (conversation not started)
+  // Message List Mode: conversation provided AND selectedAgents not provided (conversation ongoing)
+  const isChatAreaMode =
+    selectedAgents !== undefined && setSelectedAgents !== undefined;
+  const isMessageListMode =
+    conversation !== undefined && selectedAgents === undefined;
+  // Multi-agent mode: use props (for chat area)
+  const isMultiAgentMode = isChatAreaMode;
 
   // Initialize live agents
   const [liveAgents] = useState(() =>
     shuffleArray(AI_AGENTS.filter((agent) => agent.live)),
+  );
+
+  // Find default "gm" agent
+  const defaultGmAgent = useMemo(
+    () => AI_AGENTS.find((agent) => agent.name === "gm" && agent.live),
+    [],
   );
 
   // Load conversation members and match agents
@@ -81,9 +88,10 @@ export function InputArea({
   );
 
   // State for single agent (can be set when adding agent before conversation exists)
+  // Default to "gm" agent on initialization
   const [singleAgentState, setSingleAgentState] = useState<
     AgentConfig | undefined
-  >(undefined);
+  >(defaultGmAgent);
 
   // Determine single agent for non-multi-agent mode
   const singleAgent = useMemo(() => {
@@ -110,6 +118,16 @@ export function InputArea({
       setSingleAgentState(undefined);
     }
   }, [isMessageListMode, conversation]);
+
+  // Default to "gm" agent on refresh when no conversation exists
+  useEffect(() => {
+    if (!conversation && !isMessageListMode && defaultGmAgent) {
+      // Sync with selectedAgents prop if provided and empty
+      if (setSelectedAgents && (!selectedAgents || selectedAgents.length === 0)) {
+        setSelectedAgents([defaultGmAgent]);
+      }
+    }
+  }, [conversation, isMessageListMode, defaultGmAgent, setSelectedAgents, selectedAgents]);
 
   // Agent management
   const {
@@ -282,9 +300,7 @@ export function InputArea({
             <PromptInputTools className="gap-0 sm:gap-0.5">
               <AgentChips
                 agents={currentSelectedAgents}
-                members={[]}
                 onRemoveAgent={handleRemoveAgent}
-                onRemoveMember={() => {}}
                 isMultiAgentMode={isMultiAgentMode}
                 isMessageListMode={isMessageListMode}
                 conversation={conversation}
@@ -292,25 +308,6 @@ export function InputArea({
             </PromptInputTools>
 
             <div className="flex items-center gap-1">
-              {!isMobile && conversation && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      className={
-                        isMultiAgentMode ? "h-7 w-7 p-0" : "h-8 w-8 p-0"
-                      }
-                      variant="ghost"
-                      type="button"
-                      onClick={() => setMetadataOpen(true)}
-                    >
-                      <MetadataIcon size={isMultiAgentMode ? 12 : 14} />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    View {isGroup ? "group" : "conversation"} metadata
-                  </TooltipContent>
-                </Tooltip>
-              )}
               <PromptInputSubmit
                 className={`rounded bg-zinc-800 text-foreground transition-all duration-200 hover:bg-zinc-700 active:scale-[0.97] disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none ${isMobile ? "size-10" : isMultiAgentMode ? "size-7" : "size-8"}`}
                 disabled={
@@ -326,13 +323,6 @@ export function InputArea({
           </PromptInputToolbar>
         </PromptInput>
       </div>
-      {conversation && (
-        <MetadataDialog
-          open={metadataOpen}
-          onOpenChange={setMetadataOpen}
-          conversation={conversation}
-        />
-      )}
       <AddAgentDialog
         open={confirmAddAgentOpen}
         onOpenChange={setConfirmAddAgentOpen}

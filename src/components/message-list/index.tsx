@@ -1,8 +1,8 @@
-import { ChatHeader, Greeting } from "@components/chat-area/index";
+import { Greeting } from "@components/chat-area/index";
 import { InputArea, type Message } from "@components/input-area";
 import { useClient } from "@xmtp/use-client";
 import { useCallback, useEffect, useState, useRef } from "react";
-import type { DecodedMessage } from "@xmtp/browser-sdk";
+import type { DecodedMessage, Conversation } from "@xmtp/browser-sdk";
 import { useConversationsContext } from "@/src/contexts/xmtp-conversations-context";
 import { useParams, useNavigate, useLocation } from "react-router";
 import { ThinkingIndicator } from "@ui/thinking-indicator";
@@ -84,7 +84,12 @@ export function MessageList({
                 <div
                   className={`flex items-center gap-1.5 mt-1 ${message.role === "user" ? "justify-end" : "justify-start"}`}
                 >
-                  {message.sentAt && (
+                  {message.sending && (
+                    <span className="text-[10px] text-muted-foreground/60">
+                      Sending...
+                    </span>
+                  )}
+                  {!message.sending && message.sentAt && (
                     <span className="text-[10px] text-muted-foreground/60">
                       {formatTimeAgo(message.sentAt)}
                     </span>
@@ -161,6 +166,56 @@ export function ConversationView({
         scrollContainerRef.current.scrollHeight;
     }
   }, []);
+
+  // Extract stream setup logic into reusable function
+  const setupMessageStream = useCallback(
+    async (conversation: Conversation, mountedRef: { current: boolean }) => {
+      const stream = await conversation.stream({
+        onValue: (message: DecodedMessage<unknown>) => {
+          if (!mountedRef.current || typeof message.content !== "string") {
+            return;
+          }
+
+          const newMessage: Message = {
+            id: message.id,
+            role:
+              message.senderInboxId === client?.inboxId ? "user" : "assistant",
+            content: message.content,
+            sentAt: getMessageSentAt(message),
+          };
+
+          setMessages((prev) => {
+            if (prev.some((m) => m.id === message.id)) {
+              return prev;
+            }
+            if (newMessage.role === "user") {
+              const tempIndex = prev.findIndex(
+                (m) =>
+                  m.id.startsWith("temp-") && m.content === message.content,
+              );
+              if (tempIndex !== -1) {
+                if (tempMessageTimeoutRef.current) {
+                  clearTimeout(tempMessageTimeoutRef.current);
+                  tempMessageTimeoutRef.current = null;
+                }
+                const updated = [...prev];
+                updated[tempIndex] = newMessage;
+                return updated;
+              }
+            }
+            return [...prev, newMessage];
+          });
+
+          setTimeout(() => {
+            scrollToBottom();
+          }, 100);
+        },
+      });
+
+      return stream;
+    },
+    [client, scrollToBottom],
+  );
 
   // Handle agent selection from navigation
   const locationStateRef = useRef<unknown>(null);
@@ -344,16 +399,16 @@ export function ConversationView({
   ]);
 
   useEffect(() => {
+    // Skip if stream already exists (handled by first message flow)
+    if (streamCleanupRef.current) {
+      console.log("[ConversationView] Stream already exists, skipping setup");
+      return;
+    }
+
     // Clear messages immediately when conversation changes
     setMessages([]);
     setSyncError(null);
     setLoadError(null);
-
-    // Cleanup previous stream
-    if (streamCleanupRef.current) {
-      void streamCleanupRef.current();
-      streamCleanupRef.current = null;
-    }
 
     if (tempMessageTimeoutRef.current) {
       clearTimeout(tempMessageTimeoutRef.current);
@@ -425,52 +480,14 @@ export function ConversationView({
             }, 100);
           }
 
-          const stream = await selectedConversation.stream({
-            onValue: (message: DecodedMessage<unknown>) => {
-              if (!mounted || typeof message.content !== "string") {
-                return;
-              }
-
-              const newMessage: Message = {
-                id: message.id,
-                role:
-                  message.senderInboxId === client.inboxId
-                    ? "user"
-                    : "assistant",
-                content: message.content,
-                sentAt: getMessageSentAt(message),
-              };
-
-              setMessages((prev) => {
-                if (prev.some((m) => m.id === message.id)) {
-                  return prev;
-                }
-                if (newMessage.role === "user") {
-                  const tempIndex = prev.findIndex(
-                    (m) =>
-                      m.id.startsWith("temp-") && m.content === message.content,
-                  );
-                  if (tempIndex !== -1) {
-                    if (tempMessageTimeoutRef.current) {
-                      clearTimeout(tempMessageTimeoutRef.current);
-                      tempMessageTimeoutRef.current = null;
-                    }
-                    const updated = [...prev];
-                    updated[tempIndex] = newMessage;
-                    return updated;
-                  }
-                }
-                return [...prev, newMessage];
-              });
-
-              // Scroll to bottom when new message arrives
-              setTimeout(() => {
-                scrollToBottom();
-              }, 100);
-            },
-          });
+          const mountedRef = { current: mounted };
+          const stream = await setupMessageStream(
+            selectedConversation,
+            mountedRef,
+          );
 
           streamCleanupRef.current = async () => {
+            mountedRef.current = false;
             await stream.end();
           };
         } catch (error) {
@@ -504,7 +521,7 @@ export function ConversationView({
         streamCleanupRef.current = null;
       }
     };
-  }, [client, selectedConversation, scrollToBottom]);
+  }, [client, selectedConversation, scrollToBottom, setupMessageStream]);
 
   useEffect(() => {
     return () => {
@@ -554,24 +571,79 @@ export function ConversationView({
 
           try {
             console.log(
-              "[ConversationView] Creating conversation via send button:",
+              "[ConversationView] Creating conversation and sending first message:",
               agentsToUse.map((a) => a.name),
             );
             setCreateError(null);
+
+            // 0. Show optimistic message immediately with sending indicator
+            const tempMessage: Message = {
+              id: `temp-${Date.now()}`,
+              role: "user",
+              content,
+              sentAt: new Date(),
+              sending: true,
+            };
+            setMessages([tempMessage]);
+            scrollToBottom();
+
+            // 1. Create conversation
             const agentAddresses = agentsToUse.map((agent) => agent.address);
             conversation = await createGroupWithAgentAddresses(
               client,
               agentAddresses,
             );
 
-            // Set conversation state before navigation
-            setSelectedConversation(conversation);
+            // 2. Sync conversation
+            console.log("[ConversationView] Syncing new conversation");
+            await conversation.sync();
+            console.log("[ConversationView] Sync complete");
 
-            // Navigate to conversation URL
+            // 3. Set up stream BEFORE sending
+            const mountedRef = { current: true };
+            const stream = await setupMessageStream(conversation, mountedRef);
+            streamCleanupRef.current = async () => {
+              mountedRef.current = false;
+              await stream.end();
+            };
+            console.log("[ConversationView] Stream setup complete");
+
+            // 4. Send message (stream will capture it)
+            console.log(
+              "[ConversationView] Sending first message to conversation:",
+              conversation.id,
+            );
+            await conversation.send(content);
+            console.log("[ConversationView] Message sent successfully");
+
+            // 5. Load initial messages after send (in case stream missed it)
+            const existingMessages = await conversation.messages();
+            const chatMessages: Message[] = existingMessages
+              .filter(
+                (msg: DecodedMessage<unknown>): msg is DecodedMessage<string> =>
+                  typeof msg.content === "string",
+              )
+              .map((msg) => ({
+                id: msg.id,
+                role: msg.senderInboxId === client.inboxId ? "user" : "assistant",
+                content: msg.content as string,
+                sentAt: getMessageSentAt(msg),
+                sending: false,
+              }));
+            setMessages(chatMessages);
+            console.log(
+              "[ConversationView] Loaded messages after send:",
+              chatMessages.length,
+            );
+
+            // 6. Update state and navigate
+            setSelectedConversation(conversation);
             navigate(`/conversation/${conversation.id}`, { replace: true });
 
-            // Refresh conversations list in background
+            // 7. Refresh conversations list in background
             void refreshConversations();
+
+            scrollToBottom();
           } catch (error) {
             const errorMessage =
               error instanceof Error
@@ -581,67 +653,63 @@ export function ConversationView({
               "[ConversationView] Failed to create conversation:",
               error,
             );
+            // Remove temp message on error
+            setMessages([]);
             setCreateError(errorMessage);
             isSendingRef.current = false;
             return;
           }
-        }
-
-        if (!conversation) {
-          console.error(
-            "[ConversationView] No conversation available after creation attempt",
-          );
-          isSendingRef.current = false;
-          return;
-        }
-
-        // Add message optimistically
-        const tempMessage: Message = {
-          id: `temp-${Date.now()}`,
-          role: "user",
-          content,
-          sentAt: new Date(),
-        };
-
-        setMessages((prev) => [...prev, tempMessage]);
-
-        // Scroll to bottom when message is sent
-        setTimeout(() => {
-          scrollToBottom();
-        }, 100);
-
-        // Cleanup temp message after 5 seconds if not replaced
-        if (tempMessageTimeoutRef.current) {
-          clearTimeout(tempMessageTimeoutRef.current);
-        }
-        tempMessageTimeoutRef.current = setTimeout(() => {
-          setMessages((prev) => prev.filter((m) => m.id !== tempMessage.id));
-          tempMessageTimeoutRef.current = null;
-        }, 5000);
-
-        try {
-          console.log(
-            "[ConversationView] Sending message to conversation:",
-            conversation.id,
-            "content:",
+        } else {
+          // Existing conversation - normal send flow
+          // Add message optimistically with sending indicator
+          const tempMessage: Message = {
+            id: `temp-${Date.now()}`,
+            role: "user",
             content,
-          );
-          await conversation.send(content);
-          console.log("[ConversationView] Message sent successfully");
-        } catch (error) {
-          console.error("[ConversationView] Failed to send message:", error);
-          setMessages((prev) => prev.filter((m) => m.id !== tempMessage.id));
+            sentAt: new Date(),
+            sending: true,
+          };
+
+          setMessages((prev) => [...prev, tempMessage]);
+
+          // Scroll to bottom when message is sent
+          setTimeout(() => {
+            scrollToBottom();
+          }, 100);
+
+          // Cleanup temp message after 5 seconds if not replaced
           if (tempMessageTimeoutRef.current) {
             clearTimeout(tempMessageTimeoutRef.current);
-            tempMessageTimeoutRef.current = null;
           }
-          // Show error to user
-          const errorMessage =
-            error instanceof Error
-              ? `Failed to send message: ${error.message}`
-              : "Failed to send message";
-          console.error("[ConversationView] Error message:", errorMessage);
-          setCreateError(errorMessage);
+          tempMessageTimeoutRef.current = setTimeout(() => {
+            setMessages((prev) => prev.filter((m) => m.id !== tempMessage.id));
+            tempMessageTimeoutRef.current = null;
+          }, 5000);
+
+          try {
+            console.log(
+              "[ConversationView] Sending message to conversation:",
+              conversation.id,
+              "content:",
+              content,
+            );
+            await conversation.send(content);
+            console.log("[ConversationView] Message sent successfully");
+          } catch (error) {
+            console.error("[ConversationView] Failed to send message:", error);
+            setMessages((prev) => prev.filter((m) => m.id !== tempMessage.id));
+            if (tempMessageTimeoutRef.current) {
+              clearTimeout(tempMessageTimeoutRef.current);
+              tempMessageTimeoutRef.current = null;
+            }
+            // Show error to user
+            const errorMessage =
+              error instanceof Error
+                ? `Failed to send message: ${error.message}`
+                : "Failed to send message";
+            console.error("[ConversationView] Error message:", errorMessage);
+            setCreateError(errorMessage);
+          }
         }
       } finally {
         isSendingRef.current = false;
@@ -659,14 +727,12 @@ export function ConversationView({
 
   return (
     <div className="flex h-svh min-h-0 min-w-0 flex-col overflow-hidden bg-black">
-      <ChatHeader conversation={selectedConversation} />
-
       <div className="relative min-h-0 flex-1 overflow-hidden">
         <div
           ref={scrollContainerRef}
           className="absolute inset-0 left-[1px] -webkit-overflow-scrolling-touch overscroll-behavior-contain overflow-y-auto touch-pan-y"
         >
-          <div className="mx-auto flex min-w-0 max-w-4xl flex-col px-4 py-4 md:pl-[60px] md:pr-6 md:py-6">
+          <div className="mx-auto flex min-w-0 max-w-4xl flex-col px-4 py-4 md:px-6 md:py-6">
             {createError && (
               <ThinkingIndicator error message={`Error: ${createError}`} />
             )}

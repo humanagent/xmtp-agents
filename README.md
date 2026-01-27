@@ -2,20 +2,12 @@
 
 Minimal React hooks for building XMTP agent mini apps. Simple, composable hooks for all XMTP operations.
 
-## Installation
-
-```bash
-npm install agent-mini-app-hooks
-# or
-yarn add agent-mini-app-hooks
-```
-
 ## Quick Start
 
 ```tsx
-import { useClient } from "@xmtp/hooks/use-client";
-import { useConversations } from "@xmtp/hooks/use-conversations";
-import { useConversation } from "@xmtp/hooks/use-conversation";
+import { useClient } from "@/src/xmtp-hooks/use-client";
+import { useConversations } from "@/src/xmtp-hooks/use-conversations";
+import { useConversation } from "@/src/xmtp-hooks/use-conversation";
 
 function MyAgentApp() {
   const { client, isLoading } = useClient();
@@ -39,19 +31,19 @@ function MyAgentApp() {
 
 ### `useClient()`
 
-Initialize XMTP client. Returns singleton client instance.
+Initialize XMTP client. Returns singleton client instance with ephemeral account key stored in localStorage.
 
 **Import:**
 
 ```tsx
-import { useClient } from "@xmtp/hooks/use-client";
+import { useClient } from "@/src/xmtp-hooks/use-client";
 ```
 
 **Returns:**
 
-- `client` - XMTP Client instance (null if loading/error)
-- `isLoading` - boolean
-- `error` - Error | null
+- `client` - `Client<ContentTypes> | null` - XMTP Client instance (null if loading/error)
+- `isLoading` - `boolean` - Loading state
+- `error` - `Error | null` - Error if initialization fails
 
 **Example:**
 
@@ -59,28 +51,34 @@ import { useClient } from "@xmtp/hooks/use-client";
 const { client, isLoading, error } = useClient();
 ```
 
+**Notes:**
+
+- Client is a singleton - multiple calls return the same instance
+- Uses ephemeral account key stored in localStorage
+- Automatically handles initialization and error states
+
 ---
 
 ### `useConversations(client)`
 
-List and manage all conversations.
+List and manage all conversations. Automatically filters blocked conversations and streams updates.
 
 **Import:**
 
 ```tsx
-import { useConversations } from "@xmtp/hooks/use-conversations";
+import { useConversations } from "@/src/xmtp-hooks/use-conversations";
 ```
 
 **Parameters:**
 
-- `client` - XMTP Client (from `useClient`)
+- `client` - `Client<ContentTypes> | null` - XMTP Client (from `useClient`)
 
 **Returns:**
 
-- `conversations` - Conversation[] - Array of all conversations
-- `isLoading` - boolean
-- `error` - Error | null
-- `refresh` - () => Promise<void> - Manually refresh conversations
+- `conversations` - `Conversation[]` - Array of allowed conversations
+- `isLoading` - `boolean` - Loading state
+- `error` - `Error | null` - Error if fetch fails
+- `refresh` - `() => Promise<void>` - Manually refresh conversations list
 
 **Example:**
 
@@ -92,43 +90,65 @@ const { conversations, isLoading, refresh } = useConversations(client);
 await refresh();
 ```
 
+**Notes:**
+
+- Automatically filters out denied/blocked group conversations
+- Streams new conversations in real-time
+- Deduplicates conversations by ID
+
 ---
 
 ### `useConversation(conversationId, client)`
 
-**All-in-one hook for conversation operations.** Handles messages, sending, members, and group operations.
+All-in-one hook for conversation operations. Handles messages, sending, members, and group operations.
 
 **Import:**
 
 ```tsx
-import { useConversation } from "@xmtp/hooks/use-conversation";
+import { useConversation } from "@/src/xmtp-hooks/use-conversation";
 ```
 
 **Parameters:**
 
-- `conversationId` - string | null | undefined
-- `client` - XMTP Client (from `useClient`)
+- `conversationId` - `string | null | undefined` - Conversation ID
+- `client` - `Client<ContentTypes> | null` - XMTP Client (from `useClient`)
 
 **Returns:**
 
-- `conversation` - Conversation | null - The conversation object
-- `messages` - Message[] - All messages in conversation
-- `send` - (content: string) => Promise<void> - Send a message
-- `isLoading` - boolean
-- `error` - Error | null
-- `isGroup` - boolean - True if group conversation
-- `members` - GroupMember[] - Members (empty for DM)
-- `addMember` - (address: string) => Promise<void> - Add member (group only)
-- `removeMember` - (inboxId: string) => Promise<void> - Remove member (group only)
+- `conversation` - `Conversation | null` - The conversation object
+- `messages` - `Message[]` - All messages in conversation (with role: "user" | "assistant")
+- `send` - `(content: string) => Promise<void>` - Send a text message
+- `isLoading` - `boolean` - Loading state
+- `error` - `Error | null` - Error if operation fails
+- `isGroup` - `boolean` - True if group conversation
+- `members` - `GroupMember[]` - Members (empty array for DM)
+- `addMember` - `(address: string) => Promise<void>` - Add member by Ethereum address (group only)
+- `removeMember` - `(inboxId: string) => Promise<void>` - Remove member by inbox ID (group only)
+
+**Message Type:**
+
+```tsx
+type Message = {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  sentAt?: Date;
+};
+```
 
 **Example:**
 
 ```tsx
-const { client } = useAgentClient();
-const { messages, send, isGroup, members, addMember } = useAgentConversation(
-  conversationId,
-  client,
-);
+const { client } = useClient();
+const {
+  conversation,
+  messages,
+  send,
+  isGroup,
+  members,
+  addMember,
+  removeMember,
+} = useConversation(conversationId, client);
 
 // Send message
 await send("Hello!");
@@ -137,7 +157,19 @@ await send("Hello!");
 if (isGroup) {
   await addMember("0x123...");
 }
+
+// Remove member from group
+if (isGroup) {
+  await removeMember("inboxId123");
+}
 ```
+
+**Notes:**
+
+- Messages are automatically assigned roles based on sender
+- Streams new messages in real-time
+- Only loads string content messages (filters other content types)
+- Automatically loads members for group conversations
 
 ---
 
@@ -148,30 +180,29 @@ Get members in a conversation. Returns raw XMTP members data.
 **Import:**
 
 ```tsx
-import { useConversationMembers } from "@xmtp/hooks/use-conversation-members";
-import { matchAgentsFromMembers } from "@xmtp/utils";
+import { useConversationMembers } from "@/src/xmtp-hooks/use-conversation-members";
 ```
 
 **Parameters:**
 
-- `conversationId` - string | null | undefined
-- `client` - XMTP Client (from `useClient`)
+- `conversationId` - `string | null | undefined` - Conversation ID
+- `client` - `Client<ContentTypes> | null` - XMTP Client (from `useClient`)
 
 **Returns:**
 
-- `members` - GroupMember[] - Members in conversation
-- `isLoading` - boolean
-- `error` - Error | null
+- `members` - `GroupMember[]` - Members in conversation
+- `isLoading` - `boolean` - Loading state
+- `error` - `Error | null` - Error if fetch fails
 
 **Example:**
 
 ```tsx
-import { useConversationMembers } from "@xmtp/hooks/use-conversation-members";
-import { matchAgentsFromMembers } from "@xmtp/utils";
-import { AI_AGENTS } from "@/src/agents";
+import { useConversationMembers } from "@/src/xmtp-hooks/use-conversation-members";
+import { matchAgentsFromMembers } from "@/src/xmtp-hooks/utils";
+import { AI_AGENTS } from "@/src/xmtp-hooks/agents";
 
 const { client } = useClient();
-const { members } = useConversationMembers(conversationId, client);
+const { members, isLoading } = useConversationMembers(conversationId, client);
 
 // Match agents from members (business logic in utility)
 const agents = matchAgentsFromMembers(members, AI_AGENTS);
@@ -183,107 +214,98 @@ const agents = matchAgentsFromMembers(members, AI_AGENTS);
 
 Simple state hook for managing selected agents.
 
+**Import:**
+
+```tsx
+import { useAgentSelection } from "@/src/xmtp-hooks/use-agent-selection";
+```
+
 **Returns:**
 
-- `selectedAgents` - AgentConfig[]
-- `setSelectedAgents` - (agents: AgentConfig[]) => void
-- `addAgent` - (agent: AgentConfig) => void
-- `removeAgent` - (address: string) => void
-- `clearSelection` - () => void
+- `selectedAgents` - `AgentConfig[]` - Array of selected agents
+- `setSelectedAgents` - `(agents: AgentConfig[]) => void` - Set agents directly
+- `addAgent` - `(agent: AgentConfig) => void` - Add agent (prevents duplicates)
+- `removeAgent` - `(address: string) => void` - Remove agent by address
+- `clearSelection` - `() => void` - Clear all selected agents
 
 **Example:**
 
 ```tsx
-const { selectedAgents, addAgent, removeAgent } = useAgentSelection();
+import { useAgentSelection } from "@/src/xmtp-hooks/use-agent-selection";
+import { AI_AGENTS } from "@/src/xmtp-hooks/agents";
+
+const { selectedAgents, addAgent, removeAgent, clearSelection } =
+  useAgentSelection();
+
+// Add agent
+addAgent(AI_AGENTS[0]);
+
+// Remove agent
+removeAgent("0x123...");
+
+// Clear all
+clearSelection();
 ```
 
-## Complete Example
+## Utilities
+
+### Agent Configuration
+
+**Import:**
 
 ```tsx
-import { useClient } from "@xmtp/hooks/use-client";
-import { useConversations } from "@xmtp/hooks/use-conversations";
-import { useConversation } from "@xmtp/hooks/use-conversation";
-
-function ChatApp() {
-  const { client, isLoading: clientLoading } = useClient();
-  const { conversations } = useConversations(client);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-
-  const {
-    messages,
-    send,
-    isLoading: convLoading,
-  } = useConversation(selectedId, client);
-
-  if (clientLoading) return <div>Connecting...</div>;
-
-  return (
-    <div>
-      <aside>
-        {conversations.map((conv) => (
-          <button key={conv.id} onClick={() => setSelectedId(conv.id)}>
-            {conv.id}
-          </button>
-        ))}
-      </aside>
-
-      <main>
-        {convLoading ? (
-          <div>Loading messages...</div>
-        ) : (
-          <>
-            {messages.map((msg) => (
-              <div key={msg.id}>{msg.content}</div>
-            ))}
-            <input
-              onKeyPress={(e) => {
-                if (e.key === "Enter") {
-                  send(e.currentTarget.value);
-                  e.currentTarget.value = "";
-                }
-              }}
-            />
-          </>
-        )}
-      </main>
-    </div>
-  );
-}
+import {
+  AI_AGENTS,
+  getAgentByAddress,
+  getAgentById,
+  type AgentConfig,
+} from "@/src/xmtp-hooks/agents";
 ```
 
-## TypeScript
-
-All hooks are fully typed. Import types as needed:
+**AgentConfig Type:**
 
 ```tsx
-// XMTP types from browser-sdk
-import type {
-  Conversation,
-  Group,
-  DecodedMessage,
-  Client,
-} from "@xmtp/browser-sdk";
-
-// Message type from conversation hook
-import type { Message } from "@xmtp/hooks/use-conversation";
-
-// Content types
-import type { ContentTypes } from "@xmtp/utils";
-
-// Agent config
-import type { AgentConfig } from "@/src/agents";
+type AgentConfig = {
+  name: string;
+  address: string;
+  networks: string[];
+  live: boolean;
+  image?: string;
+  domain?: string;
+  category?: string;
+  description?: string;
+};
 ```
 
-## Architecture
+**Functions:**
 
-**Hooks are generic data fetchers only.** Business logic (agent matching, role assignment, filtering) belongs in utilities or components.
+- `AI_AGENTS` - Array of all available agent configurations
+- `getAgentByAddress(address: string)` - Find agent by Ethereum address
+- `getAgentById(id: string)` - Find agent by name or domain
 
-- Hooks return raw XMTP data
-- Utilities handle business logic (e.g., `matchAgentsFromMembers`, `assignMessageRole`)
-- Components compose hooks with utilities
+### Utility Functions
 
-This ensures hooks are reusable, testable, and maintain clear separation of concerns.
+**Import:**
 
-## License
+```tsx
+import {
+  matchAgentsFromMembers,
+  extractMemberAddresses,
+  assignMessageRole,
+  createGroupWithAgentAddresses,
+  isConversationAllowed,
+  denyConversation,
+  clearEphemeralAccountKey,
+  type ContentTypes,
+} from "@/src/xmtp-hooks/utils";
+```
 
-MIT
+**Functions:**
+
+- `matchAgentsFromMembers(members, agentList)` - Match group members to agent configs
+- `extractMemberAddresses(members)` - Extract Ethereum addresses from members
+- `assignMessageRole(message, clientInboxId)` - Assign "user" or "assistant" role to message
+- `createGroupWithAgentAddresses(client, addresses)` - Create group with agent addresses
+- `isConversationAllowed(conversation, client)` - Check if conversation is allowed (not denied)
+- `denyConversation(conversation, client)` - Deny/block a group conversation
+- `clearEphemeralAccountKey()` - Clear stored ephemeral account key

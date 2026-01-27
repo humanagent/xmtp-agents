@@ -2,7 +2,6 @@ import { parseAgentMentions } from "./parse-mentions";
 import type { AgentConfig } from "@xmtp/agents";
 import { cn } from "@/src/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@ui/tooltip";
-import { Button } from "@ui/button";
 
 type MessageContentProps = {
   content: string;
@@ -13,12 +12,8 @@ type MessageContentProps = {
 
 function AgentProfileContent({
   agent,
-  onCheckPermissions,
-  showPermissionsButton,
 }: {
   agent: AgentConfig;
-  onCheckPermissions?: () => void;
-  showPermissionsButton?: boolean;
 }) {
   const description = agent.description || "AI agent";
 
@@ -57,18 +52,6 @@ function AgentProfileContent({
             {agent.domain}
           </p>
         )}
-        {showPermissionsButton && onCheckPermissions && (
-          <Button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onCheckPermissions();
-            }}
-            className="mt-3 h-7 w-full text-xs bg-zinc-800 hover:bg-zinc-700 text-foreground"
-          >
-            Check Permissions
-          </Button>
-        )}
       </div>
     </div>
   );
@@ -106,11 +89,7 @@ export function MessageContent({
               sideOffset={8}
               className="w-64 p-3"
             >
-              <AgentProfileContent
-                agent={segment.agent}
-                onCheckPermissions={() => onMentionClick?.(segment.agent)}
-                showPermissionsButton={isGroup}
-              />
+              <AgentProfileContent agent={segment.agent} />
             </TooltipContent>
           </Tooltip>
         );

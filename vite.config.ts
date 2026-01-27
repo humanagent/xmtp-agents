@@ -7,7 +7,10 @@ import { VitePWA } from "vite-plugin-pwa";
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    tsconfigPaths(),
+    tsconfigPaths({
+      root: "./",
+      loose: false,
+    }),
     react(),
     VitePWA({
       registerType: "autoUpdate",
@@ -69,6 +72,13 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "."),
+      // Explicit aliases for local xmtp-hooks files (these take precedence over tsconfigPaths)
+      "@xmtp/agents": path.resolve(__dirname, "./src/xmtp-hooks/agents"),
+      "@xmtp/use-client": path.resolve(__dirname, "./src/xmtp-hooks/use-client"),
+      "@xmtp/use-conversations": path.resolve(__dirname, "./src/xmtp-hooks/use-conversations"),
+      "@xmtp/use-conversation": path.resolve(__dirname, "./src/xmtp-hooks/use-conversation"),
+      "@xmtp/use-conversation-members": path.resolve(__dirname, "./src/xmtp-hooks/use-conversation-members"),
+      "@xmtp/utils": path.resolve(__dirname, "./src/xmtp-hooks/utils"),
     },
   },
   optimizeDeps: {
