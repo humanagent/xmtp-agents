@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.1.52] - 2026-01-27
+
+### Fixed
+
+- Fixed "New Chat" button not navigating when clicked right after creating a conversation
+- Prevented navigation race condition where conversation creation would override "New Chat" navigation
+
+## [0.1.51] - 2026-01-27
+
+### Changed
+
+- Aligned plus and send buttons vertically in the input area
+- Centered input area on screen until first message is sent (ChatGPT-style)
+- Kept greeting message visible until first message is sent
+
 ## [0.1.50] - 2026-01-27
 
 ### Changed
