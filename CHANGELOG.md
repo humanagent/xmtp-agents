@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.48] - 2026-01-27
+
+### Changed
+
+- Moved agent utilities from `src/xmtp-hooks/agents.ts` to `src/lib/agent-utils.ts` for better code organization
+- Consolidated agent types, configuration, and helper functions into a single utility module
+
 ## [0.1.47] - 2026-01-27
 
 ### Added
