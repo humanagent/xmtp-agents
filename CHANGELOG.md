@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.1.46] - 2026-01-26
+
+### Changed
+
+- Removed unused devDependencies: autoprefixer, browserslist, tsx
+
+## [0.1.45] - 2026-01-26
+
+### Fixed
+
+- Removed all artificial loading states from conversation creation and first message flow
+- Removed redundant sync operations and artificial delays
+- Fixed inconsistent loading indicators that sometimes showed and sometimes didn't
+- Made message sending flow optimistic - messages appear immediately, stream handles updates
+- Only show error indicators when something actually fails, no loading states during normal flow
+
 ## [0.1.44] - 2026-01-26
 
 ### Changed
@@ -142,7 +158,7 @@
 - Added Developer Portal page for publishing and managing XMTP agents
 - Added agent CRUD operations (Create, Read, Update, Delete) with localStorage persistence
 - Added developer portal navigation item in sidebar with code icon
-- Added agent form component with fields: name, address, description, category, domain, image, suggestions, and live status
+- Added agent form component with fields: name, address, description, category, domain, image, and live status
 - Added agent list view with inline edit and delete actions
 - Integrated user-submitted agents into Explore page alongside registry agents
 - Added agent storage utility (`lib/agent-storage.ts`) for managing user agents

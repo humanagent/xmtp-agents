@@ -1,16 +1,12 @@
 import { XIcon } from "@ui/icons";
-import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import type { AgentConfig } from "@/src/agents";
+import type { AgentConfig } from "@xmtp/agents";
 import type { Conversation } from "@xmtp/browser-sdk";
 import { Group } from "@xmtp/browser-sdk";
-import { shortAddress } from "@/src/utils";
 
 type AgentChipsProps = {
   agents: AgentConfig[];
-  members: string[];
   onRemoveAgent: (address: string) => void;
-  onRemoveMember: (address: string) => void;
   isMultiAgentMode: boolean;
   isMessageListMode: boolean;
   conversation?: Conversation | null;
@@ -18,9 +14,7 @@ type AgentChipsProps = {
 
 export function AgentChips({
   agents,
-  members,
   onRemoveAgent,
-  onRemoveMember,
   isMultiAgentMode,
   isMessageListMode,
   conversation,
@@ -43,29 +37,18 @@ export function AgentChips({
     }
   }, [conversation, isMessageListMode]);
 
-  if (agents.length === 0 && members.length === 0) {
+  if (agents.length === 0) {
     return null;
   }
 
   return (
-    <AnimatePresence mode="popLayout">
-      <motion.div
-        initial={{ opacity: 0, width: 0 }}
-        animate={{ opacity: 1, width: "auto" }}
-        exit={{ opacity: 0, width: 0 }}
-        transition={{ duration: 0.2 }}
-        className="flex items-center gap-1.5 overflow-hidden flex-wrap"
-      >
-        {/* Agent chips */}
-        {agents.map((agent) => (
-          <motion.div
-            key={`agent-${agent.address}`}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.15 }}
-            className="inline-flex items-center gap-1 rounded bg-zinc-800 px-2 py-0.5 text-xs text-foreground h-6"
-          >
+    <div className="flex items-center gap-1.5 overflow-hidden flex-wrap animate-fade-in">
+      {/* Agent chips */}
+      {agents.map((agent) => (
+        <div
+          key={`agent-${agent.address}`}
+          className="inline-flex items-center gap-1 rounded bg-zinc-800 px-2 py-0.5 text-xs text-foreground h-6 animate-fade-in-scale"
+        >
             {agent.image ? (
               <img
                 alt={agent.name}
@@ -88,32 +71,8 @@ export function AgentChips({
                   <XIcon size={12} />
                 </button>
               )}
-          </motion.div>
-        ))}
-
-        {/* Member chips */}
-        {members.map((address) => (
-          <motion.div
-            key={`member-${address}`}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.15 }}
-            className="inline-flex items-center gap-1 rounded bg-zinc-800 px-2 py-0.5 text-xs text-foreground h-6"
-          >
-            <span>{shortAddress(address)}</span>
-            <button
-              type="button"
-              onClick={() => {
-                onRemoveMember(address);
-              }}
-              className="rounded hover:bg-zinc-700 p-0.5 transition-colors duration-200 active:scale-[0.97]"
-            >
-              <XIcon size={12} />
-            </button>
-          </motion.div>
-        ))}
-      </motion.div>
-    </AnimatePresence>
+        </div>
+      ))}
+    </div>
   );
 }

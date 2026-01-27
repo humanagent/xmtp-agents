@@ -1,15 +1,14 @@
 import { useIsMobile } from "@hooks/use-mobile";
 import { Button } from "@ui/button";
-import { ArrowUpIcon, MetadataIcon, PlusIcon } from "@ui/icons";
+import { ArrowUpIcon, PlusIcon } from "@ui/icons";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@ui/tooltip";
 import type { Conversation } from "@xmtp/browser-sdk";
 import { Group } from "@xmtp/browser-sdk";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { type AgentConfig, AI_AGENTS } from "@/src/agents";
+import { type AgentConfig, AI_AGENTS } from "@xmtp/agents";
 import { cn } from "@/src/utils";
 import { PlusPanel } from "./plus-panel";
 import { AgentChips } from "./agent-chips";
-import { SuggestedActions } from "./suggested-actions";
 import {
   PromptInput,
   PromptInputTextarea,
@@ -17,14 +16,11 @@ import {
   PromptInputTools,
   PromptInputSubmit,
 } from "./prompt-input";
-import { MetadataDialog } from "./dialogs/metadata-dialog";
 import { AddAgentDialog } from "./dialogs/add-agent-dialog";
 import { RemoveAgentDialog } from "./dialogs/remove-agent-dialog";
-import { useInputAreaModes } from "./hooks/use-input-area-modes";
-import { useConversationMembers } from "@xmtp/hooks/use-conversation-members";
-import { useClient } from "@xmtp/hooks/use-client";
+import { useConversationMembers } from "@xmtp/use-conversation-members";
+import { useClient } from "@xmtp/use-client";
 import { matchAgentsFromMembers } from "@xmtp/utils";
-import { AI_AGENTS } from "@/src/agents";
 import { useAgentManagement } from "./hooks/use-agent-management";
 import { shuffleArray, appendAgentMentions } from "./utils";
 
@@ -33,6 +29,7 @@ export type Message = {
   role: "user" | "assistant";
   content: string;
   sentAt?: Date;
+  sending?: boolean;
 };
 
 export function InputArea({
@@ -52,7 +49,6 @@ export function InputArea({
 }) {
   const [input, setInput] = useState("");
   const [plusPanelOpen, setPlusPanelOpen] = useState(false);
-  const [metadataOpen, setMetadataOpen] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const isSubmittingRef = useRef(false);
@@ -61,16 +57,24 @@ export function InputArea({
   const { client } = useClient();
 
   // Determine modes
-  const { isChatAreaMode, isMessageListMode, isMultiAgentMode } =
-    useInputAreaModes({
-      selectedAgents,
-      setSelectedAgents,
-      conversation,
-    });
+  // Chat Area Mode: selectedAgents provided AND conversation is null/undefined (conversation not started)
+  // Message List Mode: conversation provided AND selectedAgents not provided (conversation ongoing)
+  const isChatAreaMode =
+    selectedAgents !== undefined && setSelectedAgents !== undefined;
+  const isMessageListMode =
+    conversation !== undefined && selectedAgents === undefined;
+  // Multi-agent mode: use props (for chat area)
+  const isMultiAgentMode = isChatAreaMode;
 
   // Initialize live agents
   const [liveAgents] = useState(() =>
     shuffleArray(AI_AGENTS.filter((agent) => agent.live)),
+  );
+
+  // Find default "gm" agent
+  const defaultGmAgent = useMemo(
+    () => AI_AGENTS.find((agent) => agent.name === "gm" && agent.live),
+    [],
   );
 
   // Load conversation members and match agents
@@ -84,9 +88,10 @@ export function InputArea({
   );
 
   // State for single agent (can be set when adding agent before conversation exists)
+  // Default to "gm" agent on initialization
   const [singleAgentState, setSingleAgentState] = useState<
     AgentConfig | undefined
-  >(undefined);
+  >(defaultGmAgent);
 
   // Determine single agent for non-multi-agent mode
   const singleAgent = useMemo(() => {
@@ -113,6 +118,16 @@ export function InputArea({
       setSingleAgentState(undefined);
     }
   }, [isMessageListMode, conversation]);
+
+  // Default to "gm" agent on refresh when no conversation exists
+  useEffect(() => {
+    if (!conversation && !isMessageListMode && defaultGmAgent) {
+      // Sync with selectedAgents prop if provided and empty
+      if (setSelectedAgents && (!selectedAgents || selectedAgents.length === 0)) {
+        setSelectedAgents([defaultGmAgent]);
+      }
+    }
+  }, [conversation, isMessageListMode, defaultGmAgent, setSelectedAgents, selectedAgents]);
 
   // Agent management
   const {
@@ -145,8 +160,8 @@ export function InputArea({
   const effectiveSingleAgent = singleAgent;
 
   // In message list mode, show all conversation agents. In chat area mode, use selected agents or single agent
-  const currentSelectedAgents = isMultiAgentMode
-    ? selectedAgents
+  const currentSelectedAgents: AgentConfig[] = isMultiAgentMode
+    ? selectedAgents || []
     : isMessageListMode && conversationAgents.length > 0
       ? conversationAgents
       : effectiveSingleAgent
@@ -194,24 +209,6 @@ export function InputArea({
     }
   }, [openAgentsDialog, onOpenAgentsDialogChange]);
 
-  // Suggested actions
-  const suggestedActions = useMemo(() => {
-    if (currentSelectedAgents.length === 0) {
-      return [];
-    }
-
-    const allSuggestions: string[] = currentSelectedAgents
-      .flatMap((agent) => agent.suggestions || [])
-      .filter((suggestion): suggestion is string => Boolean(suggestion));
-
-    if (allSuggestions.length === 0) {
-      return [];
-    }
-
-    const shuffled = shuffleArray(allSuggestions);
-    return shuffled.slice(0, 4);
-  }, [currentSelectedAgents]);
-
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     e.stopPropagation();
@@ -238,12 +235,19 @@ export function InputArea({
         conversationAgents,
         currentSelectedAgents,
       );
+      console.log(
+        "[InputArea] Sending message:",
+        messageToSend,
+        "with agents:",
+        currentSelectedAgents.map((a) => a.name),
+      );
       sendMessage?.(
         messageToSend,
-        isMultiAgentMode ? currentSelectedAgents : undefined,
+        currentSelectedAgents.length > 0 ? currentSelectedAgents : undefined,
       );
       setInput("");
-    } catch {
+    } catch (error) {
+      console.error("[InputArea] Error in handleSubmit:", error);
       // Error handling - sendMessage callback handles errors
     } finally {
       setTimeout(() => {
@@ -252,33 +256,10 @@ export function InputArea({
     }
   };
 
-  const handleSuggestionClick = (suggestion: string) => {
-    if (sendMessage) {
-      const messageToSend = appendAgentMentions(
-        suggestion,
-        conversationAgents,
-        currentSelectedAgents,
-      );
-      sendMessage(
-        messageToSend,
-        isMultiAgentMode ? currentSelectedAgents : undefined,
-      );
-    }
-  };
-
   return (
     <div
       className={`relative flex w-full flex-col ${isMultiAgentMode ? "gap-2" : "gap-4"}`}
     >
-      {suggestedActions.length > 0 &&
-        !input.trim() &&
-        isChatAreaMode &&
-        !conversation && (
-          <SuggestedActions
-            suggestions={suggestedActions}
-            onClick={handleSuggestionClick}
-          />
-        )}
       <div className="relative" ref={panelRef}>
         <PlusPanel
           open={plusPanelOpen}
@@ -297,7 +278,7 @@ export function InputArea({
               className={cn(
                 "shrink-0 p-0 transition-colors duration-200 active:scale-[0.97]",
                 plusPanelOpen
-                  ? "text-accent hover:text-accent"
+                  ? "text-foreground hover:text-foreground"
                   : "text-muted-foreground hover:text-foreground",
                 isMobile ? "h-10 w-10" : "h-8 w-8",
               )}
@@ -319,9 +300,7 @@ export function InputArea({
             <PromptInputTools className="gap-0 sm:gap-0.5">
               <AgentChips
                 agents={currentSelectedAgents}
-                members={[]}
                 onRemoveAgent={handleRemoveAgent}
-                onRemoveMember={() => {}}
                 isMultiAgentMode={isMultiAgentMode}
                 isMessageListMode={isMessageListMode}
                 conversation={conversation}
@@ -329,27 +308,8 @@ export function InputArea({
             </PromptInputTools>
 
             <div className="flex items-center gap-1">
-              {!isMobile && conversation && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      className={
-                        isMultiAgentMode ? "h-7 w-7 p-0" : "h-8 w-8 p-0"
-                      }
-                      variant="ghost"
-                      type="button"
-                      onClick={() => setMetadataOpen(true)}
-                    >
-                      <MetadataIcon size={isMultiAgentMode ? 12 : 14} />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    View {isGroup ? "group" : "conversation"} metadata
-                  </TooltipContent>
-                </Tooltip>
-              )}
               <PromptInputSubmit
-                className={`rounded bg-accent text-accent-foreground transition-all duration-200 hover:bg-accent/90 hover:shadow-[0_0_12px_rgba(207,28,15,0.4)] active:scale-[0.97] disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none ${isMobile ? "size-10" : isMultiAgentMode ? "size-7" : "size-8"}`}
+                className={`rounded bg-zinc-800 text-foreground transition-all duration-200 hover:bg-zinc-700 active:scale-[0.97] disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none ${isMobile ? "size-10" : isMultiAgentMode ? "size-7" : "size-8"}`}
                 disabled={
                   !input.trim() ||
                   (isMultiAgentMode && currentSelectedAgents.length === 0)
@@ -363,13 +323,6 @@ export function InputArea({
           </PromptInputToolbar>
         </PromptInput>
       </div>
-      {conversation && (
-        <MetadataDialog
-          open={metadataOpen}
-          onOpenChange={setMetadataOpen}
-          conversation={conversation}
-        />
-      )}
       <AddAgentDialog
         open={confirmAddAgentOpen}
         onOpenChange={setConfirmAddAgentOpen}

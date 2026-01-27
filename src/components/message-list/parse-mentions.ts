@@ -1,5 +1,5 @@
-import { AI_AGENTS } from "@/src/agents";
-import type { AgentConfig } from "@/src/agents";
+import { AI_AGENTS } from "@xmtp/agents";
+import type { AgentConfig } from "@xmtp/agents";
 
 export type TextSegment =
   | { type: "text"; content: string }
