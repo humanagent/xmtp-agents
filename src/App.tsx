@@ -31,7 +31,6 @@ function SidebarInsetWithSwipe() {
           path="/conversation/:conversationId"
           element={<ConversationView />}
         />
-        <Route path="/explore" element={<Navigate to="/" replace />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </SidebarInset>

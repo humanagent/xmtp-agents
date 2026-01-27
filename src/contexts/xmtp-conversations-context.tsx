@@ -2,7 +2,7 @@ import { createContext, useContext, useState, type ReactNode } from "react";
 import { useConversations } from "@xmtp/hooks/use-conversations";
 import type { Client, Conversation } from "@xmtp/browser-sdk";
 import type { ContentTypes } from "@xmtp/utils";
-import type { AgentConfig } from "@/src/agents";
+import type { AgentConfig } from "@/src/xmtp/agents";
 
 type PendingConversationStatus = "creating" | "sending";
 

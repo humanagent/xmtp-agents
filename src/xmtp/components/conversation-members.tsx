@@ -2,7 +2,7 @@ import { useConversationMembers } from "../hooks/use-conversation-members";
 import { matchAgentsFromMembers } from "../utils";
 import type { Client } from "@xmtp/browser-sdk";
 import type { ContentTypes } from "../utils";
-import type { AgentConfig } from "@/src/agents";
+import type { AgentConfig } from "@/src/xmtp/agents";
 
 type ConversationMembersProps = {
   conversationId: string | null | undefined;

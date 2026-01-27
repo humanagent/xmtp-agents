@@ -5,7 +5,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@ui/tooltip";
 import type { Conversation } from "@xmtp/browser-sdk";
 import { Group } from "@xmtp/browser-sdk";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { type AgentConfig, AI_AGENTS } from "@/src/agents";
+import { type AgentConfig, AI_AGENTS } from "@/src/xmtp/agents";
 import { cn } from "@/src/utils";
 import { PlusPanel } from "./plus-panel";
 import { AgentChips } from "./agent-chips";
@@ -24,7 +24,7 @@ import { useInputAreaModes } from "./hooks/use-input-area-modes";
 import { useConversationMembers } from "@xmtp/hooks/use-conversation-members";
 import { useClient } from "@xmtp/hooks/use-client";
 import { matchAgentsFromMembers } from "@xmtp/utils";
-import { AI_AGENTS } from "@/src/agents";
+import { AI_AGENTS } from "@/src/xmtp/agents";
 import { useAgentManagement } from "./hooks/use-agent-management";
 import { shuffleArray, appendAgentMentions } from "./utils";
 

@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.1.45] - 2026-01-26
+
+### Fixed
+
+- Removed all artificial loading states from conversation creation and first message flow
+- Removed redundant sync operations and artificial delays
+- Fixed inconsistent loading indicators that sometimes showed and sometimes didn't
+- Made message sending flow optimistic - messages appear immediately, stream handles updates
+- Only show error indicators when something actually fails, no loading states during normal flow
+
 ## [0.1.44] - 2026-01-26
 
 ### Changed

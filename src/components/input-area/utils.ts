@@ -1,4 +1,4 @@
-import type { AgentConfig } from "@/src/agents";
+import type { AgentConfig } from "@/src/xmtp/agents";
 
 export function shuffleArray<T>(array: T[]): T[] {
   const shuffled = [...array];
