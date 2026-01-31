@@ -1,8 +1,6 @@
 import { XIcon } from "@ui/icons";
-import { useEffect, useState } from "react";
 import type { AgentConfig } from "@lib/agent-utils";
 import type { Conversation } from "@xmtp/browser-sdk";
-import { Group } from "@xmtp/browser-sdk";
 
 type AgentChipsProps = {
   agents: AgentConfig[];
@@ -10,6 +8,7 @@ type AgentChipsProps = {
   isMultiAgentMode: boolean;
   isMessageListMode: boolean;
   conversation?: Conversation | null;
+  memberCount?: number;
 };
 
 export function AgentChips({
@@ -18,24 +17,9 @@ export function AgentChips({
   isMultiAgentMode,
   isMessageListMode,
   conversation,
+  memberCount = 0,
 }: AgentChipsProps) {
-  const [canRemove, setCanRemove] = useState(true);
-
-  useEffect(() => {
-    if (isMessageListMode && conversation instanceof Group) {
-      void (async () => {
-        try {
-          const groupMembers = await conversation.members();
-          setCanRemove(groupMembers.length > 2);
-        } catch (error) {
-          console.error("[AgentChips] Error fetching members:", error);
-          setCanRemove(true);
-        }
-      })();
-    } else {
-      setCanRemove(true);
-    }
-  }, [conversation, isMessageListMode]);
+  const canRemove = isMultiAgentMode || (isMessageListMode && conversation && memberCount > 2);
 
   if (agents.length === 0) {
     return null;
@@ -59,8 +43,7 @@ export function AgentChips({
             <div className="h-4 w-4 shrink-0 rounded bg-muted" />
           )}
           <span>{agent.name}</span>
-          {(isMultiAgentMode || (isMessageListMode && conversation)) &&
-            canRemove && (
+          {canRemove && (
               <button
                 type="button"
                 onClick={() => {
