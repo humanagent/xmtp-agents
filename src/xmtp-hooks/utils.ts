@@ -127,6 +127,7 @@ export async function createXMTPClient(
     const clientPromise = Client.create(signer, {
       env: options?.env ?? "production",
       appVersion: options?.appVersion ?? "xmtp-agents/0",
+      loggingLevel: "off" as const,
       codecs,
     });
 

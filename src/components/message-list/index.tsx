@@ -188,6 +188,7 @@ export function ConversationView({
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const isSendingRef = useRef(false);
   const shouldNavigateAfterCreateRef = useRef(true);
+  const loadedConversationIdRef = useRef<string | undefined>(undefined);
   const { client } = useClient();
   const {
     selectedConversation,
@@ -477,25 +478,40 @@ export function ConversationView({
   ]);
 
   useEffect(() => {
-    // Always clear messages when conversation changes or is cleared
-    setMessages([]);
+    if (!selectedConversation) {
+      setMessages([]);
+      setSyncError(null);
+      setLoadError(null);
+      loadedConversationIdRef.current = undefined;
+      if (tempMessageTimeoutRef.current) {
+        clearTimeout(tempMessageTimeoutRef.current);
+        tempMessageTimeoutRef.current = null;
+      }
+      if (streamCleanupRef.current) {
+        void streamCleanupRef.current();
+        streamCleanupRef.current = null;
+      }
+      return;
+    }
+
+    const currentId = selectedConversation.id;
+    const prevId = loadedConversationIdRef.current;
+    const switchingConversation =
+      prevId !== undefined && prevId !== currentId;
+    if (switchingConversation) {
+      setMessages([]);
+    }
+    loadedConversationIdRef.current = currentId;
+
     setSyncError(null);
     setLoadError(null);
-
     if (tempMessageTimeoutRef.current) {
       clearTimeout(tempMessageTimeoutRef.current);
       tempMessageTimeoutRef.current = null;
     }
 
-    // Cleanup stream when conversation is cleared
-    if (!selectedConversation && streamCleanupRef.current) {
-      void streamCleanupRef.current();
-      streamCleanupRef.current = null;
-    }
-
-    // Skip if stream already exists (handled by first message flow) OR no conversation
-    if (streamCleanupRef.current || !client || !selectedConversation) {
-      if (streamCleanupRef.current && selectedConversation) {
+    if (streamCleanupRef.current || !client) {
+      if (streamCleanupRef.current) {
         console.log("[ConversationView] Stream already exists, skipping setup");
       }
       return;
@@ -720,13 +736,8 @@ export function ConversationView({
                 sending: false,
               }));
             setMessages(chatMessages);
-            console.log(
-              "[ConversationView] Loaded messages after send:",
-              chatMessages.length,
-            );
 
-            // 6. Update state and navigate (only if user hasn't navigated away)
-            setSelectedConversation(conversation);
+            // 6. Navigate to conversation (URL sync effect will set selectedConversation)
             // Only navigate if we're still on the same path we started from
             // and navigation wasn't cancelled by "New Chat" click
             const currentPath = location.pathname;

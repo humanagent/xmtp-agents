@@ -336,6 +336,7 @@ export function InputArea({
                 isMultiAgentMode={isMultiAgentMode}
                 isMessageListMode={isMessageListMode}
                 conversation={conversation}
+                memberCount={conversationMembers.length}
               />
             </PromptInputTools>
           </PromptInputToolbar>
